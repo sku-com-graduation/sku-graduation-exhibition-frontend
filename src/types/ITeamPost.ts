@@ -9,7 +9,7 @@ export interface ITeamStudent {
 }
 
 export interface ITeamPost {
-  students_info: ITeamStudent[];
+  students: ITeamStudent[];
   PostTeamInfoDTO: {
     projectName: "가상현실 아이돌 시뮬레이터";
     explanation: "뭐시기뭐시기";
