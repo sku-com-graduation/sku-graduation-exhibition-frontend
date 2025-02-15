@@ -10,7 +10,8 @@ export interface ITeamStudent {
 
 export interface ITeamPost {
   students: ITeamStudent[];
-  PostTeamInfoDTO: {
+  teamInfo: {
+    category: string;
     projectName: string;
     explanation: string;
     teamProfileImage: string;
