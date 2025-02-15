@@ -1,8 +1,6 @@
 export interface IAccount {
-  encryptedStudentId: string;
-  encryptedTeamId: string;
-  name: string;
-  studentNumber: string;
-  role: string;
-  exhibitionYear: string;
+  encryptedAccountId: string;
+  team: string;
+  user_email: string;
+  recent: string;
 }
