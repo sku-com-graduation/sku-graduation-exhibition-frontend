@@ -77,7 +77,7 @@ const LoginDiv = styled.div`
   }
 `;
 
-export const Header = () => {
+const Header = () => {
   const { year } = useParams();
   const [choiceYear, setChoiceYear] = useState<string | undefined>(year);
   const navigate = useNavigate();
@@ -115,3 +115,5 @@ export const Header = () => {
     </Container>
   );
 };
+
+export default Header;
