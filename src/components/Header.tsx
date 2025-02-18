@@ -1,9 +1,13 @@
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+
 import { useModal } from "../hooks/useModal";
 import { Login } from "./Login";
 
 const Container = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
@@ -13,16 +17,18 @@ const Container = styled.div`
   border-bottom: 1px solid #ebebeb;
 `;
 
-const RightContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.9375rem;
-`;
-
 const LeftContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
   align-items: center;
   gap: 10px;
+`;
+
+const RightContainer = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 0.9375rem;
 `;
 
 const Logo = styled.div`
@@ -72,16 +78,30 @@ const LoginDiv = styled.div`
 `;
 
 export const Header = () => {
+  const { year } = useParams();
+  const [choiceYear, setChoiceYear] = useState<string | undefined>(year);
+  const navigate = useNavigate();
   const { openModal, Modal } = useModal();
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedYear = event.target.value;
+    setChoiceYear(selectedYear);
+    navigate(`/${selectedYear}`);
+  };
 
   return (
     <Container>
       <LeftContainer>
         <Logo>SKU</Logo>
-        <YearSelect value={2025}>
+        <YearSelect value={choiceYear} onChange={handleYearChange}>
           <option value="" disabled hidden>
             전시 연도
           </option>
+          {["2025", "2024", "2023"].map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
         </YearSelect>
       </LeftContainer>
 
