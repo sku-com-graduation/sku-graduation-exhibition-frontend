@@ -1,5 +1,33 @@
+import { useNavigate } from "react-router-dom";
+
 const MainPage = () => {
-  return <div>MainPage</div>;
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          navigate(`/2025`);
+        }}
+      >
+        2025
+      </button>
+      <button
+        onClick={() => {
+          navigate(`/2024`);
+        }}
+      >
+        2024
+      </button>
+      <button
+        onClick={() => {
+          navigate(`/2023`);
+        }}
+      >
+        2023
+      </button>
+    </div>
+  );
 };
 
 export default MainPage;

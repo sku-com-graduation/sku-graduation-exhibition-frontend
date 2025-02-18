@@ -1,6 +1,10 @@
-import styled from "styled-components";
-import api from "../api";
 import React, { useState } from "react";
+import styled from "styled-components";
+
+import { postAuth } from "../api/auth";
+import { useDispatch } from "react-redux";
+import { setAuth } from "../store/reducers/auth";
+
 const LoginWrapper = styled.div`
   width: 100%;
   max-width: 400px;
@@ -98,21 +102,21 @@ const Button = styled.button`
 `;
 
 export const Login = () => {
+  const dispatch = useDispatch();
+
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [failedLogin, setFailedLogin] = useState<boolean>(false);
 
-  const postLogin = () => {
-    api
-      .post(`/public/account/login`, { userName: username, password: password })
-      .then((d) => {
-        const result = d.data;
-        sessionStorage.setItem(`token`, result.token);
-        window.location.reload();
-      })
-      .catch(() => {
-        setFailedLogin(true);
-      });
+  const postLogin = async () => {
+    try {
+      const user = await postAuth(username, password);
+      dispatch(setAuth(user));
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+      setFailedLogin(true);
+    }
   };
 
   return (
