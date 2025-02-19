@@ -7,6 +7,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import MainPage from "./pages/MainPage";
 import AdminPage from "./pages/AdminPage";
+import ProjectPage from "./pages/ProjectPage";
+import YearHomePage from "./pages/YearHomePage";
 
 const Content = styled.div``;
 
@@ -31,7 +33,7 @@ function App() {
             path="/:year"
             element={
               <DefaultLayout>
-                <>연도별 페이지</>
+                <YearHomePage/>
               </DefaultLayout>
             }
           />
@@ -39,7 +41,7 @@ function App() {
             path="/:year/project"
             element={
               <DefaultLayout>
-                <>연도 별 프로젝트 페이지</>
+                <ProjectPage/>
               </DefaultLayout>
             }
           />

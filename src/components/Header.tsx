@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import { useModal } from "../hooks/useModal";
@@ -79,6 +79,7 @@ const LoginDiv = styled.div`
 
 const Header = () => {
   const { year } = useParams();
+  const location = useLocation()
   const [choiceYear, setChoiceYear] = useState<string | undefined>(year);
   const navigate = useNavigate();
   const { openModal, Modal } = useModal();
@@ -86,13 +87,16 @@ const Header = () => {
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = event.target.value;
     setChoiceYear(selectedYear);
-    navigate(`/${selectedYear}`);
+    const pathParts = location.pathname.split('/');
+    pathParts[1] = selectedYear;
+    const newPath = pathParts.length > 2 ? pathParts.join('/') : `/${selectedYear}`;
+    navigate(newPath);
   };
 
   return (
     <Container>
       <LeftContainer>
-        <Logo>SKU</Logo>
+        <Logo onClick={()=>navigate('/')}>SKU</Logo>
         <YearSelect value={choiceYear} onChange={handleYearChange}>
           <option value="" disabled hidden>
             전시 연도
@@ -106,7 +110,7 @@ const Header = () => {
       </LeftContainer>
 
       <RightContainer>
-        <LoginDiv>PROJECT</LoginDiv>
+        <LoginDiv onClick={()=>navigate("/"+year+"/project")}>PROJECT</LoginDiv>
         <LoginDiv onClick={openModal}>LOGIN</LoginDiv>
         <Modal>
           <Login />
