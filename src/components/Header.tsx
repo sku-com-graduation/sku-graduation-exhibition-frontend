@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { useModal } from "../hooks/useModal";
 import { Login } from "./Login";
-import { useDispatch, useSelector } from "react-redux";
+import { useModal } from "../hooks/useModal";
 import { RootState } from "../store/store";
-import { setAuth } from "../store/reducers/auth";
-import IAuth from "../types/IAuth";
+import { clearAuth } from "../store/reducers/auth";
+
+import { getLogout } from "../api/auth";
+import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 
 const Container = styled.div`
   display: grid;
@@ -83,7 +85,11 @@ const LoginDiv = styled.div`
 const Header = () => {
   const { year } = useParams();
   const seletedAuth = useSelector((state: RootState) => state.auth);
-  console.log(seletedAuth);
+  const seletedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
+
+  useEffect(() => {
+    console.log(JSON.stringify(seletedAuth, null, 4) + "\n" + JSON.stringify(seletedExhibitionYear, null, 4));
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -91,13 +97,14 @@ const Header = () => {
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = event.target.value;
+    dispatch(setExhibitionYear(selectedYear));
     navigate(`/${selectedYear}`);
   };
 
   const postLogout = async () => {
     try {
-      await postLogout();
-      dispatch(setAuth({} as IAuth));
+      await getLogout();
+      dispatch(clearAuth());
     } catch (error) {
       console.log(error);
     }
@@ -122,13 +129,15 @@ const Header = () => {
       <RightContainer>
         <LoginDiv onClick={() => navigate(`/${year}/project`)}>PROJECT</LoginDiv>
         {seletedAuth.accessToken ? (
-          <LoginDiv>
-            {seletedAuth.teamName}({seletedAuth.role})
-          </LoginDiv>
+          <>
+            <LoginDiv>
+              {seletedAuth.teamName}({seletedAuth.role})
+            </LoginDiv>
+            <LoginDiv onClick={postLogout}>LOGOUT</LoginDiv>
+          </>
         ) : (
           <LoginDiv onClick={openModal}>LOGIN</LoginDiv>
         )}
-        <LoginDiv onClick={postLogout}>logout</LoginDiv>
         <Modal>
           <Login />
         </Modal>
