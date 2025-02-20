@@ -1,9 +1,13 @@
-import React, { useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { useModal } from "../hooks/useModal";
 import { Login } from "./Login";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { setAuth } from "../store/reducers/auth";
+import IAuth from "../types/IAuth";
 
 const Container = styled.div`
   display: grid;
@@ -73,31 +77,37 @@ const LoginDiv = styled.div`
   cursor: pointer;
   &:hover {
     color: #0077fe;
-    font-size: 1.2rem;
   }
 `;
 
 const Header = () => {
   const { year } = useParams();
-  const location = useLocation()
-  const [choiceYear, setChoiceYear] = useState<string | undefined>(year);
+  const seletedAuth = useSelector((state: RootState) => state.auth);
+  console.log(seletedAuth);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { openModal, Modal } = useModal();
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = event.target.value;
-    setChoiceYear(selectedYear);
-    const pathParts = location.pathname.split('/');
-    pathParts[1] = selectedYear;
-    const newPath = pathParts.length > 2 ? pathParts.join('/') : `/${selectedYear}`;
-    navigate(newPath);
+    navigate(`/${selectedYear}`);
+  };
+
+  const postLogout = async () => {
+    try {
+      await postLogout();
+      dispatch(setAuth({} as IAuth));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <Container>
       <LeftContainer>
-        <Logo onClick={()=>navigate('/')}>SKU</Logo>
-        <YearSelect value={choiceYear} onChange={handleYearChange}>
+        <Logo onClick={() => navigate("/")}>SKU</Logo>
+        <YearSelect value={year} onChange={handleYearChange}>
           <option value="" disabled hidden>
             전시 연도
           </option>
@@ -110,8 +120,15 @@ const Header = () => {
       </LeftContainer>
 
       <RightContainer>
-        <LoginDiv onClick={()=>navigate("/"+year+"/project")}>PROJECT</LoginDiv>
-        <LoginDiv onClick={openModal}>LOGIN</LoginDiv>
+        <LoginDiv onClick={() => navigate(`/${year}/project`)}>PROJECT</LoginDiv>
+        {seletedAuth.accessToken ? (
+          <LoginDiv>
+            {seletedAuth.teamName}({seletedAuth.role})
+          </LoginDiv>
+        ) : (
+          <LoginDiv onClick={openModal}>LOGIN</LoginDiv>
+        )}
+        <LoginDiv onClick={postLogout}>logout</LoginDiv>
         <Modal>
           <Login />
         </Modal>
