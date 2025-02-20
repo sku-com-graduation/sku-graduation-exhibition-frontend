@@ -9,7 +9,7 @@ import { deleteAccount, getAccount, resetAccount, postAccount } from "./account"
 import { deleteTeams, getProjects, getTeams, patchTeams } from "./team";
 import { postGetTeampost } from "./teamPost";
 
-function App() {
+function ApiTest() {
   const dispatch = useDispatch();
   const selectedAuth = useSelector((state: RootState) => state.auth);
   useEffect(() => {
@@ -164,4 +164,4 @@ function App() {
   );
 }
 
-export default App;
+export default ApiTest;

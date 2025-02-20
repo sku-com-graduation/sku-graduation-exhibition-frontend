@@ -9,6 +9,7 @@ import MainPage from "./pages/MainPage";
 import AdminPage from "./pages/AdminPage";
 import ProjectPage from "./pages/ProjectPage";
 import YearHomePage from "./pages/YearHomePage";
+import ApiTest from "./api/ApiTest";
 
 const Content = styled.div``;
 
@@ -33,7 +34,7 @@ function App() {
             path="/:year"
             element={
               <DefaultLayout>
-                <YearHomePage/>
+                <YearHomePage />
               </DefaultLayout>
             }
           />
@@ -41,10 +42,19 @@ function App() {
             path="/:year/project"
             element={
               <DefaultLayout>
-                <ProjectPage/>
+                <ProjectPage />
               </DefaultLayout>
             }
           />
+          <Route
+            path="/api"
+            element={
+              <DefaultLayout>
+                <ApiTest />
+              </DefaultLayout>
+            }
+          />
+          <Route path="*" element={<>NOT FOUND</>} />
         </Routes>
       </Router>
     </ThemeProvider>
