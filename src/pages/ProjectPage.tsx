@@ -1,39 +1,97 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getProjects } from "../api/team";
 import { IProject } from "../types/IProject";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
+import img1 from "../assets/image/img1.jpg";
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-rows: auto;
+`;
+
 const Container = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
   gap: 5rem;
   padding: 5rem;
 `;
+
 const TeamBox = styled.div`
-  width: 100%; /* 너비를 부모 요소에 맞게 100%로 설정 */
-  padding-bottom: 100%; /* 높이를 너비에 비례하도록 설정 (정사각형 유지) */
-  position: relative; /* 내부 요소를 절대 위치로 설정하기 위해 필요 */
-  border: 1px solid red;
-`;
-const TeamImage = styled.img`
   width: 100%;
+  padding-bottom: 100%;
+  position: relative;
+  border: 0.0625rem solid #d5d5d5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const TeamImage = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.3s ease-in-out;
+
+  &:hover {
+    filter: brightness(30%);
+  }
+`;
+
+const CategoryContainer = styled.div`
+  padding: 0rem 10rem 5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  text-align: center;
+`;
+
+const CategoryBox = styled.div`
+  border-radius: 2rem;
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  background: #6c9fff;
+  color: #fff;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const Title = styled.div`
+  padding: 5rem 0rem;
+  text-align: center;
+  font-size: 3rem;
+`;
+
+const TeamName = styled.div`
+  position: absolute;
+  bottom: -2rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
 `;
 
 const ProjectPage = () => {
   const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
-
   const navigate = useNavigate();
+
+  const categorys = ["ALL", "GAME", "MOBILE", "WEB"];
+
   const [projects, setProjects] = useState<IProject[]>([]);
+  const [category, setCategory] = useState<string>(categorys[0]);
 
   const getProject = async (year: string) => {
     try {
       const res = await getProjects(year);
       setProjects(res);
     } catch (error) {
-      console.error("Failed to fetch projects:", error);
+      console.error(error);
     }
   };
 
@@ -43,17 +101,40 @@ const ProjectPage = () => {
     }
   }, [selectedExhibitionYear]);
 
+  const handleCategoryChange = useCallback((category: string) => {
+    setCategory(category);
+  }, []);
+
+  const filteredProjects = Array.isArray(projects)
+    ? projects.filter((pro) => category === "ALL" || pro.category === category)
+    : [];
+
   return (
-    <Container>
-      {projects.map((pro) => {
-        return (
-          <TeamBox key={pro.encryptedTeamId} onClick={() => navigate(`/${selectedExhibitionYear}/project/${pro.encryptedTeamId}`)}>
-            <TeamImage src={`data:image/jpeg;base64,${pro.teamProfileImg}`} />
-            {pro.encryptedTeamId}-{pro.category}-{pro.teamName}-{pro.teamProfileImg}
-          </TeamBox>
-        );
-      })}
-    </Container>
+    <Wrapper>
+      <Title>PROJECT</Title>
+      <CategoryContainer>
+        {categorys.map((c) => (
+          <CategoryBox key={c} onClick={() => handleCategoryChange(c)}>
+            {c}
+          </CategoryBox>
+        ))}
+      </CategoryContainer>
+      <Container>
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map((pro) => (
+            <TeamBox
+              key={pro.encryptedTeamId}
+              onClick={() => navigate(`/${selectedExhibitionYear}/project/${pro.teamName}`)}
+            >
+              <TeamImage src={img1} />
+              <TeamName>{pro.teamName}</TeamName>
+            </TeamBox>
+          ))
+        ) : (
+          <div></div>
+        )}
+      </Container>
+    </Wrapper>
   );
 };
 
