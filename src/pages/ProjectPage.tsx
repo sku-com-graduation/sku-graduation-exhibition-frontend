@@ -56,10 +56,13 @@ const CategoryBox = styled.div`
   border-radius: 2rem;
   font-size: 1.5rem;
   padding: 0.5rem;
-  background: #6c9fff;
+  background: ${(props) => props.color};
   color: #fff;
+
+  transition: background 0.1s ease-in-out;
   &:hover {
     cursor: pointer;
+    background: #5fbcff;
   }
 `;
 
@@ -114,7 +117,7 @@ const ProjectPage = () => {
       <Title>PROJECT</Title>
       <CategoryContainer>
         {categorys.map((c) => (
-          <CategoryBox key={c} onClick={() => handleCategoryChange(c)}>
+          <CategoryBox key={c} onClick={() => handleCategoryChange(c)} color={category === c ? "#5fbcff" : "#b1b1b1"}>
             {c}
           </CategoryBox>
         ))}
