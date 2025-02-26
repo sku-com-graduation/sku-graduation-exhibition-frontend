@@ -31,7 +31,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route
+            path="/admin"
+            element={
+              <DefaultLayout>
+                <AdminPage />
+              </DefaultLayout>
+            }
+          />
           <Route
             path="/:year"
             element={
