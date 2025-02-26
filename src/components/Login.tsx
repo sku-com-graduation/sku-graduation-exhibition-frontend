@@ -138,6 +138,9 @@ export const Login = () => {
           type="password"
           placeholder="password"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") postLogin();
+          }}
         />
       </FieldWrapper>
       {failedLogin && <FailedMessage>이메일 또는 비밀번호가 일치하지 않습니다.</FailedMessage>}

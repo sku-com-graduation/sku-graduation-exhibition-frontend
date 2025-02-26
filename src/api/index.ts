@@ -14,7 +14,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// 요청 인터셉터 - 인증이 필요한 API만 Authorization 추가
 api.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem(AUTH_KEY_NAME);

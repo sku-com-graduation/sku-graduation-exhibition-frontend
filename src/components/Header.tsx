@@ -12,18 +12,20 @@ import { getLogout } from "../api/auth";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 
 const Container = styled.div`
+  width: 100%;
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
   padding: 0 1.25rem;
-  width: 100%;
   height: 5rem;
   border-bottom: 1px solid #ebebeb;
 `;
 
 const LeftContainer = styled.div`
+  box-sizing: border-box;
+
   display: grid;
   grid-auto-flow: column;
   align-items: center;
@@ -31,6 +33,8 @@ const LeftContainer = styled.div`
 `;
 
 const RightContainer = styled.div`
+  box-sizing: border-box;
+
   display: grid;
   grid-auto-flow: column;
   align-items: center;
@@ -38,6 +42,8 @@ const RightContainer = styled.div`
 `;
 
 const Logo = styled.div`
+  box-sizing: border-box;
+
   font-size: 1.2rem;
   padding-right: 10px;
   border-right: 1px solid #333;
@@ -51,6 +57,8 @@ const Logo = styled.div`
 `;
 
 const YearSelect = styled.select`
+  box-sizing: border-box;
+
   font-size: 1rem;
   color: #333;
   padding: 5px 10px;
@@ -85,10 +93,9 @@ const LoginDiv = styled.div`
 const Header = () => {
   const { year } = useParams();
   const seletedAuth = useSelector((state: RootState) => state.auth);
-  const seletedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
 
   useEffect(() => {
-    console.log(JSON.stringify(seletedAuth, null, 4) + "\n" + JSON.stringify(seletedExhibitionYear, null, 4));
+    console.log(JSON.stringify(seletedAuth, null, 4));
   });
 
   const dispatch = useDispatch();
@@ -107,6 +114,12 @@ const Header = () => {
       dispatch(clearAuth());
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const myPage = () => {
+    if (seletedAuth.role === "ADMIN") {
+      navigate("/admin");
     }
   };
 
@@ -130,9 +143,7 @@ const Header = () => {
         <LoginDiv onClick={() => navigate(`/${year}/project`)}>PROJECT</LoginDiv>
         {seletedAuth.accessToken ? (
           <>
-            <LoginDiv>
-              {seletedAuth.teamName}({seletedAuth.role})
-            </LoginDiv>
+            <LoginDiv onClick={myPage}>{seletedAuth.teamName}</LoginDiv>
             <LoginDiv onClick={postLogout}>LOGOUT</LoginDiv>
           </>
         ) : (
