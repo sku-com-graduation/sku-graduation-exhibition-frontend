@@ -2,7 +2,7 @@ import api from ".";
 import { IAccount } from "../types/IAccount";
 
 /** 연도별 계정 정보 조회 */
-export const getAccount = async (year: string): Promise<IAccount> => {
+export const getAccount = async (year: string): Promise<IAccount[]> => {
   try {
     const result = await api.get(`/admin/account/search?year=${year}`);
     return result.data;

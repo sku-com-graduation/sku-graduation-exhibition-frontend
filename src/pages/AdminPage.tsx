@@ -1,16 +1,14 @@
 import { useState } from "react";
 import styled from "styled-components";
-import DataTable from "../components/table/DataTable";
 import FullFeaturedCrudGrid from "../components/table/FullFeaturedCrudGrid";
-// import ACDataTable from "../components/table/ACDataTable";
 
 const adminMenus: {
-  id: string;
+  id: "student" | "team" | "account";
   title: string;
 }[] = [
   { id: "student", title: "학생 관리" },
   { id: "team", title: "팀 관리" },
-  { id: "processor", title: "교수 관리" },
+  // { id: "processor", title: "교수 관리" },
   { id: "account", title: "계정 관리" },
 ];
 
@@ -62,7 +60,7 @@ const WorkContainer = styled.div`
 `;
 
 const AdminPage = () => {
-  const [selectedMenu, setSelectedMenu] = useState<string>(adminMenus[0].id);
+  const [selectedMenu, setSelectedMenu] = useState<"student" | "team" | "account">(adminMenus[1].id);
 
   return (
     <Container>
@@ -77,9 +75,7 @@ const AdminPage = () => {
         })}
       </MenuContainer>
       <WorkContainer>
-        {/* <DataTable /> */}
-        {/* <ACDataTable /> */}
-        <FullFeaturedCrudGrid />
+        <FullFeaturedCrudGrid mode={selectedMenu} />
       </WorkContainer>
     </Container>
   );
