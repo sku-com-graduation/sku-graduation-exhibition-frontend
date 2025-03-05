@@ -66,7 +66,7 @@ const CategoryBox = styled.div`
   transition: background 0.1s ease-in-out;
   &:hover {
     cursor: pointer;
-    background: #5fbcff;
+    background: #85b4ff;
   }
 `;
 
@@ -115,15 +115,13 @@ const ProjectPage = () => {
     setCategory(category);
   }, []);
 
-  const filteredProjects = Array.isArray(projects)
-    ? projects.filter((pro) => category === "ALL" || pro.category === category)
-    : [];
+  const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
   return (
     <Wrapper>
       <Title>PROJECT</Title>
       <CategoryContainer>
         {categorys.map((c) => (
-          <CategoryBox key={c} onClick={() => handleCategoryChange(c)} color={category === c ? "#5fbcff" : "#b1b1b1"}>
+          <CategoryBox key={c} onClick={() => handleCategoryChange(c)} color={category === c ? "#85b4ff" : "#b1b1b1"}>
             {c}
           </CategoryBox>
         ))}
