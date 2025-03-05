@@ -10,58 +10,113 @@ import Test from "../components/Test";
 
 const Container = styled.div`
   width: 100%;
-  border-radius: 10px;
-  background: #c5efff;
+  /* background: #eff5ff; */
   display: grid;
   grid-template-rows: repeat(5, auto);
   gap: 3rem;
+  place-items: center;
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 `;
 
 const TeamIntro = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  grid-template-rows: 1fr 6fr;
+  grid-template-columns: 1.5fr 1fr; /* 이미지와 텍스트의 비율을 1:1.5로 설정 */
+  grid-template-rows: auto 1fr;
+  gap: 2rem;
   box-sizing: border-box;
-  padding: 5rem;
-  gap: 1rem;
+  padding: 4rem;
+  border-radius: 1rem;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 추가 */
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* 모바일에서는 1열로 표시 */
-    grid-template-rows: auto auto; /* 행 간격 조정 */
+    grid-template-columns: 1fr; /* 모바일에서 이미지와 텍스트를 세로로 배치 */
+    grid-template-rows: auto auto;
     padding: 2rem;
   }
 `;
 
-const TeamTitle = styled.div`
-  border: 1px solid red;
-  font-size: 2rem;
-  text-align: center;
+const TeamTitle = styled.h1`
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: -0.5px;
+  margin-bottom: 1rem;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    text-align: center;
+    font-size: 2.2rem;
+  }
 `;
 
 const TeamContent = styled.div`
-  border: 1px solid red;
-  font-size: 1.2rem;
+  width: 80%;
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+  text-align: justify;
+  padding: 0.5rem 0;
+  white-space: pre-line;
+  margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 const TeamProfile = styled.img`
   width: 100%;
-  height: auto;
-  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
+  border-radius: 1rem; /* 둥근 이미지 */
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
   grid-row: span 2;
-  border: 1px solid red;
+  transition: transform 0.3s ease-in-out;
+  margin: 0 auto;
+
+  &:hover {
+    transform: scale(1.05); /* 호버시 이미지 확대 효과 */
+  }
 
   @media (max-width: 768px) {
-    height: 200px;
+    width: 15rem;
+    height: 15rem;
+    margin: 0 auto;
   }
 `;
 
-const StudentInfo = styled.img`
-  width: 6.25rem;
-  height: 6.25rem;
-  border-radius: 5rem;
+const VideoIntro = styled.div`
+  width: 100%;
+  max-width: 80rem;
+  overflow: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
+`;
 
+const TeamVideo = styled.video`
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 1rem;
+`;
+
+const StudentInfo = styled.img`
+  width: 10rem;
+  height: 10rem;
+  border-radius: 5rem;
+  object-fit: cover;
   @media (max-width: 768px) {
     width: 4.5rem;
     height: 4.5rem;
@@ -75,10 +130,26 @@ const StudentIntro = styled.div`
   width: 100%;
 `;
 
+const PosterIntro = styled.div`
+  width: 100%;
+  display: grid;
+  place-items: center; /* 수평 및 수직 중앙 정렬 */
+`;
+
+const PosterImg = styled.img`
+  width: 50%;
+  height: auto; /* 비율에 맞게 높이를 자동으로 조절 */
+  object-fit: cover;
+  max-width: 100%; /* 화면 크기 변화에 맞게 크기 조절 */
+
+  @media (max-width: 768px) {
+    width: 15rem;
+    height: 15rem;
+  }
+`;
+
 const TeamPage = () => {
   const { year, team_uuid } = useParams();
-  // const [searchParams] = useSearchParams();
-  // const team_id = searchParams.get("team_id");
 
   if (!encodeURIComponent) {
     throw new Error("");
@@ -110,21 +181,22 @@ const TeamPage = () => {
 
   return (
     <>
-      <button onClick={() => navigate(`${location.pathname}/edit}`)}>수정</button>
-
-      {seletedAuth.teamName === team_uuid ? (
-        <>
-          <button>수정</button>
-        </>
-      ) : (
-        <></>
-      )}
+      {seletedAuth.teamName === team_uuid ||
+        (seletedAuth.teamName === "admin" && (
+          <>
+            <button onClick={() => navigate(`${location.pathname}/edit}`)}>Edit</button>
+          </>
+        ))}
       <Container>
         <TeamIntro>
-          <TeamProfile src={`data:image/jpeg;base64,${teampost?.teamInfo.teamProfileImage}`} />
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
+          <TeamProfile src={`data:image/jpeg;base64,${teampost?.teamInfo.teamProfileImage}`} />
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
+
+        <Test />
+
+        <SectionTitle>Crew</SectionTitle>
         <StudentIntro>
           {teampost?.students.map((student, index) => {
             return (
@@ -135,23 +207,23 @@ const TeamPage = () => {
             );
           })}
         </StudentIntro>
-        <Test />
-        <div>
+
+        {/* 비디오 섹션 제목 변경 */}
+        <SectionTitle>Project Video</SectionTitle>
+        <VideoIntro>
           {teampost?.teamInfo.demoVideo && (
-            <video controls style={{ width: "100%", height: "auto" }}>
-              <source src={`data:video/mp4;base64,${teampost.teamInfo.demoVideo}`} type="video/mp4" />
-              <source src={`data:video/webm;base64,${teampost.teamInfo.demoVideo}`} type="video/webm" />
-              <source src={`data:video/ogg;base64,${teampost.teamInfo.demoVideo}`} type="video/ogg" />
-              브라우저가 비디오 태그를 지원하지 않습니다.
-            </video>
+            <TeamVideo controls>
+              <source src={`data:video/mp4;base64,${teampost?.teamInfo.demoVideo}`} type="video/mp4" />
+              Your browser does not support the video tag.
+            </TeamVideo>
           )}
-        </div>
-        <div>
-          <img
-            src={`data:image/jpeg;base64,${teampost?.teamInfo.posterImage}`}
-            style={{ width: "100%", height: "auto" }}
-          />
-        </div>
+        </VideoIntro>
+
+        {/* 포스터 섹션 제목 변경 */}
+        <SectionTitle>Poster</SectionTitle>
+        <PosterIntro>
+          <PosterImg src={`data:image/jpeg;base64,${teampost?.teamInfo.posterImage}`} />
+        </PosterIntro>
       </Container>
     </>
   );

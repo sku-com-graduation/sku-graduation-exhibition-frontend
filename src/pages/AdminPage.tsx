@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import DataTable from "../components/table/DataTable";
+// import DataTable from "../components/table/DataTable";
 import FullFeaturedCrudGrid from "../components/table/FullFeaturedCrudGrid";
 // import ACDataTable from "../components/table/ACDataTable";
 
