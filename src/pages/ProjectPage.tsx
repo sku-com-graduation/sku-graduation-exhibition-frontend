@@ -1,31 +1,33 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { useEffect, useState, useCallback } from "react";
 import { getProjects } from "../api/team";
 import { IProject } from "../types/IProject";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import img1 from "../assets/image/img1.jpg";
 
 const Wrapper = styled.div`
+  width: 100%;
   display: grid;
   grid-template-rows: auto;
+  box-sizing: border-box;
 `;
 
 const Container = styled.div`
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
   gap: 5rem;
   padding: 5rem;
+  box-sizing: border-box;
 `;
 
 const TeamBox = styled.div`
+  box-sizing: border-box;
   width: 100%;
   padding-bottom: 100%;
   position: relative;
   border: 0.0625rem solid #d5d5d5;
-  display: flex;
   flex-direction: column;
   align-items: center;
 `;
@@ -45,6 +47,8 @@ const TeamImage = styled.img`
 `;
 
 const CategoryContainer = styled.div`
+  box-sizing: border-box;
+
   padding: 0rem 10rem 5rem;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -81,8 +85,11 @@ const TeamName = styled.div`
 `;
 
 const ProjectPage = () => {
-  const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
+  const { year } = useParams();
+  // const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
   const navigate = useNavigate();
+  // const dispatch = useDispatch();
+  const location = useLocation();
 
   const categorys = ["ALL", "GAME", "MOBILE", "WEB"];
 
@@ -99,10 +106,10 @@ const ProjectPage = () => {
   };
 
   useEffect(() => {
-    if (selectedExhibitionYear) {
-      getProject(selectedExhibitionYear);
+    if (year) {
+      getProject(year);
     }
-  }, [selectedExhibitionYear]);
+  }, [year]);
 
   const handleCategoryChange = useCallback((category: string) => {
     setCategory(category);
@@ -111,7 +118,6 @@ const ProjectPage = () => {
   const filteredProjects = Array.isArray(projects)
     ? projects.filter((pro) => category === "ALL" || pro.category === category)
     : [];
-
   return (
     <Wrapper>
       <Title>PROJECT</Title>
@@ -125,11 +131,9 @@ const ProjectPage = () => {
       <Container>
         {filteredProjects.length > 0 ? (
           filteredProjects.map((pro) => (
-            <TeamBox
-              key={pro.encryptedTeamId}
-              onClick={() => navigate(`/${selectedExhibitionYear}/project/${pro.teamName}`)}
-            >
+            <TeamBox key={pro.encryptedTeamId} onClick={() => navigate(`${location.pathname}/${pro.uuid}`)}>
               <TeamImage src={img1} />
+              {/* <TeamImage src={`data:image/jpeg;base64,${p}`} /> */}
               <TeamName>{pro.teamName}</TeamName>
             </TeamBox>
           ))

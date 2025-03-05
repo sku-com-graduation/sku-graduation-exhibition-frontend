@@ -10,17 +10,19 @@ import AdminPage from "./pages/AdminPage";
 import ProjectPage from "./pages/ProjectPage";
 import YearHomePage from "./pages/YearHomePage";
 import ApiTest from "./api/ApiTest";
+import TeamPage from "./pages/TeamPage";
+import TeamEditPage from "./pages/TeamEditPage";
 
 const Content = styled.div``;
 
 const DefaultLayout: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => (
-  <>
+  <div style={{ width: "100%", boxSizing: "border-box" }}>
     <Header />
     <Content>{children}</Content>
     <Footer />
-  </>
+  </div>
 );
 
 function App() {
@@ -29,7 +31,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route
+            path="/admin"
+            element={
+              <DefaultLayout>
+                <AdminPage />
+              </DefaultLayout>
+            }
+          />
           <Route
             path="/:year"
             element={
@@ -43,6 +52,22 @@ function App() {
             element={
               <DefaultLayout>
                 <ProjectPage />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/:year/project/:team_uuid"
+            element={
+              <DefaultLayout>
+                <TeamPage />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/:year/project/:team_uuid/edit"
+            element={
+              <DefaultLayout>
+                <TeamEditPage />
               </DefaultLayout>
             }
           />
