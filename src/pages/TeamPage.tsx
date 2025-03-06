@@ -7,6 +7,8 @@ import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
 import { ITeamPost } from "../types/ITeamPost";
 import Test from "../components/Test";
+import { useModal } from "../hooks/useModal";
+import Profile from "../components/Profile";
 
 const Container = styled.div`
   width: 100%;
@@ -150,6 +152,7 @@ const PosterImg = styled.img`
 
 const TeamPage = () => {
   const { year, team_uuid } = useParams();
+  const { openModal, Modal } = useModal();
 
   if (!encodeURIComponent) {
     throw new Error("");
@@ -201,12 +204,15 @@ const TeamPage = () => {
           {teampost?.students.map((student, index) => {
             return (
               <div style={{ display: "inline-block", margin: "0 10px" }} key={index}>
-                <StudentInfo src={`data:image/jpeg;base64,${student.profileImage}`} />
+                <StudentInfo src={`data:image/jpeg;base64,${student.profileImage}`} onClick={openModal} />
                 <div>{student.name}</div>
               </div>
             );
           })}
         </StudentIntro>
+        <Modal>
+          <Profile />
+        </Modal>
 
         {/* 비디오 섹션 제목 변경 */}
         <SectionTitle>Project Video</SectionTitle>
