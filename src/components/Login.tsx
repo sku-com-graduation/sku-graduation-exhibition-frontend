@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { setAuth } from "../store/reducers/auth";
 
 const LoginWrapper = styled.div`
-  width: 100%;
+  width: 20rem;
   max-width: 400px;
   background: #ffffff;
   border-radius: 12px;

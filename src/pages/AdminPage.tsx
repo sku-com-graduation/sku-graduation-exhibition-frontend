@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import FullFeaturedCrudGrid from "../components/table/FullFeaturedCrudGrid";
+import FullFeaturedCrudGrid from "../components/table/FullFeaturedCrudGrid"; // FullFeaturedCrudGrid 주석 처리
 
 const adminMenus: {
   id: "student" | "team" | "account";
