@@ -10,6 +10,7 @@ import { clearAuth } from "../store/reducers/auth";
 
 import { getLogout } from "../api/auth";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
+import { SelectCS } from "./input/Select";
 
 const Container = styled.div`
   width: 100%;
@@ -53,30 +54,6 @@ const Logo = styled.div`
   &:hover {
     color: #0077fe;
     font-size: 1.2rem;
-  }
-`;
-
-const YearSelect = styled.select`
-  box-sizing: border-box;
-
-  font-size: 1rem;
-  color: #333;
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #fff;
-  cursor: pointer;
-  appearance: none;
-  text-align: center;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-
-  option {
-    font-size: 1rem;
-    padding: 0.3125rem;
   }
 `;
 
@@ -127,7 +104,7 @@ const Header = () => {
     <Container>
       <LeftContainer>
         <Logo onClick={() => navigate("/")}>SKU</Logo>
-        <YearSelect value={year} onChange={handleYearChange}>
+        <SelectCS value={year} onChange={handleYearChange}>
           <option value="" disabled hidden>
             전시 연도
           </option>
@@ -136,7 +113,7 @@ const Header = () => {
               {y}
             </option>
           ))}
-        </YearSelect>
+        </SelectCS>
       </LeftContainer>
 
       <RightContainer>
