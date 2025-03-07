@@ -5,6 +5,8 @@ import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import img1 from "../assets/image/img1.jpg";
 
+import { categories, CategoryType } from "../constant/categorys";
+
 const Wrapper = styled.div`
   width: 100%;
   display: grid;
@@ -84,15 +86,12 @@ const TeamName = styled.div`
 
 const ProjectPage = () => {
   const { year } = useParams();
-  // const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
+
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
   const location = useLocation();
 
-  const categorys = ["ALL", "GAME", "MOBILE", "WEB"];
-
   const [projects, setProjects] = useState<IProject[]>([]);
-  const [category, setCategory] = useState<string>(categorys[0]);
+  const [category, setCategory] = useState<CategoryType>(categories[0]);
 
   const getProject = async (year: string) => {
     try {
@@ -109,16 +108,18 @@ const ProjectPage = () => {
     }
   }, [year]);
 
-  const handleCategoryChange = useCallback((category: string) => {
+  const handleCategoryChange = useCallback((category: CategoryType) => {
     setCategory(category);
   }, []);
 
-  const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
+  const filteredProjects = Array.isArray(projects)
+    ? projects.filter((pro) => category === "ALL" || pro.category === category)
+    : [];
   return (
     <Wrapper>
       <Title>PROJECT</Title>
       <CategoryContainer>
-        {categorys.map((c) => (
+        {categories.map((c) => (
           <CategoryBox key={c} onClick={() => handleCategoryChange(c)} color={category === c ? "#85b4ff" : "#b1b1b1"}>
             {c}
           </CategoryBox>
