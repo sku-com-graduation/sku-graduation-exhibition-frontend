@@ -3,7 +3,6 @@ import { getProjects } from "../api/team";
 import { IProject } from "../types/IProject";
 import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-
 import img1 from "../assets/image/img1.jpg";
 
 const Wrapper = styled.div`
@@ -27,7 +26,6 @@ const TeamBox = styled.div`
   width: 100%;
   padding-bottom: 100%;
   position: relative;
-  border: 0.0625rem solid #d5d5d5;
   flex-direction: column;
   align-items: center;
 `;
@@ -42,7 +40,7 @@ const TeamImage = styled.img`
   transition: filter 0.3s ease-in-out;
 
   &:hover {
-    filter: brightness(30%);
+    filter: brightness(50%);
   }
 `;
 
@@ -130,8 +128,7 @@ const ProjectPage = () => {
         {filteredProjects.length > 0 ? (
           filteredProjects.map((pro) => (
             <TeamBox key={pro.encryptedTeamId} onClick={() => navigate(`${location.pathname}/${pro.uuid}`)}>
-              <TeamImage src={img1} />
-              {/* <TeamImage src={`data:image/jpeg;base64,${p}`} /> */}
+              <TeamImage src={pro.teamProfileImage ? `data:image/jpeg;base64,${pro.teamProfileImage}` : img1} />
               <TeamName>{pro.teamName}</TeamName>
             </TeamBox>
           ))

@@ -5,14 +5,13 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
-import { ITeamPost } from "../types/ITeamPost";
+import { ITeamPost, ITeamStudent } from "../types/ITeamPost";
 import Test from "../components/Test";
 import { useModal } from "../hooks/useModal";
 import Profile from "../components/Profile";
 
 const Container = styled.div`
   width: 100%;
-  /* background: #eff5ff; */
   display: grid;
   grid-template-rows: repeat(5, auto);
   gap: 3rem;
@@ -26,23 +25,23 @@ const SectionTitle = styled.h2`
   margin-bottom: 1rem;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0.2rem;
 `;
 
 const TeamIntro = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: 1.5fr 1fr; /* 이미지와 텍스트의 비율을 1:1.5로 설정 */
+  grid-template-columns: 1.5fr 1fr;
   grid-template-rows: auto 1fr;
   gap: 2rem;
   box-sizing: border-box;
   padding: 4rem;
   border-radius: 1rem;
   background-color: #f9f9f9;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 추가 */
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* 모바일에서 이미지와 텍스트를 세로로 배치 */
+    grid-template-columns: 1fr;
     grid-template-rows: auto auto;
     padding: 2rem;
   }
@@ -52,7 +51,7 @@ const TeamTitle = styled.h1`
   font-size: 2.6rem;
   font-weight: 700;
   color: #333;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.05rem;
   margin-bottom: 1rem;
   text-align: left;
 
@@ -67,7 +66,7 @@ const TeamContent = styled.div`
   font-size: 1.1rem;
   color: #666;
   line-height: 1.8;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05rem;
   text-align: justify;
   padding: 0.5rem 0;
   white-space: pre-line;
@@ -82,14 +81,14 @@ const TeamProfile = styled.img`
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 1rem; /* 둥근 이미지 */
-  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
   grid-row: span 2;
   transition: transform 0.3s ease-in-out;
   margin: 0 auto;
 
   &:hover {
-    transform: scale(1.05); /* 호버시 이미지 확대 효과 */
+    transform: scale(1.05);
   }
 
   @media (max-width: 768px) {
@@ -119,6 +118,11 @@ const StudentInfo = styled.img`
   height: 10rem;
   border-radius: 5rem;
   object-fit: cover;
+  transition: filter 0.3s ease-in-out;
+
+  &:hover {
+    filter: brightness(50%);
+  }
   @media (max-width: 768px) {
     width: 4.5rem;
     height: 4.5rem;
@@ -130,19 +134,22 @@ const StudentIntro = styled.div`
   text-align: center;
   box-sizing: border-box;
   width: 100%;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const PosterIntro = styled.div`
   width: 100%;
   display: grid;
-  place-items: center; /* 수평 및 수직 중앙 정렬 */
+  place-items: center;
 `;
 
 const PosterImg = styled.img`
   width: 50%;
-  height: auto; /* 비율에 맞게 높이를 자동으로 조절 */
+  height: auto;
   object-fit: cover;
-  max-width: 100%; /* 화면 크기 변화에 맞게 크기 조절 */
+  max-width: 100%;
 
   @media (max-width: 768px) {
     width: 15rem;
@@ -160,6 +167,7 @@ const TeamPage = () => {
 
   const dispatch = useDispatch();
   const [teampost, seTeampost] = useState<ITeamPost>();
+  const [selectedStudent, setSelectedStudent] = useState<ITeamStudent | null>();
 
   const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
 
@@ -177,6 +185,11 @@ const TeamPage = () => {
   useEffect(() => {
     if (team_uuid) getTeampost(team_uuid);
   }, [team_uuid]);
+
+  const handleStudentClick = (student: ITeamStudent) => {
+    setSelectedStudent(student);
+    openModal();
+  };
 
   const seletedAuth = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
@@ -197,22 +210,25 @@ const TeamPage = () => {
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
-        <Test />
+        <Test img={teampost?.teamInfo.slideImages} />
 
         <SectionTitle>Crew</SectionTitle>
         <StudentIntro>
           {teampost?.students.map((student, index) => {
             return (
               <div style={{ display: "inline-block", margin: "0 10px" }} key={index}>
-                <StudentInfo src={`data:image/jpeg;base64,${student.profileImage}`} onClick={openModal} />
+                <StudentInfo
+                  src={`data:image/jpeg;base64,${student.profileImage}`}
+                  onClick={() => {
+                    handleStudentClick(student);
+                  }}
+                />
                 <div>{student.name}</div>
               </div>
             );
           })}
         </StudentIntro>
-        <Modal>
-          <Profile />
-        </Modal>
+        <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} />}</Modal>
 
         {/* 비디오 섹션 제목 변경 */}
         <SectionTitle>Project Video</SectionTitle>

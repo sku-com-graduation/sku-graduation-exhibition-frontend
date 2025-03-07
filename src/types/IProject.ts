@@ -3,6 +3,6 @@ export interface IProject {
   encryptedTeamId: string;
   teamName: string;
   title: string | null;
-  teamProfileImg: string | null;
+  teamProfileImage: string | null;
   category: string;
 }

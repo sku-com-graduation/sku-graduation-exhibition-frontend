@@ -1,49 +1,46 @@
 import styled from "styled-components";
 
-import img1 from "../assets/image/img1.jpg";
-// import { patchTeampostSlideImage } from "../api/teamPost";
-
-// 이미지들을 담을 컨테이너
 const MarqueeContainer = styled.div`
   display: flex;
-  overflow: hidden; /* 컨테이너 밖으로 나가지 않도록 */
-  width: 100%; /* 전체 화면 크기에 맞추기 */
+  overflow: hidden;
+  width: 100%;
 `;
 
-// 이미지를 흐르게 할 애니메이션
 const MarqueeWrapper = styled.div`
   display: flex;
-  animation: marquee 15s linear infinite; /* 애니메이션 15초, 무한 반복 */
+  animation: marquee 15s linear infinite;
 
   @keyframes marquee {
     0% {
-      transform: translateX(0); /* 시작 위치 */
+      transform: translateX(0);
     }
     100% {
-      transform: translateX(-100%); /* 끝 위치 */
+      transform: translateX(-50%); /* 중간까지 이동 */
     }
   }
 `;
 
-// 개별 이미지 스타일
 const MarqueeImage = styled.img`
-  width: 20%; /* 이미지 크기 설정 */
-  margin-right: 10px; /* 이미지 사이 간격 */
+  width: 20%;
+  margin-right: 10px;
 `;
 
-// const getSlideImage = async () => {
-//   const res = await patchTeampostSlideImage()
-// }
+interface TestProps {
+  img: string[] | undefined;
+}
 
-const Test = () => {
+const Test: React.FC<TestProps> = ({ img }) => {
+  if (!img) return null;
+
+  // 이미지 배열을 두 배로 만들어서 무한 반복처럼 보이게 함
+  const repeatedImages = [...img, ...img];
+
   return (
     <MarqueeContainer>
       <MarqueeWrapper>
-        <MarqueeImage src={img1} alt="image 1" />
-        <MarqueeImage src={img1} alt="image 1" />
-        <MarqueeImage src={img1} alt="image 1" />
-        <MarqueeImage src={img1} alt="image 1" />
-        <MarqueeImage src={img1} alt="image 1" />
+        {repeatedImages.map((image, index) => (
+          <MarqueeImage key={index} src={`data:image/jpeg;base64,${image}`} alt={`image ${index + 1}`} />
+        ))}
       </MarqueeWrapper>
     </MarqueeContainer>
   );
