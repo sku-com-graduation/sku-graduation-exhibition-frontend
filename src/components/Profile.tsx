@@ -1,6 +1,8 @@
 import styled from "styled-components";
-import { ITeamStudent } from "../types/ITeamPost";
+import { ITeamStudent } from "../interface";
 import { GithubIcon, EmailIcon, AirplainIcon, LaptopIcon } from "./Icons";
+import empty from "../assets/image/empty.png";
+import userEmpty from "../assets/image/userEmpty.png";
 
 const removeTrailingSlash = (url: string) => {
   return url.endsWith("/") ? url.slice(0, -1) : url;
@@ -108,7 +110,10 @@ const InfoItem = styled.div`
 const Profile = ({ selectedStudent }: { selectedStudent: ITeamStudent }) => {
   return (
     <Wrapper>
-      <StudentImg src={`data:image/jpeg;base64,${selectedStudent.profileImage}`} alt="Profile Picture" />
+      <StudentImg
+        src={selectedStudent.profileImage ? `data:image/jpeg;base64,${selectedStudent.profileImage}` : userEmpty}
+        alt="Profile Picture"
+      />
       <TextContainer>
         <NameRoleContainer>
           <Name>{selectedStudent.name}</Name>

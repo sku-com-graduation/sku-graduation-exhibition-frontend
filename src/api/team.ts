@@ -1,6 +1,5 @@
 import api from ".";
-import { IProject } from "../types/IProject";
-import { ITeam } from "../types/ITeam";
+import { IProject, ITeam } from "../interface";
 
 export const getTeams = async (year: string): Promise<ITeam[]> => {
   try {
@@ -11,17 +10,20 @@ export const getTeams = async (year: string): Promise<ITeam[]> => {
   }
 };
 
-export const patchTeams = async (teams: ITeam[]) => {
+export const putTeams = async (teams: ITeam[]) => {
   try {
-    const result = await api.patch(`/admin/team/update`, teams);
+    console.log("put");
+    const result = await api.put(`/admin/team/update`, teams);
     return result.data;
   } catch (error) {
     throw new Error(`${error}`);
   }
 };
 
-export const deleteTeams = async (teamIds: { encryptionTeamIds: string[] }) => {
+export const deleteTeams = async (teamIds: string[]) => {
   try {
+    console.log("delete");
+
     const result = await api.delete(`/admin/team/delete`, { data: teamIds });
     return result.data;
   } catch (error) {

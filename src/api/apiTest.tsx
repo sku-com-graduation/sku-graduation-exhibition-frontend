@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 
 import { setAuth } from "../store/reducers/auth";
 import { postAuth } from "./auth";
-import { deleteStudent, getStudent, patchStudent, postStudent } from "./student";
+import { deleteStudent, getStudent, putStudent, postStudent } from "./student";
 import { deleteAccount, getAccount, resetAccount, postAccount } from "./account";
-import { deleteTeams, getProjects, getTeams, patchTeams } from "./team";
+import { deleteTeams, getProjects, getTeams, putTeams } from "./team";
 import { postGetTeampost } from "./teamPost";
 
 function ApiTest() {
@@ -51,17 +51,17 @@ function ApiTest() {
   };
 
   const deleteS = async () => {
-    const res = await deleteStudent(["dsV6HlkFfy9S7Zxc+PoTew=="]);
+    const res = await deleteStudent(["DFif/4EZQ0FB5zWzIY1rgA=="]);
     console.log(res);
   };
 
   const patchS = async () => {
-    const res = await patchStudent([
+    const res = await putStudent([
       {
-        encryptedStudentId: "neDFlHrhj19DyoaAHU+4ew==",
-        encryptedTeamId: "neDFlHrhj19DyoaAHU+4ew==",
+        encryptedStudentId: "G8oi9/E9zdsYxlBkZklreQ==",
+        encryptedTeamId: "G8oi9/E9zdsYxlBkZklreQ==",
         exhibitionYear: "2025",
-        name: "test222",
+        name: "김석진",
         role: "LEADER",
         studentNumber: "1234",
       },
@@ -116,10 +116,10 @@ function ApiTest() {
     console.log(res);
   };
   const patchTeam = async () => {
-    const res = await patchTeams([
+    const res = await putTeams([
       {
-        encryptedTeamId: "9If7wadlsJJsuPxYr85v5Q==",
-        encryptedprofessorId: "tivTV1S62ssqNFaqD9ErvA==",
+        encryptedTeamId: "tIGX5QhFUEjuaCKtQxXKHQ==",
+        encryptedProfessorId: "tIGX5QhFUEjuaCKtQxXKHQ==",
         name: "test",
         exhibitionYear: 2025,
         category: "WEB",

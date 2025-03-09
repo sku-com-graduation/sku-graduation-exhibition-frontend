@@ -1,4 +1,4 @@
-export interface IAccount {
+export default interface IAccount {
   encryptedAccountId: string;
   team: string;
   user_email: string;

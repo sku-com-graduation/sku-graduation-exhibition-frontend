@@ -1,5 +1,5 @@
 import api from ".";
-import { ITeamPost } from "../types/ITeamPost";
+import { ITeamPost } from "../interface";
 
 export const postGetTeampost = async (teamId: string): Promise<ITeamPost> => {
   try {
@@ -10,9 +10,9 @@ export const postGetTeampost = async (teamId: string): Promise<ITeamPost> => {
   }
 };
 
-export const patchTeampostSlideImage = async () => {
+export const putTeampostSlideImage = async () => {
   try {
-    const result = await api.patch(`user/post/update/slideImage`);
+    const result = await api.put(`user/post/update/slideImage`);
     return result.data;
   } catch (error) {
     throw new Error(`${error}`);

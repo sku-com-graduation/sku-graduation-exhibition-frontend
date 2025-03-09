@@ -1,4 +1,4 @@
-export interface ITeamStudent {
+export default interface ITeamStudent {
   name: string;
   info: string;
   role: string;
@@ -8,7 +8,7 @@ export interface ITeamStudent {
   profileImage: string;
 }
 
-export interface ITeamPost {
+export default interface ITeamPost {
   students: ITeamStudent[];
   teamInfo: {
     category: string;

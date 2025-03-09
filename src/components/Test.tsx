@@ -32,7 +32,6 @@ interface TestProps {
 const Test: React.FC<TestProps> = ({ img }) => {
   if (!img) return null;
 
-  // 이미지 배열을 두 배로 만들어서 무한 반복처럼 보이게 함
   const repeatedImages = [...img, ...img];
 
   return (

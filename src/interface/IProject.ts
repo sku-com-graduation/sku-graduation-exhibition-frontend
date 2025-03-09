@@ -1,4 +1,4 @@
-export interface IProject {
+export default interface IProject {
   uuid: string;
   encryptedTeamId: string;
   teamName: string;

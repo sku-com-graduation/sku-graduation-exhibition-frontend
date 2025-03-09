@@ -1,5 +1,5 @@
 import api from ".";
-import { IAccount } from "../types/IAccount";
+import { IAccount } from "../interface";
 
 /** 연도별 계정 정보 조회 */
 export const getAccount = async (year: string): Promise<IAccount[]> => {
