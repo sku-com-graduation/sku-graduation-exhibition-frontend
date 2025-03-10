@@ -239,11 +239,22 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
               </Button>
             </Box>
           )}
+          {mode === "professor" && (
+            <Button
+              startIcon={<AddIcon />}
+              onClick={handleAddRow}
+              variant="outlined"
+              sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}
+            >
+              추가
+            </Button>
+          )}
           <Button
             startIcon={<DeleteIcon />}
             onClick={handleDeleteRows}
             disabled={!selectedRows.length}
             variant="outlined"
+            color="error"
             sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}
           >
             삭제
