@@ -8,15 +8,17 @@ export interface ITeamStudent {
   profileImage: string;
 }
 
+export interface ITeamInfo {
+  category: string;
+  projectName: string;
+  explanation: string;
+  teamProfileImage: string;
+  slideImages: string[];
+  posterImage: string;
+  demoVideo: string;
+}
+
 export interface ITeamPost {
   students: ITeamStudent[];
-  teamInfo: {
-    category: string;
-    projectName: string;
-    explanation: string;
-    teamProfileImage: string;
-    slideImages: string[];
-    posterImage: string;
-    demoVideo: string;
-  };
+  teamInfo: ITeamInfo;
 }

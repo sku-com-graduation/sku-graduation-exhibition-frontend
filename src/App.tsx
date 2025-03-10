@@ -9,11 +9,13 @@ import MainPage from "./pages/MainPage";
 import AdminPage from "./pages/AdminPage";
 import ProjectPage from "./pages/ProjectPage";
 import YearHomePage from "./pages/YearHomePage";
-import ApiTest from "./api/ApiTest";
+import ApiTest from "./api/apiTest";
 import TeamPage from "./pages/TeamPage";
 import TeamEditPage from "./pages/TeamEditPage";
 
-const Content = styled.div``;
+const Content = styled.div`
+  padding-top: 5rem;
+`;
 
 const DefaultLayout: React.FC<{
   children: React.ReactNode;
@@ -32,7 +34,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route
-            path="/admin"
+            path="/:year/admin"
             element={
               <DefaultLayout>
                 <AdminPage />

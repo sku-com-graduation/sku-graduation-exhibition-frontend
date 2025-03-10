@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import IAuth from "../../types/IAuth";
+import { IAuth } from "../../interface";
 
 const initialState: IAuth = {
   accessToken: "",

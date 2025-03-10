@@ -1,6 +1,6 @@
 import api from ".";
 import { AxiosError } from "axios";
-import IStudent from "../types/IStudent";
+import { IStudent } from "../interface";
 
 /** 연도별 학생 정보 조회 API */
 export const getStudent = async (year: string): Promise<IStudent[]> => {
@@ -31,14 +31,16 @@ export const postStudent = async (csvStudent: File) => {
 };
 
 /** 학생 정보 수정 API */
-export const patchStudent = async (studentInfo: IStudent[]) => {
+export const putStudent = async (studentInfo: IStudent[]) => {
   try {
-    const result = await api.patch(`/admin/student/update`, studentInfo);
+    const result = await api.put(`/admin/student/update`, studentInfo);
     if (result.status === 200) {
       return result.data;
     }
   } catch (error) {
-    if (error instanceof AxiosError) throw new Error(`${error}`);
+    if (error instanceof AxiosError) {
+      throw new Error(`에러발생 ${JSON.stringify(error, null, 4)}`);
+    }
   }
 };
 

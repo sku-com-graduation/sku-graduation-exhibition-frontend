@@ -1,5 +1,5 @@
 import api from ".";
-import IAuth from "../types/IAuth";
+import { IAuth } from "../interface";
 
 /** login API */
 export const postAuth = async (userName: string, password: string): Promise<IAuth> => {

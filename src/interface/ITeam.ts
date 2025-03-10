@@ -1,6 +1,6 @@
-export interface ITeam {
+export default interface ITeam {
   encryptedTeamId: string;
-  encryptedprofessorId: string;
+  encryptedProfessorId: string;
   name: string;
   exhibitionYear: number;
   category: string;

@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
-import { ITeamPost, ITeamStudent } from "../types/ITeamPost";
+import { ITeamPost, ITeamStudent } from "../interface";
 import Test from "../components/Test";
 import { useModal } from "../hooks/useModal";
 import Profile from "../components/Profile";
+import empty from "../assets/image/empty.png";
+import userEmpty from "../assets/image/userEmpty.png";
 
 const Container = styled.div`
   width: 100%;
@@ -117,6 +119,7 @@ const StudentInfo = styled.img`
   width: 10rem;
   height: 10rem;
   border-radius: 5rem;
+  border: 0.1rem solid #d8d8d8;
   object-fit: cover;
   transition: filter 0.3s ease-in-out;
 
@@ -143,6 +146,7 @@ const PosterIntro = styled.div`
   width: 100%;
   display: grid;
   place-items: center;
+  gap: 100rem;
 `;
 
 const PosterImg = styled.img`
@@ -195,6 +199,10 @@ const TeamPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   return (
     <>
       {seletedAuth.teamName === team_uuid ||
@@ -206,19 +214,25 @@ const TeamPage = () => {
       <Container>
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
-          <TeamProfile src={`data:image/jpeg;base64,${teampost?.teamInfo.teamProfileImage}`} />
+          <TeamProfile
+            src={
+              teampost?.teamInfo.teamProfileImage
+                ? `data:image/jpeg;base64,${teampost?.teamInfo.teamProfileImage}`
+                : empty
+            }
+          />
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
         <Test img={teampost?.teamInfo.slideImages} />
 
-        <SectionTitle>Crew</SectionTitle>
+        <SectionTitle>Members</SectionTitle>
         <StudentIntro>
           {teampost?.students.map((student, index) => {
             return (
               <div style={{ display: "inline-block", margin: "0 10px" }} key={index}>
                 <StudentInfo
-                  src={`data:image/jpeg;base64,${student.profileImage}`}
+                  src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty}
                   onClick={() => {
                     handleStudentClick(student);
                   }}
@@ -230,7 +244,6 @@ const TeamPage = () => {
         </StudentIntro>
         <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} />}</Modal>
 
-        {/* 비디오 섹션 제목 변경 */}
         <SectionTitle>Project Video</SectionTitle>
         <VideoIntro>
           {teampost?.teamInfo.demoVideo && (
@@ -241,10 +254,11 @@ const TeamPage = () => {
           )}
         </VideoIntro>
 
-        {/* 포스터 섹션 제목 변경 */}
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg src={`data:image/jpeg;base64,${teampost?.teamInfo.posterImage}`} />
+          <PosterImg
+            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost?.teamInfo.posterImage}` : empty}
+          />
         </PosterIntro>
       </Container>
     </>
