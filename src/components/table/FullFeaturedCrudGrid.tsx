@@ -92,6 +92,7 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
   const [columns, setColumns] = useState<GridColDef[]>([]);
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // 셀 스타일을 conditionally 적용하는 함수
   const getCellClassName = (params: GridCellParams) => {
@@ -173,6 +174,7 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
 
   const handleUpload = async () => {
     if (!file) return alert("파일을 선택하세요.");
+    setLoading(true);
     try {
       if (mode === "student") {
         const result = await postStudent(file);
@@ -181,8 +183,11 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
         const result = await postAccount(file);
         console.log("Uploaded:", result);
       }
+      alert("업로드 성공");
     } catch (error) {
-      alert("업로드 실패: " + error);
+      alert("업로드 실패, 잠시후 다시 시도해주세요.");
+    } finally {
+      window.location.reload();
     }
   };
 

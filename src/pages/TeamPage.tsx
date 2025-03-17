@@ -161,6 +161,26 @@ const PosterImg = styled.img`
   }
 `;
 
+const EditButton = styled.button`
+  position: fixed;
+  top: 10rem;
+  right: 2rem;
+  padding: 0.5rem 1rem;
+  background-color: #4a90e2;
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #357ab8;
+    transform: translateY(-0.2rem);
+  }
+`;
+
 const TeamPage = () => {
   const { year, team_uuid } = useParams();
   const { openModal, Modal } = useModal();
@@ -170,10 +190,14 @@ const TeamPage = () => {
   }
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const seletedAuth = useSelector((state: RootState) => state.auth);
+  const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
+
   const [teampost, seTeampost] = useState<ITeamPost>();
   const [selectedStudent, setSelectedStudent] = useState<ITeamStudent | null>();
-
-  const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
 
   useEffect(() => {
     if (!selectedExhibitionYear && year) {
@@ -195,22 +219,16 @@ const TeamPage = () => {
     openModal();
   };
 
-  const seletedAuth = useSelector((state: RootState) => state.auth);
-  const navigate = useNavigate();
-  const location = useLocation();
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
 
   return (
     <>
-      {seletedAuth.teamName === team_uuid ||
-        (seletedAuth.teamName === "admin" && (
-          <>
-            <button onClick={() => navigate(`${location.pathname}/edit}`)}>Edit</button>
-          </>
-        ))}
+      {(seletedAuth.uuid === team_uuid || seletedAuth.teamName === "admin") && (
+        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>Edit</EditButton>
+      )}
+
       <Container>
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
