@@ -5,6 +5,8 @@ const initialState: IAuth = {
   accessToken: "",
   teamName: "",
   role: "",
+  uuid: "",
+  recent: "",
 };
 
 const auth = createSlice({
@@ -15,6 +17,8 @@ const auth = createSlice({
       state.accessToken = action.payload.accessToken;
       state.teamName = action.payload.teamName;
       state.role = action.payload.role;
+      state.uuid = action.payload.uuid;
+      state.recent = action.payload.recent;
     },
     clearAuth: () => initialState,
   },

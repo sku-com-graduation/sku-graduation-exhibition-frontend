@@ -16,18 +16,16 @@ const Container = styled.div`
   left: 50%;
   width: 100%;
   display: grid;
-  /* border-radius: 0 0 1rem 1rem; */
   grid-template-columns: auto auto;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
   padding: 0 1.25rem;
   height: 5rem;
-  border-bottom: 1px solid #ebebeb;
   background: white;
   transition: transform 0.3s ease-in-out;
   transform: translateY(0) translateX(-50%);
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1); */
   z-index: 1000;
 `;
 

@@ -5,6 +5,8 @@ import styled from "styled-components";
 import { postGetTeampost, putTeampost, putTeampostSlideImage } from "../api/teamPost";
 import { ITeamPost } from "../interface";
 import empty from "../assets/image/empty.png";
+import SlideImageEditor from "@components/SlideImageEditor";
+import DemoVideoEditor from "@components/DemoVideoEditor";
 
 const Container = styled.div`
   width: 100%;
@@ -327,7 +329,7 @@ const TeamEditPage = () => {
         : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
 
     const formData = new FormData();
-    formData.append("encryptedTeamId", "NSHu54Tb8A0BX4JjyvNdLQ==");
+    formData.append("encryptedTeamId", "FRAgIFnQMAAAZKFoZUAsHw==");
     formData.append("title", editData.title);
     formData.append("content", editData.content);
     formData.append("category", "GAME");
@@ -339,7 +341,7 @@ const TeamEditPage = () => {
 
     // 슬라이드 이미지는 기존 이미지(변환)와 새로 추가된 파일 모두 File 객체로 전송
     const formDataSlide = new FormData();
-    formDataSlide.append("encryptedTeamId", "NSHu54Tb8A0BX4JjyvNdLQ==");
+    formDataSlide.append("encryptedTeamId", "FRAgIFnQMAAAZKFoZUAsHw==");
 
     // 기존 슬라이드 이미지(base64 문자열)를 File 객체로 변환하여 추가
     existingSlideImages.forEach((img, idx) => {
@@ -411,56 +413,18 @@ const TeamEditPage = () => {
 
       {/* 슬라이드 이미지 수정 */}
       <SectionTitle>Slide Images</SectionTitle>
-      <SlideContainer>
-        {existingSlideImages.map((img, idx) => (
-          <div key={`existing-${idx}`} style={{ position: "relative", display: "inline-block" }}>
-            <SlideImage src={`data:image/jpeg;base64,${img}`} alt={`slide-${idx}`} />
-            <button
-              onClick={() => handleDeleteExistingSlideImage(idx)}
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                background: "rgba(255, 0, 0, 0.7)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "50%",
-                cursor: "pointer",
-                padding: "0.2rem 0.5rem",
-              }}
-            >
-              X
-            </button>
-          </div>
-        ))}
-
-        {newSlideImages.map((img, idx) => (
-          <div key={`new-${idx}`} style={{ position: "relative", display: "inline-block" }}>
-            <SlideImage src={URL.createObjectURL(img)} alt={`new-slide-${idx}`} />
-            <button
-              onClick={() => handleDeleteNewSlideImage(idx)}
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                background: "rgba(255, 0, 0, 0.7)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "50%",
-                cursor: "pointer",
-                padding: "0.2rem 0.5rem",
-              }}
-            >
-              X
-            </button>
-          </div>
-        ))}
-      </SlideContainer>
-      <FileInput type="file" name="slideImages" accept="image/*" multiple onChange={handleSlideImagesChange} />
+      <SlideImageEditor
+        existingImages={existingSlideImages}
+        newImages={newSlideImages}
+        setExistingImages={setExistingSlideImages}
+        setNewImages={setNewSlideImages}
+      />
 
       {/* 프로젝트 동영상 수정 */}
       <SectionTitle>Project Video</SectionTitle>
-      <VideoIntro>
+      <DemoVideoEditor base={editData.demo as string} handleFileChange={handleFileChange} />
+
+      {/* <VideoIntro>
         {editData.demo && (
           <TeamVideo controls>
             <source
@@ -475,7 +439,7 @@ const TeamEditPage = () => {
           </TeamVideo>
         )}
         <FileInput type="file" name="demo" accept="video/*" onChange={handleFileChange} />
-      </VideoIntro>
+      </VideoIntro> */}
 
       {/* 포스터 수정 */}
       <SectionTitle>Poster</SectionTitle>
