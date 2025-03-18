@@ -1,29 +1,50 @@
-// components/ui/Input.tsx
 import styled from "styled-components";
 
-export const EditableInput = styled.input`
+export const EditableTitle = styled.input`
   font-size: 2rem;
   font-weight: 700;
+  color: #333;
   border: none;
   border-bottom: 2px solid #ccc;
   outline: none;
   width: 100%;
-  padding: 0.5rem;
   background: transparent;
-  text-align: center;
+  margin-bottom: 1rem;
+  @media (max-width: 768px) {
+    font-size: 2.2rem;
+    text-align: center;
+    width: 90%;
+  }
 `;
 
 export const EditableTextArea = styled.textarea`
   width: 100%;
-  min-height: 150px;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  color: #333;
+  line-height: 1.8;
+  letter-spacing: 0.05rem;
   padding: 0.75rem;
   border: 1px solid #bbb;
   border-radius: 0.5rem;
-  resize: vertical;
+  background-color: #f9f9f9;
+  resize: none;
+  transition: border 0.2s ease-in-out, background 0.2s ease-in-out;
+  font-family: "Pretendard-Regular", "Arial", sans-serif;
+
   &:focus {
-    border-color: #888;
+    border: 1px solid #888;
     background-color: #fff;
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #aaa;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    text-align: center;
+    font-size: 1rem;
   }
 `;
 
@@ -33,27 +54,10 @@ interface FileInputProps {
 
 export const FileInput = styled.input<FileInputProps>`
   margin-top: 0.5rem;
-  display: ${({ hidden }) => (hidden ? "none" : "block")};
+  display: none;
 `;
 
-export const SaveButton = styled.button`
-  padding: 0.75rem 2rem;
-  background-color: #0070f3;
-  color: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  cursor: pointer;
-  &:hover {
-    background-color: #005bb5;
-  }
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-export const AddImageButton = styled.div`
+export const AddArea = styled.div`
   width: 100px;
   height: 100px;
   border-radius: 0.5rem;
@@ -61,7 +65,7 @@ export const AddImageButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+
   border: 2px dashed #ccc;
   color: #999;
 

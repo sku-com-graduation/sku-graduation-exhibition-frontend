@@ -1,9 +1,12 @@
-import React, { ChangeEvent, useRef, useState, useMemo, useEffect } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import styled from "styled-components";
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, horizontalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AddImageButton } from "./ui/Input";
+import { AddArea } from "./ui/Input";
+import { v4 as uuidv4 } from "uuid";
+import { CloseIcon } from "./Icons";
+import { DeleteButton } from "./ui/Button";
 
 const SlideContainer = styled.div`
   display: flex;
@@ -16,18 +19,6 @@ const SlideImage = styled.img`
   height: 100px;
   object-fit: cover;
   border-radius: 0.5rem;
-`;
-
-const DeleteButton = styled.button`
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: rgba(255, 0, 0, 0.8);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  padding: 0.2rem 0.5rem;
 `;
 
 const ImageWrapper = styled.div`
@@ -79,24 +70,30 @@ const SlideImageEditor = ({ existingImages, newImages, setExistingImages, setNew
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const [items, setItems] = useState<SlideItem[]>([]);
-
-  useEffect(() => {
-    setItems([
-      ...existingImages.map((img, idx) => ({ id: `existing-${idx}`, type: "existing", img } as ExistingImage)),
-      ...newImages.map((file, idx) => ({ id: `new-${idx}`, type: "new", file } as NewImage)),
-    ]);
-  }, [existingImages, newImages]);
+  // 초기 items는 부모 상태를 기반으로 한 번만 생성합니다.
+  const [items, setItems] = useState<SlideItem[]>(() => [
+    ...existingImages.map((img) => ({ id: `existing-${uuidv4()}`, type: "existing", img } as ExistingImage)),
+    ...newImages.map((file) => ({ id: `new-${uuidv4()}`, type: "new", file } as NewImage)),
+  ]);
 
   const handleNewImages = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0) return;
+
+    // 새 파일에 고유 id를 부여
+    const newItems = files.map((file) => ({ id: `new-${uuidv4()}`, type: "new", file } as NewImage));
+
+    // items와 부모 상태 모두 업데이트
+    setItems((prev) => [...prev, ...newItems]);
     setNewImages((prev) => [...prev, ...files]);
   };
 
   const deleteImage = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    setExistingImages((prev) => prev.filter((_, idx) => `existing-${idx}` !== id));
-    setNewImages((prev) => prev.filter((_, idx) => `new-${idx}` !== id));
+    const newItems = items.filter((item) => item.id !== id);
+    setItems(newItems);
+
+    setExistingImages(newItems.filter((i): i is ExistingImage => i.type === "existing").map((i) => i.img));
+    setNewImages(newItems.filter((i): i is NewImage => i.type === "new").map((i) => i.file));
   };
 
   const openFileInput = () => {
@@ -124,17 +121,27 @@ const SlideImageEditor = ({ existingImages, newImages, setExistingImages, setNew
             {items.map((item) => (
               <SortableItem key={item.id} id={item.id}>
                 <ImageWrapper>
-                  <SlideImage
-                    src={
-                      item.type === "existing" ? `data:image/jpeg;base64,${item.img}` : URL.createObjectURL(item.file)
-                    }
-                    alt={item.id}
-                  />
-                  <DeleteButton onClick={() => deleteImage(item.id)}>X</DeleteButton>
+                  <SlideImage src={item.type === "existing" ? `data:image/jpeg;base64,${item.img}` : URL.createObjectURL(item.file)} alt={item.id} />
+                  <DeleteButton
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteImage(item.id);
+                    }}
+                  >
+                    <CloseIcon />
+                  </DeleteButton>
                 </ImageWrapper>
               </SortableItem>
             ))}
-            <AddImageButton onClick={openFileInput}>+</AddImageButton>
+            <AddArea onClick={openFileInput}>+</AddArea>
           </SlideContainer>
         </SortableContext>
       </DndContext>

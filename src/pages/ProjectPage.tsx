@@ -4,10 +4,11 @@ import { IProject } from "../interface";
 import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import empty from "../assets/image/empty.png";
-
 import { categories, CategoryType } from "../constant/categorys";
+import { AnimatePresence, motion } from "framer-motion";
 
-// Wrapper with basic styles
+// 기존 스타일 컴포넌트들은 그대로 유지
+
 const Wrapper = styled.div`
   width: 100%;
   display: grid;
@@ -15,7 +16,6 @@ const Wrapper = styled.div`
   box-sizing: border-box;
 `;
 
-// Container: Adjust grid template columns based on screen size
 const Container = styled.div`
   width: 100%;
   display: grid;
@@ -64,7 +64,6 @@ const Overlay = styled.div`
   pointer-events: none;
 `;
 
-// OverlayText: Font size adjustment for smaller screens
 const OverlayText = styled.h3`
   color: white;
   text-align: center;
@@ -76,7 +75,6 @@ const OverlayText = styled.h3`
   }
 `;
 
-// TeamImage: Adjust image size and transition for mobile
 const TeamImage = styled.img`
   position: absolute;
   top: 0;
@@ -91,7 +89,6 @@ const TeamImage = styled.img`
   }
 `;
 
-// CategoryContainer: Grid adjustment for mobile
 const CategoryContainer = styled.div`
   box-sizing: border-box;
   padding: 0rem 10rem 5rem;
@@ -106,8 +103,7 @@ const CategoryContainer = styled.div`
   }
 `;
 
-// CategoryBox: Adjust font size for smaller screens
-const CategoryBox = styled.div`
+const CategoryBox = styled.div<{ color: string }>`
   border-radius: 2rem;
   font-size: 1.5rem;
   padding: 0.5rem;
@@ -116,7 +112,6 @@ const CategoryBox = styled.div`
   transition: background 0.1s ease-in-out;
 
   &:hover {
-    cursor: pointer;
     background: #85b4ff;
   }
 
@@ -125,7 +120,6 @@ const CategoryBox = styled.div`
   }
 `;
 
-// Title: Adjust title font size for smaller screens
 const Title = styled.div`
   padding: 5rem 0rem;
   text-align: center;
@@ -137,7 +131,6 @@ const Title = styled.div`
   }
 `;
 
-// TeamName: Position the name appropriately for mobile
 const TeamName = styled.div`
   position: absolute;
   bottom: -2rem;
@@ -161,8 +154,9 @@ const ProjectPage = () => {
 
   const getProject = async (year: string) => {
     try {
-      const res = await getProjects(year);
-      setProjects(res);
+      const res: IProject[] = await getProjects(year);
+      const sortedProjects = res.sort((a, b) => a.teamName.localeCompare(b.teamName));
+      setProjects(sortedProjects);
     } catch (error) {
       console.error(error);
     }
@@ -178,9 +172,9 @@ const ProjectPage = () => {
     setCategory(category);
   }, []);
 
-  const filteredProjects = Array.isArray(projects)
-    ? projects.filter((pro) => category === "ALL" || pro.category === category)
-    : [];
+  // 카테고리별로 필터링
+  const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
+
   return (
     <Wrapper>
       <Title>PROJECT</Title>
@@ -192,19 +186,30 @@ const ProjectPage = () => {
         ))}
       </CategoryContainer>
       <Container>
-        {filteredProjects.length > 0 ? (
-          filteredProjects.map((pro) => (
-            <TeamBox key={pro.encryptedTeamId} onClick={() => navigate(`${location.pathname}/${pro.uuid}`)}>
-              <TeamImage src={pro.teamProfileImage ? `data:image/jpeg;base64,${pro.teamProfileImage}` : empty} />
-              <Overlay className="overlay">
-                <OverlayText>{pro.title}</OverlayText>
-              </Overlay>
-              <TeamName>{pro.teamName}</TeamName>
-            </TeamBox>
-          ))
-        ) : (
-          <div></div>
-        )}
+        <AnimatePresence>
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((pro) => (
+              <motion.div
+                layout
+                key={pro.uuid}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TeamBox onClick={() => navigate(`${location.pathname}/${pro.uuid}`)}>
+                  <TeamImage src={pro.teamProfileImage ? `data:image/jpeg;base64,${pro.teamProfileImage}` : empty} />
+                  <Overlay className="overlay">
+                    <OverlayText>{pro.title}</OverlayText>
+                  </Overlay>
+                  <TeamName>{pro.teamName}</TeamName>
+                </TeamBox>
+              </motion.div>
+            ))
+          ) : (
+            <></>
+          )}
+        </AnimatePresence>
       </Container>
     </Wrapper>
   );

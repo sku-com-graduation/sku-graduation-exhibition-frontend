@@ -9,7 +9,7 @@ export const SelectCS = styled.select`
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #fff;
-  cursor: pointer;
+
   appearance: none;
   text-align: center;
 

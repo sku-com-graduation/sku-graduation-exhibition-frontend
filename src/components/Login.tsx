@@ -63,7 +63,7 @@ const SubTextWrapper = styled.div`
 
   div:nth-child(2) {
     color: #1962ff;
-    cursor: pointer;
+
     transition: color 0.3s;
 
     &:hover {
@@ -89,7 +89,7 @@ const Button = styled.button`
   background-color: #007bff;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
+
   transition: background-color 0.2s;
 
   &:hover {

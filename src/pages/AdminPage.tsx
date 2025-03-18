@@ -39,7 +39,7 @@ const MenuItem = styled.div<{ $isSelected: boolean }>`
   background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#F3F3F3")};
   border-radius: 1rem 1rem 0 0;
   place-items: center;
-  cursor: pointer;
+
   transition: background-color 0.25s;
 
   &:hover {
@@ -122,7 +122,7 @@ export default AdminPage;
 //   background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#F3F3F3")};
 //   border-radius: 1rem 1rem 0 0;
 //   place-items: center;
-//   cursor: pointer;
+//
 //   transition: background-color 0.25s;
 
 //   &:hover {

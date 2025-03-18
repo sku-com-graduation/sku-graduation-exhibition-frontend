@@ -4,14 +4,7 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-  GridRowSelectionModel,
-  GridCellParams,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridRowSelectionModel, GridCellParams } from "@mui/x-data-grid";
 import { randomId } from "@mui/x-data-grid-generator";
 import { SelectCS } from "../input/Select";
 import { getStudent, putStudent, postStudent, deleteStudent } from "../../api/student";
@@ -41,10 +34,7 @@ const getDatas = async (mode: "student" | "team" | "account" | "professor") => {
 };
 
 // 모드에 따라 데이터를 저장하는 함수
-const putDatas = async (
-  mode: "student" | "team" | "professor" | "account",
-  updateData: IStudent[] | IAccount[] | IProfessor | ITeam[]
-) => {
+const putDatas = async (mode: "student" | "team" | "professor" | "account", updateData: IStudent[] | IAccount[] | IProfessor | ITeam[]) => {
   console.log(updateData);
   const dataFetchers = {
     student: (data: IStudent[]) => putStudent(data),
@@ -68,7 +58,10 @@ const deleteDatas = async (mode: "student" | "team" | "professor", deleteData: s
 const createEmptyRow = <T extends RowData>(template: T, id: string): T => {
   return Object.keys(template).reduce(
     (acc, key) => {
-      if (key !== "id") acc[key] = "" as T[typeof key];
+      if (key !== "id") {
+        const defaultValue = typeof template[key] === "boolean" ? false : "";
+        acc[key] = defaultValue as T[typeof key];
+      }
       return acc;
     },
     { id } as T
@@ -144,17 +137,28 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
     console.log(JSON.stringify(rows, null, 4));
   }, [rows]);
 
+  const defaultProfessorTemplate: IProfessor = {
+    encryptedProfessorId: "",
+    name: "",
+    email: "",
+    tenure: false,
+    profileImg: "",
+  };
+
   const handleAddRow = () => {
-    if (rows.length === 0) return;
-    setRows([createEmptyRow(rows[0], randomId()), ...rows]);
+    // rows 배열이 비어있을 경우 기본 템플릿 사용
+    const template = rows.length > 0 ? rows[0] : defaultProfessorTemplate;
+    const newRow = createEmptyRow(template, randomId());
+    const newRows = [newRow, ...rows];
+    setRows(newRows);
+    // 새 rows 배열을 기반으로 열 정보를 다시 생성하여 업데이트
+    setColumns(dynamicColumns(newRows));
   };
 
   const handleDeleteRows = async () => {
     if (!selectedRows.length) return;
     const newRows = rows.map((row) => (selectedRows.includes(row.id) ? { ...row, isChanged: "delete" } : row));
-    const deleteRows = newRows
-      .filter(({ isChanged }) => isChanged === "delete")
-      .map(({ encryptedStudentId }) => encryptedStudentId);
+    const deleteRows = newRows.filter(({ isChanged }) => isChanged === "delete").map(({ encryptedStudentId }) => encryptedStudentId);
     console.log(JSON.stringify(deleteRows, null, 4));
     try {
       await deleteDatas(mode as "student" | "team" | "professor", deleteRows);
@@ -234,23 +238,13 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
                   width: 180,
                 }}
               />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleUpload}
-                sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}
-              >
+              <Button variant="contained" color="primary" onClick={handleUpload} sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}>
                 업로드
               </Button>
             </Box>
           )}
           {mode === "professor" && (
-            <Button
-              startIcon={<AddIcon />}
-              onClick={handleAddRow}
-              variant="outlined"
-              sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}
-            >
+            <Button startIcon={<AddIcon />} onClick={handleAddRow} variant="outlined" sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}>
               추가
             </Button>
           )}
@@ -264,12 +258,7 @@ export default function FullFeaturedCrudGrid({ mode }: { mode: "student" | "team
           >
             삭제
           </Button>
-          <Button
-            startIcon={<SaveIcon />}
-            onClick={saveDatas}
-            variant="outlined"
-            sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}
-          >
+          <Button startIcon={<SaveIcon />} onClick={saveDatas} variant="outlined" sx={{ fontSize: "0.85rem", p: "0.4rem 0.7rem" }}>
             저장
           </Button>
         </Box>

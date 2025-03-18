@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { Login } from "./Login";
 import { useModal } from "../hooks/useModal";
 import { RootState } from "../store/store";
@@ -10,62 +11,49 @@ import { getLogout } from "../api/auth";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { SelectCS } from "./input/Select";
 
-const Container = styled.div`
+const Container = styled(motion.div)`
   position: fixed;
   top: 0;
-  left: 50%;
   width: 100%;
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  box-sizing: border-box;
-  padding: 0 1.25rem;
-  height: 5rem;
-  background: white;
-  transition: transform 0.3s ease-in-out;
-  transform: translateY(0) translateX(-50%);
-  /* box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1); */
+  padding: 0rem 1rem 0rem 1rem;
+  height: 4rem;
   z-index: 1000;
+  background: #fff;
+  box-sizing: border-box;
 `;
 
 const LeftContainer = styled.div`
-  box-sizing: border-box;
-  display: grid;
-  grid-auto-flow: column;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 1rem;
 `;
 
 const RightContainer = styled.div`
-  display: grid;
-  box-sizing: border-box;
-  grid-auto-flow: column;
+  display: flex;
+  align-items: center;
   gap: 1rem;
 `;
 
 const Logo = styled.div`
-  display: grid;
-  color: #555;
-  place-items: center;
   font-size: 1.2rem;
-  padding-right: 10px;
-  box-sizing: border-box;
-  height: 100%;
-  transition: color 0.3s, font-size 0.2s;
-  cursor: pointer;
+  font-weight: bold;
+  color: #555;
+
+  transition: color 0.3s;
 
   &:hover {
     color: #0077fe;
-    font-size: 1.2rem;
   }
 `;
 
-const LoginDiv = styled.div`
+const NavItem = styled.div`
   font-size: 1rem;
   color: #555;
-  transition: color 0.3s, font-size 0.2s;
-  cursor: pointer;
+
+  transition: color 0.3s;
 
   &:hover {
     color: #0077fe;
@@ -74,35 +62,31 @@ const LoginDiv = styled.div`
 
 const Header = () => {
   const { year } = useParams();
-  const seletedAuth = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const selectedAuth = useSelector((state: RootState) => state.auth);
   const { openModal, Modal } = useModal();
 
-  // useRef를 이용해 DOM에 직접 접근
-  const headerRef = useRef<HTMLDivElement>(null);
+  const controls = useAnimation();
+  const { scrollY } = useViewportScroll();
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (headerRef.current) {
-        // 스크롤 내릴 때는 헤더 숨김, 올릴 때는 보이게 처리
-        if (currentScrollY > lastScrollY.current) {
-          headerRef.current.style.transform = "translateY(-100%) translateX(-50%)";
-        } else {
-          headerRef.current.style.transform = "translateY(0) translateX(-50%)";
-        }
+    const unsubscribe = scrollY.onChange((currentY) => {
+      if (currentY > lastScrollY.current) {
+        // 스크롤 다운 시 헤더 숨김
+        controls.start({ y: "-100%" });
+      } else {
+        // 스크롤 업 시 헤더 표시
+        controls.start({ y: 0 });
       }
-      lastScrollY.current = currentScrollY;
-    };
+      lastScrollY.current = currentY;
+    });
+    return () => unsubscribe();
+  }, [scrollY, controls]);
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedYear = event.target.value;
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedYear = e.target.value;
     dispatch(setExhibitionYear(selectedYear));
     navigate(`/${selectedYear}`);
   };
@@ -112,46 +96,48 @@ const Header = () => {
       await getLogout();
       dispatch(clearAuth());
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  const myPage = () => {
-    if (seletedAuth.role === "ADMIN") {
+  const goToMyPage = () => {
+    if (selectedAuth.role === "ADMIN") {
       navigate(`/${year}/admin`);
     }
   };
 
   return (
-    <Container ref={headerRef}>
-      <LeftContainer>
-        <Logo onClick={() => navigate("/")}>SKU</Logo>
-        <SelectCS value={year} onChange={handleYearChange}>
-          <option value="" disabled hidden>
-            전시 연도
-          </option>
-          {["2025", "2024", "2023"].map((y) => (
-            <option key={y} value={y}>
-              {y}
+    <>
+      <Container animate={controls} initial={{ y: 0 }} transition={{ type: "tween", duration: 0.3 }}>
+        <LeftContainer>
+          <Logo onClick={() => navigate("/")}>SKU</Logo>
+          <SelectCS value={year} onChange={handleYearChange}>
+            <option value="" disabled hidden>
+              전시 연도
             </option>
-          ))}
-        </SelectCS>
-      </LeftContainer>
-      <RightContainer>
-        <LoginDiv onClick={() => navigate(`/${year}/project`)}>PROJECT</LoginDiv>
-        {seletedAuth.accessToken ? (
-          <>
-            <LoginDiv onClick={myPage}>{seletedAuth.teamName}</LoginDiv>
-            <LoginDiv onClick={postLogout}>LOGOUT</LoginDiv>
-          </>
-        ) : (
-          <LoginDiv onClick={openModal}>LOGIN</LoginDiv>
-        )}
-        <Modal>
-          <Login />
-        </Modal>
-      </RightContainer>
-    </Container>
+            {["2025", "2024", "2023"].map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </SelectCS>
+        </LeftContainer>
+        <RightContainer>
+          <NavItem onClick={() => navigate(`/${year}/project`)}>PROJECT</NavItem>
+          {selectedAuth.accessToken ? (
+            <>
+              <NavItem onClick={goToMyPage}>{selectedAuth.teamName}</NavItem>
+              <NavItem onClick={postLogout}>LOGOUT</NavItem>
+            </>
+          ) : (
+            <NavItem onClick={openModal}>LOGIN</NavItem>
+          )}
+        </RightContainer>
+      </Container>
+      <Modal>
+        <Login />
+      </Modal>
+    </>
   );
 };
 

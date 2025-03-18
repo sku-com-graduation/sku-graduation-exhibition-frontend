@@ -5,12 +5,15 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
-import { ITeamPost, ITeamStudent } from "../interface";
+import { IProject, ITeamPost, ITeamStudent } from "../interface";
 import Test from "../components/Test";
 import { useModal } from "../hooks/useModal";
 import Profile from "../components/Profile";
 import empty from "../assets/image/empty.png";
 import userEmpty from "../assets/image/userEmpty.png";
+import { getProjects } from "@src/api/team";
+import { ArrowleftIcon, ArrowRightIcon } from "@components/Icons";
+import { motion } from "framer-motion";
 
 const Container = styled.div`
   width: 100%;
@@ -115,38 +118,10 @@ const TeamVideo = styled.video`
   border-radius: 1rem;
 `;
 
-const StudentInfo = styled.img`
-  width: 10rem;
-  height: 10rem;
-  border-radius: 5rem;
-  border: 0.1rem solid #d8d8d8;
-  object-fit: cover;
-  transition: filter 0.3s ease-in-out;
-
-  &:hover {
-    filter: brightness(50%);
-  }
-  @media (max-width: 768px) {
-    width: 4.5rem;
-    height: 4.5rem;
-  }
-`;
-
-const StudentIntro = styled.div`
-  padding: 0 0.625rem;
-  text-align: center;
-  box-sizing: border-box;
-  width: 100%;
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
 const PosterIntro = styled.div`
   width: 100%;
   display: grid;
   place-items: center;
-  gap: 100rem;
 `;
 
 const PosterImg = styled.img`
@@ -171,7 +146,7 @@ const EditButton = styled.button`
   font-weight: 600;
   border-radius: 0.5rem;
   border: none;
-  cursor: pointer;
+
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 
@@ -181,38 +156,126 @@ const EditButton = styled.button`
   }
 `;
 
+const SideButton = styled(motion.button)`
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 50%;
+
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1000;
+
+  &:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0.8rem 1.5rem rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const PrevButton = styled(SideButton)`
+  left: 1rem;
+`;
+
+const NextButton = styled(SideButton)`
+  right: 1rem;
+`;
+
+const StudentList = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+const StudentItem = styled.div`
+  text-align: center;
+`;
+
+const StudentInfo = styled.img`
+  width: 10rem;
+  height: 10rem;
+  border-radius: 5rem;
+  border: 0.1rem solid #d8d8d8;
+  object-fit: cover;
+  transition: filter 0.3s ease-in-out;
+
+  &:hover {
+    filter: brightness(50%);
+  }
+
+  @media (max-width: 768px) {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+`;
+
+const StudentName = styled.div`
+  margin-top: 0.5rem;
+`;
+
 const TeamPage = () => {
   const { year, team_uuid } = useParams();
   const { openModal, Modal } = useModal();
-
-  if (!encodeURIComponent) {
-    throw new Error("");
-  }
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const seletedAuth = useSelector((state: RootState) => state.auth);
-  const selectedExhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
+  const auth = useSelector((state: RootState) => state.auth);
+  const exhibitionYear = useSelector((state: RootState) => state.exhibitionYear);
 
-  const [teampost, seTeampost] = useState<ITeamPost>();
-  const [selectedStudent, setSelectedStudent] = useState<ITeamStudent | null>();
+  const [teampost, setTeampost] = useState<ITeamPost>();
+  const [selectedStudent, setSelectedStudent] = useState<ITeamStudent | null>(null);
+  const [projects, setProjects] = useState<IProject[]>([]);
 
-  useEffect(() => {
-    if (!selectedExhibitionYear && year) {
-      dispatch(setExhibitionYear(year));
+  const fetchProjects = async (year: string) => {
+    try {
+      const res: IProject[] = await getProjects(year);
+      const sortedProjects = res.sort((a, b) => a.teamName.localeCompare(b.teamName));
+      setProjects(sortedProjects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
     }
-  }, [selectedExhibitionYear, year, dispatch]);
+  };
 
-  const getTeampost = async (team_id: string) => {
-    const res = await postGetTeampost(team_id);
-    seTeampost(res);
+  const fetchTeampost = async (teamId: string) => {
+    try {
+      const res = await postGetTeampost(teamId);
+      setTeampost(res);
+    } catch (error) {
+      console.error("Error fetching team post:", error);
+    }
   };
 
   useEffect(() => {
-    if (team_uuid) getTeampost(team_uuid);
+    if (year) {
+      fetchProjects(year);
+      if (!exhibitionYear) {
+        dispatch(setExhibitionYear(year));
+      }
+    }
+  }, [year, exhibitionYear, dispatch]);
+
+  useEffect(() => {
+    if (team_uuid) {
+      fetchTeampost(team_uuid);
+    }
   }, [team_uuid]);
+
+  const navigateProject = (direction: "prev" | "next") => {
+    if (!teampost || projects.length === 0) return;
+    const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
+    const newTeamId = projects[newIndex].uuid;
+    navigate(`/${year}/project/${newTeamId}`);
+  };
 
   const handleStudentClick = (student: ITeamStudent) => {
     setSelectedStudent(student);
@@ -223,50 +286,60 @@ const TeamPage = () => {
     window.scrollTo(0, 0);
   }, [location]);
 
+  const buttonVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1 },
+  };
+
   return (
     <>
-      {(seletedAuth.uuid === team_uuid || seletedAuth.teamName === "admin") && (
-        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>Edit</EditButton>
-      )}
+      {(auth.uuid === team_uuid || auth.teamName === "admin") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+
+      <PrevButton
+        variants={buttonVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 1, ease: "easeOut" }}
+        onClick={() => navigateProject("prev")}
+      >
+        <ArrowleftIcon />
+      </PrevButton>
+
+      <NextButton
+        variants={buttonVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 1, ease: "easeOut" }}
+        onClick={() => navigateProject("next")}
+      >
+        <ArrowRightIcon />
+      </NextButton>
 
       <Container>
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
-          <TeamProfile
-            src={
-              teampost?.teamInfo.teamProfileImage
-                ? `data:image/jpeg;base64,${teampost?.teamInfo.teamProfileImage}`
-                : empty
-            }
-          />
+          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
         <Test img={teampost?.teamInfo.slideImages} />
 
         <SectionTitle>Members</SectionTitle>
-        <StudentIntro>
-          {teampost?.students.map((student, index) => {
-            return (
-              <div style={{ display: "inline-block", margin: "0 10px" }} key={index}>
-                <StudentInfo
-                  src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty}
-                  onClick={() => {
-                    handleStudentClick(student);
-                  }}
-                />
-                <div>{student.name}</div>
-              </div>
-            );
-          })}
-        </StudentIntro>
+        <StudentList>
+          {teampost?.students.map((student, index) => (
+            <StudentItem key={index} onClick={() => handleStudentClick(student)}>
+              <StudentInfo src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty} />
+              <StudentName>{student.name}</StudentName>
+            </StudentItem>
+          ))}
+        </StudentList>
         <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} />}</Modal>
 
         <SectionTitle>Project Video</SectionTitle>
         <VideoIntro>
           {teampost?.teamInfo.demoVideo && (
             <TeamVideo controls>
-              <source src={`data:video/mp4;base64,${teampost?.teamInfo.demoVideo}`} type="video/mp4" />
+              <source src={`data:video/mp4;base64,${teampost.teamInfo.demoVideo}`} type="video/mp4" />
               Your browser does not support the video tag.
             </TeamVideo>
           )}
@@ -274,9 +347,7 @@ const TeamPage = () => {
 
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg
-            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost?.teamInfo.posterImage}` : empty}
-          />
+          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
         </PosterIntro>
       </Container>
     </>

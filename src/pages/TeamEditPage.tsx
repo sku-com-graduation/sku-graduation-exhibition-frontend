@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent } from "react";
+import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
@@ -7,6 +7,7 @@ import { ITeamPost } from "../interface";
 import empty from "../assets/image/empty.png";
 import SlideImageEditor from "@components/SlideImageEditor";
 import DemoVideoEditor from "@components/DemoVideoEditor";
+import { AddArea, EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
 
 const Container = styled.div`
   width: 100%;
@@ -57,7 +58,6 @@ const TeamProfile = styled.img`
   transition: filter 0.3s ease-in-out;
 
   &:hover {
-    cursor: pointer;
     filter: brightness(50%);
   }
 
@@ -68,19 +68,11 @@ const TeamProfile = styled.img`
   }
 `;
 
-const VideoIntro = styled.div`
-  width: 100%;
-  max-width: 80rem;
-  overflow: hidden;
-  padding: 1rem;
-  box-sizing: border-box;
-`;
-
-const TeamVideo = styled.video`
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 1rem;
+const CharCount = styled.div`
+  font-size: 0.9rem;
+  color: #666;
+  text-align: right;
+  margin-top: 0.25rem;
 `;
 
 const PosterIntro = styled.div`
@@ -101,72 +93,6 @@ const PosterImg = styled.img`
   }
 `;
 
-const EditableInput = styled.input`
-  font-size: 2.6rem;
-  font-weight: 700;
-  color: #333;
-  border: none;
-  border-bottom: 2px solid #ccc;
-  outline: none;
-  width: 80%;
-  background: transparent;
-  margin-bottom: 1rem;
-  @media (max-width: 768px) {
-    font-size: 2.2rem;
-    text-align: center;
-    width: 90%;
-  }
-`;
-
-const EditableTextArea = styled.textarea`
-  width: 100%;
-  max-width: 800px;
-  min-height: 150px;
-  font-size: 1.1rem;
-  color: #333;
-  line-height: 1.8;
-  letter-spacing: 0.05rem;
-  padding: 0.75rem;
-  border: 1px solid #bbb;
-  border-radius: 0.5rem;
-  background-color: #f9f9f9;
-  resize: vertical;
-  transition: border 0.2s ease-in-out, background 0.2s ease-in-out;
-  font-family: "Pretendard-Regular", "Arial", sans-serif;
-
-  &:focus {
-    border: 1px solid #888;
-    background-color: #fff;
-    outline: none;
-  }
-
-  &::placeholder {
-    color: #aaa;
-    font-size: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    text-align: center;
-    font-size: 1rem;
-  }
-`;
-
-const FileInput = styled.input`
-  margin-top: 0.5rem;
-`;
-
-const SlideContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-`;
-
-const SlideImage = styled.img`
-  width: 100px;
-  height: auto;
-  object-fit: cover;
-`;
-
 const SaveButton = styled.button`
   padding: 0.75rem 2rem;
   background-color: #0070f3;
@@ -174,7 +100,7 @@ const SaveButton = styled.button`
   border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
-  cursor: pointer;
+
   &:hover {
     background-color: #005bb5;
   }
@@ -183,7 +109,6 @@ const SaveButton = styled.button`
 const ImageWrapper = styled.div`
   position: relative;
   width: 100%;
-  cursor: pointer;
 
   &:hover .overlay {
     opacity: 1;
@@ -236,6 +161,9 @@ const TeamEditPage = () => {
   // 기존 슬라이드 이미지는 base64 문자열로, 새 슬라이드 이미지는 File 객체로 관리
   const [existingSlideImages, setExistingSlideImages] = useState<string[]>([]);
   const [newSlideImages, setNewSlideImages] = useState<File[]>([]);
+
+  // 포스터 파일 입력에 대한 ref 추가
+  const posterInputRef = useRef<HTMLInputElement>(null);
 
   // base64 문자열을 File 객체로 변환하는 헬퍼 함수
   const base64ToFile = (base64: string, filename: string, mimeType: string): File => {
@@ -292,24 +220,6 @@ const TeamEditPage = () => {
     }
   };
 
-  // 새 슬라이드 이미지 여러 파일 선택 처리
-  const handleSlideImagesChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setNewSlideImages((prev) => [...prev, ...files]);
-    }
-  };
-
-  // 기존 슬라이드 이미지 삭제 처리
-  const handleDeleteExistingSlideImage = (index: number) => {
-    setExistingSlideImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  // 새 슬라이드 이미지 삭제 처리
-  const handleDeleteNewSlideImage = (index: number) => {
-    setNewSlideImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
   // 저장 처리 – 모든 이미지/동영상 데이터를 File 객체로 변환하여 전송
   const handleSave = async () => {
     if (!team_uuid) return;
@@ -320,13 +230,10 @@ const TeamEditPage = () => {
         ? editData.teamProfileImage
         : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
 
-    const demoFile =
-      editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
+    const demoFile = editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
 
     const posterFile =
-      editData.posterImg instanceof File
-        ? editData.posterImg
-        : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
+      editData.posterImg instanceof File ? editData.posterImg : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
 
     const formData = new FormData();
     formData.append("encryptedTeamId", "FRAgIFnQMAAAZKFoZUAsHw==");
@@ -368,13 +275,7 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         {/* 프로젝트 타이틀 수정 */}
-        <EditableInput
-          type="text"
-          name="title"
-          value={editData.title}
-          onChange={handleInputChange}
-          placeholder="PROJECT TITLE"
-        />
+        <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
 
         <div style={{ gridRow: "span 2" }}>
           <ImageWrapper onClick={() => document.getElementById("teamProfileInput")?.click()}>
@@ -408,7 +309,9 @@ const TeamEditPage = () => {
           onChange={handleInputChange}
           placeholder="Enter Project Description"
           rows={6}
+          maxLength={500}
         />
+        <CharCount>{(editData.content || "").length} / 500</CharCount>
       </TeamIntro>
 
       {/* 슬라이드 이미지 수정 */}
@@ -424,23 +327,6 @@ const TeamEditPage = () => {
       <SectionTitle>Project Video</SectionTitle>
       <DemoVideoEditor base={editData.demo as string} handleFileChange={handleFileChange} />
 
-      {/* <VideoIntro>
-        {editData.demo && (
-          <TeamVideo controls>
-            <source
-              src={
-                typeof editData.demo === "string"
-                  ? `data:video/mp4;base64,${editData.demo}`
-                  : URL.createObjectURL(editData.demo)
-              }
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </TeamVideo>
-        )}
-        <FileInput type="file" name="demo" accept="video/*" onChange={handleFileChange} />
-      </VideoIntro> */}
-
       {/* 포스터 수정 */}
       <SectionTitle>Poster</SectionTitle>
       <PosterIntro>
@@ -454,11 +340,12 @@ const TeamEditPage = () => {
           }
           alt="Poster"
         />
-        <FileInput type="file" name="posterImg" accept="image/*" onChange={handleFileChange} />
+        <AddArea onClick={() => posterInputRef.current?.click()}>Add Poster</AddArea>
+        <FileInput ref={posterInputRef} type="file" name="posterImg" accept="image/*" onChange={handleFileChange} />
       </PosterIntro>
 
       {/* 저장 버튼 */}
-      <SaveButton onClick={handleSave}>Save</SaveButton>
+      <SaveButton onClick={handleSave}>SAVE</SaveButton>
     </Container>
   );
 };
