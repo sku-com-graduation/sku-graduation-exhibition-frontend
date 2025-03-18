@@ -9,7 +9,9 @@ import slider2 from "../assets/image/t2.gif";
 // 중복된 이미지 import 제거: slider3와 slider4는 slider1, slider2와 동일
 import round from "../assets/image/round.png";
 import study from "../assets/image/study.jpg";
+import study2 from "../assets/image/study2.jpg";
 import test from "../assets/image/test.mp4";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 // 그리드 레이아웃 (웹: 3열, 모바일: 단일 컬럼)
 const GridContainer = styled(motion.div)`
@@ -118,6 +120,12 @@ const DateContainer = styled(motion.div)`
     margin-bottom: 1rem;
   }
 
+  & > *:nth-child(3) {
+    justify-self: start;
+    align-self: center;
+    margin-bottom: 1rem;
+  }
+
   & > *:nth-child(4) {
     justify-self: end;
     text-align: right;
@@ -202,16 +210,31 @@ const FullWidthVideo = styled(motion.video)`
 const ModernIntroContainer = styled(motion.div)`
   position: relative;
   margin: 2rem 0;
-  margin-left: auto; /* 컨테이너를 오른쪽에 배치 */
+  margin-left: auto;
   padding: 4rem 3rem;
-  background: url(${study}) no-repeat center center;
+  background: url(${study2}) no-repeat center center;
   background-size: cover;
-  background-attachment: fixed; /* 배경 고정 효과 */
-  border-radius: 20px;
+  background-attachment: fixed;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  text-align: left; /* 내부 텍스트는 좌측 정렬 */
+  text-align: left;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 어두운 오버레이 */
+    z-index: 1;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 2;
+  }
 
   &:hover {
     transform: translateY(-5px);
@@ -250,23 +273,37 @@ const ModernIntroText = styled(motion.p)`
 
 const ModernIntroSection = () => {
   return (
-    <ModernIntroContainer initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 1.2 }}>
-      <ModernIntroTitle initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 1.3 }}>
-        성결대학교 컴퓨터공학과 졸업 작품 전시회에 오신 것을 진심으로 환영합니다.
+    <ModernIntroContainer
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 1.2 }}
+    >
+      <ModernIntroTitle
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 1.3 }}
+      >
+        성결대학교 컴퓨터공학과 졸업 작품 전시회에 오신 것을 환영합니다.
       </ModernIntroTitle>
-      <ModernIntroText initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 1.5 }}>
-        본 전시는 우리 학과 학생들이 지난 4년간 학문적 연구와 창의적 도전의 결실로 탄생한 다양한 작품들을 한자리에서 만나실 수 있는 기회를 제공합니다.
+      <ModernIntroText
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 1.5 }}
+      >
+        본 전시는 우리 학과 학생들이 지난 4년간 학문적 연구와 창의적 도전의 결실로 탄생한 다양한 작품들을 한자리에서
+        만나실 수 있는 기회를 제공합니다.
         <br />
         <br />
-        각 작품은 학생들의 끊임없는 열정과 노력, 그리고 미래에 대한 꿈과 희망이 담겨 있으며, 이를 통해 혁신적인 아이디어와 기술 발전의 현장을 경험하실
-        수 있습니다.
+        각 작품은 학생들의 끊임없는 열정과 노력, 그리고 미래에 대한 꿈과 희망이 담겨 있으며, 이를 통해 혁신적인
+        아이디어와 기술 발전의 현장을 경험하실 수 있습니다.
         <br />
         <br />
-        전시회를 통해 여러분께서도 우리 학생들의 독창성과 열정에 깊은 감동을 받으시길 바라며, 새로운 영감과 도전을 얻으시길 기대합니다.
+        전시회를 통해 여러분께서도 우리 학생들의 독창성과 열정에 깊은 감동을 받으시길 바라며, 새로운 영감과 도전을
+        얻으시길 기대합니다.
         <br />
         <br />
-        이번 전시는 단순한 작품 전시를 넘어, 창의적인 사고와 기술 혁신의 장을 마련하고, 차세대 IT 인재들이 꿈을 실현할 수 있는 발판을 제공하는 의미
-        있는 자리입니다.
+        이번 전시는 단순한 작품 전시를 넘어, 창의적인 사고와 기술 혁신의 장을 마련하고, 차세대 IT 인재들이 꿈을 실현할
+        수 있는 발판을 제공하는 의미 있는 자리입니다.
         <br />
         <br />
         여러분의 많은 관심과 성원 속에, 뜻깊은 전시회가 되기를 진심으로 기원합니다.
@@ -274,6 +311,26 @@ const ModernIntroSection = () => {
     </ModernIntroContainer>
   );
 };
+
+const CTAButton = styled(motion.button)`
+  display: block;
+  margin: 4rem auto; /* 가운데 정렬 예시 */
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #68aeff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background-color: #005bb5;
+    transform: translateY(-3px);
+  }
+`;
 
 // Slider 컴포넌트: 이미지 배열을 받아 두 방향 슬라이더 생성
 const ImageSlider = () => {
@@ -308,6 +365,10 @@ const scrollTextVariants = {
 };
 
 const YearHomePage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { year } = useParams();
+
   const { scrollY } = useViewportScroll();
   const scale = useTransform(scrollY, [0, 300], [1, 1.1]);
   const opacityValue = useTransform(scrollY, [0, 300], [1, 0.85]);
@@ -343,22 +404,35 @@ const YearHomePage = () => {
           />
         </ImageContainer>
 
-        <DateContainer initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 1, delay: 1.2 }}>
+        <DateContainer
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 1.2 }}
+        >
           <div>2025 GRADUATION EXHIBITION</div>
           <div>
             <div>SUNGKYUL</div>
             <div>COMPUTER</div>
             <div>ENGINEERING</div>
           </div>
-          <div></div>
+          <h1>______________ACADEMIC INFORMATION CENTER</h1>
           {/* <img src={round} alt="Round Decoration" /> */}
-          <div>2025.03.18 09:00 - 18:00</div>
+          <div>
+            <div>2025.11.07</div>
+            <div>09:00 - 18:00</div>
+          </div>
         </DateContainer>
       </GridContainer>
 
       <ScrollTextContainer>
         <motion.div style={{ scale, opacity: opacityValue }}>
-          <ScrollText variants={scrollTextVariants} initial="hidden" whileInView="visible" transition={{ duration: 1 }} viewport={{ amount: 0.5 }}>
+          <ScrollText
+            variants={scrollTextVariants}
+            initial="hidden"
+            whileInView="visible"
+            transition={{ duration: 1 }}
+            viewport={{ amount: 0.5 }}
+          >
             PROJECTS
           </ScrollText>
         </motion.div>
@@ -378,6 +452,16 @@ const YearHomePage = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 20, duration: 1.2, delay: 2 }}
       />
+
+      <CTAButton
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 1, delay: 2.5 }}
+        onClick={() => navigate(`/${year}/project`)}
+      >
+        VIEW PROJECTS
+      </CTAButton>
     </>
   );
 };

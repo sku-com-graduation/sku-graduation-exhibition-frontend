@@ -146,7 +146,7 @@ const EditButton = styled.button`
   font-weight: 600;
   border-radius: 0.5rem;
   border: none;
-
+  z-index: 5000;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.2s ease;
 
@@ -272,7 +272,10 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
+    const newIndex =
+      direction === "prev"
+        ? (currentIndex - 1 + projects.length) % projects.length
+        : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -293,7 +296,9 @@ const TeamPage = () => {
 
   return (
     <>
-      {(auth.uuid === team_uuid || auth.teamName === "admin") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+      {(auth.uuid === team_uuid || auth.teamName === "admin") && (
+        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
+      )}
 
       <PrevButton
         variants={buttonVariants}
@@ -318,7 +323,13 @@ const TeamPage = () => {
       <Container>
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
-          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
+          <TeamProfile
+            src={
+              teampost?.teamInfo.teamProfileImage
+                ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}`
+                : empty
+            }
+          />
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
@@ -333,7 +344,7 @@ const TeamPage = () => {
             </StudentItem>
           ))}
         </StudentList>
-        <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} />}</Modal>
+        <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} />}</Modal>
 
         <SectionTitle>Project Video</SectionTitle>
         <VideoIntro>
@@ -347,7 +358,9 @@ const TeamPage = () => {
 
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
+          <PosterImg
+            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty}
+          />
         </PosterIntro>
       </Container>
     </>

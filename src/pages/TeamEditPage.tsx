@@ -230,13 +230,16 @@ const TeamEditPage = () => {
         ? editData.teamProfileImage
         : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
 
-    const demoFile = editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
+    const demoFile =
+      editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
 
     const posterFile =
-      editData.posterImg instanceof File ? editData.posterImg : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
+      editData.posterImg instanceof File
+        ? editData.posterImg
+        : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
 
     const formData = new FormData();
-    formData.append("encryptedTeamId", "FRAgIFnQMAAAZKFoZUAsHw==");
+    formData.append("teamUuId", team_uuid);
     formData.append("title", editData.title);
     formData.append("content", editData.content);
     formData.append("category", "GAME");
@@ -244,11 +247,15 @@ const TeamEditPage = () => {
     formData.append("demo", demoFile);
     formData.append("posterImg", posterFile);
 
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
     const res = await putTeampost(formData);
 
     // 슬라이드 이미지는 기존 이미지(변환)와 새로 추가된 파일 모두 File 객체로 전송
     const formDataSlide = new FormData();
-    formDataSlide.append("encryptedTeamId", "FRAgIFnQMAAAZKFoZUAsHw==");
+    formDataSlide.append("teamUuid", team_uuid);
 
     // 기존 슬라이드 이미지(base64 문자열)를 File 객체로 변환하여 추가
     existingSlideImages.forEach((img, idx) => {
@@ -275,7 +282,13 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         {/* 프로젝트 타이틀 수정 */}
-        <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
+        <EditableTitle
+          type="text"
+          name="title"
+          value={editData.title}
+          onChange={handleInputChange}
+          placeholder="PROJECT TITLE"
+        />
 
         <div style={{ gridRow: "span 2" }}>
           <ImageWrapper onClick={() => document.getElementById("teamProfileInput")?.click()}>

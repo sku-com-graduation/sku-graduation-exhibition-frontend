@@ -1,13 +1,122 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { ITeamStudent } from "../interface";
-import { GithubIcon, EmailIcon, AirplainIcon, LaptopIcon } from "./Icons";
-import empty from "../assets/image/empty.png";
 import userEmpty from "../assets/image/userEmpty.png";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/store/store";
 
 const removeTrailingSlash = (url: string) => {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 };
 
+const Profile = (props: { selectedStudent: ITeamStudent; teamUuid: string | undefined }) => {
+  const auth = useSelector((state: RootState) => state.auth);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedStudent, setEditedStudent] = useState(props.selectedStudent);
+
+  const handleEditClick = () => setIsEditing(true);
+  const handleCancelClick = () => {
+    setEditedStudent(props.selectedStudent);
+    setIsEditing(false);
+  };
+  const handleSaveClick = () => {
+    console.log("Saved Data:", editedStudent);
+    setIsEditing(false);
+  };
+
+  return (
+    <Wrapper>
+      <StudentImg
+        src={editedStudent.profileImage ? `data:image/jpeg;base64,${editedStudent.profileImage}` : userEmpty}
+        alt="Profile Picture"
+      />
+      <TextContainer>
+        <NameRoleContainer>
+          {isEditing ? (
+            <>
+              <Input
+                value={editedStudent.name}
+                onChange={(e) => setEditedStudent({ ...editedStudent, name: e.target.value })}
+              />
+              <Role>{editedStudent.role}</Role>
+            </>
+          ) : (
+            <>
+              <Name>{editedStudent.name}</Name>
+              <Role>{editedStudent.role}</Role>
+            </>
+          )}
+        </NameRoleContainer>
+
+        {isEditing ? (
+          <>
+            <Input
+              value={editedStudent.info || ""}
+              onChange={(e) => setEditedStudent({ ...editedStudent, info: e.target.value })}
+              placeholder="정보 입력"
+            />
+            <Input
+              value={editedStudent.studentBlog || ""}
+              onChange={(e) => setEditedStudent({ ...editedStudent, studentBlog: e.target.value })}
+              placeholder="블로그 URL 입력"
+            />
+            <Input
+              value={editedStudent.studentEmail || ""}
+              onChange={(e) => setEditedStudent({ ...editedStudent, studentEmail: e.target.value })}
+              placeholder="이메일 입력"
+            />
+            <Input
+              value={editedStudent.githubUrl || ""}
+              onChange={(e) => setEditedStudent({ ...editedStudent, githubUrl: e.target.value })}
+              placeholder="깃허브 URL 입력"
+            />
+          </>
+        ) : (
+          <>
+            {editedStudent.info && <InfoText>{editedStudent.info}</InfoText>}
+            {editedStudent.studentBlog && (
+              <InfoText>
+                <a href={removeTrailingSlash(editedStudent.studentBlog)} target="_blank" rel="noopener noreferrer">
+                  {removeTrailingSlash(editedStudent.studentBlog)}
+                </a>
+              </InfoText>
+            )}
+            {editedStudent.studentEmail && (
+              <InfoText>
+                <a href={`mailto:${editedStudent.studentEmail}`} target="_blank" rel="noopener noreferrer">
+                  {editedStudent.studentEmail}
+                </a>
+              </InfoText>
+            )}
+            {editedStudent.githubUrl && (
+              <InfoText>
+                <a href={removeTrailingSlash(editedStudent.githubUrl)} target="_blank" rel="noopener noreferrer">
+                  {removeTrailingSlash(editedStudent.githubUrl)}
+                </a>
+              </InfoText>
+            )}
+          </>
+        )}
+
+        {/* ✅ 수정 & 저장 버튼 추가 */}
+        {auth.uuid === props.teamUuid && (
+          <ButtonContainer>
+            {isEditing ? (
+              <>
+                <SaveButton onClick={handleSaveClick}>저장</SaveButton>
+                <CancelButton onClick={handleCancelClick}>취소</CancelButton>
+              </>
+            ) : (
+              <EditButton onClick={handleEditClick}>수정</EditButton>
+            )}
+          </ButtonContainer>
+        )}
+      </TextContainer>
+    </Wrapper>
+  );
+};
+
+// ✅ 스타일 추가
 const Wrapper = styled.div`
   width: 30rem;
   height: auto;
@@ -18,18 +127,7 @@ const Wrapper = styled.div`
   border-radius: 1rem;
   padding: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
   align-items: center;
-
-  &:hover {
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 1rem;
-    grid-template-columns: 4.5rem 1fr;
-  }
 `;
 
 const StudentImg = styled.img`
@@ -37,19 +135,6 @@ const StudentImg = styled.img`
   height: 10rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #f2f2f2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  justify-self: center;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-
-  @media (max-width: 768px) {
-    width: 4.5rem;
-    height: 4.5rem;
-  }
 `;
 
 const TextContainer = styled.div`
@@ -59,103 +144,92 @@ const TextContainer = styled.div`
 `;
 
 const NameRoleContainer = styled.div`
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 1rem;
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
 `;
 
 const Name = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
 `;
 
 const Role = styled.div`
   font-size: 1.2rem;
   font-weight: 600;
-  color: white;
   background-color: #95a5b1;
+  color: white;
   padding: 0.3rem 1rem;
   border-radius: 1rem;
-  text-align: center;
-  white-space: nowrap;
 `;
 
-const InfoItem = styled.div`
+const InfoText = styled.div`
   font-size: 1rem;
   color: #555;
-  margin-bottom: 0.5rem;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.5rem;
-  align-items: center;
+`;
 
-  & > svg {
-    font-size: 1.2rem;
-    color: #555;
-  }
+const Input = styled.input`
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border 0.3s ease;
 
-  & > a {
-    text-decoration: none;
-    color: #555;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: #0077cc;
-    }
+  &:focus {
+    border-color: #0077cc;
+    outline: none;
   }
 `;
 
-const Profile = ({ selectedStudent }: { selectedStudent: ITeamStudent }) => {
-  return (
-    <Wrapper>
-      <StudentImg
-        src={selectedStudent.profileImage ? `data:image/jpeg;base64,${selectedStudent.profileImage}` : userEmpty}
-        alt="Profile Picture"
-      />
-      <TextContainer>
-        <NameRoleContainer>
-          <Name>{selectedStudent.name}</Name>
-          <Role>{selectedStudent.role}</Role>
-        </NameRoleContainer>
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
 
-        {selectedStudent.info && (
-          <InfoItem>
-            <LaptopIcon />
-            {selectedStudent.info}
-          </InfoItem>
-        )}
+const EditButton = styled.button`
+  background-color: #0077cc;
+  color: white;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 
-        {selectedStudent.studentBlog && (
-          <InfoItem>
-            <AirplainIcon />
-            <a href={removeTrailingSlash(selectedStudent.studentBlog)} target="_blank" rel="noopener noreferrer">
-              {removeTrailingSlash(selectedStudent.studentBlog)}
-            </a>
-          </InfoItem>
-        )}
+  &:hover {
+    background-color: #005fa3;
+  }
+`;
 
-        {selectedStudent.studentEmail && (
-          <InfoItem>
-            <EmailIcon />
-            <a href={`mailto:${selectedStudent.studentEmail}`} target="_blank" rel="noopener noreferrer">
-              {selectedStudent.studentEmail}
-            </a>
-          </InfoItem>
-        )}
+const SaveButton = styled.button`
+  background-color: #28a745;
+  color: white;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 
-        {selectedStudent.githubUrl && (
-          <InfoItem>
-            <GithubIcon />
-            <a href={removeTrailingSlash(selectedStudent.githubUrl)} target="_blank" rel="noopener noreferrer">
-              {removeTrailingSlash(selectedStudent.githubUrl)}
-            </a>
-          </InfoItem>
-        )}
-      </TextContainer>
-    </Wrapper>
-  );
-};
+  &:hover {
+    background-color: #1e7e34;
+  }
+`;
+
+const CancelButton = styled.button`
+  background-color: #dc3545;
+  color: white;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background-color: #c82333;
+  }
+`;
 
 export default Profile;
