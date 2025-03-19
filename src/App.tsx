@@ -6,11 +6,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import theme from "./styles/theme";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import ApiTest from "./api/apiTest";
 
 import CustomCursor from "./components/CustomCursor";
 
 import { AdminPage, MainPage, TeamPage, TeamEditPage, ProjectPage, YearHomePage } from "./pages";
+import Test from "./pages/Test";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -31,7 +31,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.6, ease: "easeIn" }}
     >
       {children}
     </Content>
@@ -87,14 +87,7 @@ function AnimatedRoutes() {
             </DefaultLayout>
           }
         />
-        <Route
-          path="/api"
-          element={
-            <DefaultLayout>
-              <ApiTest />
-            </DefaultLayout>
-          }
-        />
+        <Route path="/test" element={<Test />} />
         <Route path="*" element={<>NOT FOUND</>} />
       </Routes>
     </AnimatePresence>

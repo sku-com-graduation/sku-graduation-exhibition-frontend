@@ -6,7 +6,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter, GridRowSelectionModel, GridCellParams } from "@mui/x-data-grid";
 import { randomId } from "@mui/x-data-grid-generator";
-import { SelectCS } from "../input/Select";
+import { SelectCS } from "../Select";
 import { getStudent, putStudent, postStudent, deleteStudent } from "../../api/student";
 import { deleteTeams, getTeams, putTeams } from "../../api/team";
 import { getAccount, postAccount } from "../../api/account";

@@ -9,7 +9,7 @@ import { RootState } from "../store/store";
 import { clearAuth } from "../store/reducers/auth";
 import { getLogout } from "../api/auth";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
-import { SelectCS } from "./input/Select";
+import { SelectCS } from "./Select";
 
 const Container = styled(motion.div)`
   position: fixed;
@@ -110,7 +110,7 @@ const Header = () => {
     <>
       <Container animate={controls} initial={{ y: 0 }} transition={{ type: "tween", duration: 0.3 }}>
         <LeftContainer>
-          <Logo onClick={() => navigate("/")}>SKU</Logo>
+          <Logo onClick={() => navigate(`/${year}`)}>SKU</Logo>
           <SelectCS value={year} onChange={handleYearChange}>
             <option value="" disabled hidden>
               전시 연도

@@ -23,12 +23,12 @@ export const putTeampost = async (data: FormData) => {
   }
 };
 
-export const putTeamStudent = async (data: ITeamStudent) => {
+export const putTeamStudent = async (data: FormData) => {
   try {
     const result = await api.put(`/user/post/update/studentProfile`, data);
     return result.data;
   } catch (error) {
-    throw new Error(`${error}`);
+    throw new Error(`문제 발생: ${error}`);
   }
 };
 

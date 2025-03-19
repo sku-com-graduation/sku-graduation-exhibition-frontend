@@ -8,6 +8,7 @@ import empty from "../assets/image/empty.png";
 import SlideImageEditor from "@components/SlideImageEditor";
 import DemoVideoEditor from "@components/DemoVideoEditor";
 import { AddArea, EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
+import base64ToFile from "@src/utils/base64ToFile";
 
 const Container = styled.div`
   width: 100%;
@@ -165,17 +166,6 @@ const TeamEditPage = () => {
   // 포스터 파일 입력에 대한 ref 추가
   const posterInputRef = useRef<HTMLInputElement>(null);
 
-  // base64 문자열을 File 객체로 변환하는 헬퍼 함수
-  const base64ToFile = (base64: string, filename: string, mimeType: string): File => {
-    const byteString = atob(base64);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new File([ia], filename, { type: mimeType });
-  };
-
   // 데이터 가져오기
   const getTeampost = async (team_id: string) => {
     const res = await postGetTeampost(team_id);
@@ -230,26 +220,19 @@ const TeamEditPage = () => {
         ? editData.teamProfileImage
         : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
 
-    const demoFile =
-      editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
+    const demoFile = editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
 
     const posterFile =
-      editData.posterImg instanceof File
-        ? editData.posterImg
-        : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
+      editData.posterImg instanceof File ? editData.posterImg : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
 
     const formData = new FormData();
-    formData.append("teamUuId", team_uuid);
+    formData.append("teamUuid", team_uuid);
     formData.append("title", editData.title);
     formData.append("content", editData.content);
     formData.append("category", "GAME");
     formData.append("teamProfileImage", teamProfileFile);
     formData.append("demo", demoFile);
     formData.append("posterImg", posterFile);
-
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
 
     const res = await putTeampost(formData);
 
@@ -282,13 +265,7 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         {/* 프로젝트 타이틀 수정 */}
-        <EditableTitle
-          type="text"
-          name="title"
-          value={editData.title}
-          onChange={handleInputChange}
-          placeholder="PROJECT TITLE"
-        />
+        <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
 
         <div style={{ gridRow: "span 2" }}>
           <ImageWrapper onClick={() => document.getElementById("teamProfileInput")?.click()}>

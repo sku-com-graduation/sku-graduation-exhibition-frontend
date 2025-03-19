@@ -6,7 +6,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
 import { IProject, ITeamPost, ITeamStudent } from "../interface";
-import Test from "../components/Test";
+import SlideImage from "../components/SlideImage";
 import { useModal } from "../hooks/useModal";
 import Profile from "../components/Profile";
 import empty from "../assets/image/empty.png";
@@ -138,7 +138,7 @@ const PosterImg = styled.img`
 
 const EditButton = styled.button`
   position: fixed;
-  top: 10rem;
+  top: 5rem;
   right: 2rem;
   padding: 0.5rem 1rem;
   background-color: #4a90e2;
@@ -272,10 +272,7 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex =
-      direction === "prev"
-        ? (currentIndex - 1 + projects.length) % projects.length
-        : (currentIndex + 1) % projects.length;
+    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -296,9 +293,7 @@ const TeamPage = () => {
 
   return (
     <>
-      {(auth.uuid === team_uuid || auth.teamName === "admin") && (
-        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
-      )}
+      {(auth.uuid === team_uuid || auth.teamName === "admin") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
 
       <PrevButton
         variants={buttonVariants}
@@ -323,17 +318,11 @@ const TeamPage = () => {
       <Container>
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
-          <TeamProfile
-            src={
-              teampost?.teamInfo.teamProfileImage
-                ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}`
-                : empty
-            }
-          />
+          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
-        <Test img={teampost?.teamInfo.slideImages} />
+        <SlideImage img={teampost?.teamInfo.slideImages} />
 
         <SectionTitle>Members</SectionTitle>
         <StudentList>
@@ -358,9 +347,7 @@ const TeamPage = () => {
 
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg
-            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty}
-          />
+          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
         </PosterIntro>
       </Container>
     </>

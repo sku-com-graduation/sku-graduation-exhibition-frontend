@@ -39,3 +39,12 @@ export const getProjects = async (year: string): Promise<IProject[]> => {
     throw new Error(`${error}`);
   }
 };
+
+export const getTeamProflies = async (year: string): Promise<string[]> => {
+  try {
+    const result = await api.get(`public/team/search/teamProflie?year=${year}`);
+    return result.data;
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
+};

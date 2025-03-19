@@ -15,13 +15,15 @@ const MarqueeWrapper = styled.div`
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-50%); /* 중간까지 이동 */
+      transform: translateX(-50%);
     }
   }
 `;
 
 const MarqueeImage = styled.img`
   width: 20%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   margin-right: 10px;
 `;
 
@@ -29,7 +31,7 @@ interface TestProps {
   img: string[] | undefined;
 }
 
-const Test: React.FC<TestProps> = ({ img }) => {
+const SlideImage: React.FC<TestProps> = ({ img }) => {
   if (!img) return null;
 
   const repeatedImages = [...img, ...img];
@@ -45,4 +47,4 @@ const Test: React.FC<TestProps> = ({ img }) => {
   );
 };
 
-export default Test;
+export default SlideImage;
