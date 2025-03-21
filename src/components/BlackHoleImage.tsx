@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -16,9 +16,9 @@ const MaskedDiv = styled(motion.div)`
   width: 100%;
   height: 100%;
   background: radial-gradient(
-    circle at center,
+    circle at 30%,
     transparent var(--hole-size),
-    rgba(0, 0, 0, 0.8) calc(var(--hole-size) + 5%),
+    rgba(0, 0, 0, 0.8) calc(var(--hole-size) + 1%),
     black calc(var(--hole-size) + 10%)
   );
 `;
@@ -26,8 +26,8 @@ const MaskedDiv = styled(motion.div)`
 const BlackHoleImage = () => {
   const { scrollY } = useScroll();
   const [overlayVisible, setOverlayVisible] = useState(true);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
-  // 구멍 크기 조정 (0 ~ 100vh 기준)
   const holeSize = useTransform(scrollY, [0, 500], ["15%", "100%"]);
   const scale = useTransform(scrollY, [0, 500], [1, 1.5]);
   const opacity = useTransform(scrollY, [400, 500], [1, 0]);
