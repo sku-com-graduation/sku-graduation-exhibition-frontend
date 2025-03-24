@@ -1,49 +1,92 @@
+import { getTeamProflies } from "@src/api/team";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-const MarqueeContainer = styled.div`
-  display: flex;
+const SliderWrapper = styled.div`
   overflow: hidden;
   width: 100%;
+  margin: 3rem 0;
 `;
 
-const MarqueeWrapper = styled.div`
+const SlideTrack = styled.div<{ reverse?: boolean }>`
   display: flex;
-  animation: marquee 15s linear infinite;
+  width: max-content;
+  animation: ${({ reverse }) => (reverse ? "slideReverse" : "slide")} 30s linear infinite;
 
-  @keyframes marquee {
+  @keyframes slide {
     0% {
-      transform: translateX(0);
+      transform: translateX(0%);
     }
     100% {
       transform: translateX(-50%);
     }
   }
+
+  @keyframes slideReverse {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
 `;
 
-const MarqueeImage = styled.img`
-  width: 20%;
-  aspect-ratio: 1 / 1;
+const SliderImage = styled.img`
+  width: 200px;
+  height: 200px;
   object-fit: cover;
-  margin-right: 10px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  margin-right: 1rem;
+
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
 `;
 
-interface TestProps {
-  img: string[] | undefined;
-}
+const fetchTeamProfile = async (year: string) => {
+  try {
+    const res: string[] = await getTeamProflies(year);
+    return res;
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+  }
+};
 
-const SlideImage: React.FC<TestProps> = ({ img }) => {
-  if (!img) return null;
+const SlideImage: React.FC<{ year: string }> = ({ year }) => {
+  const [images, setImages] = useState<string[]>([]);
 
-  const repeatedImages = [...img, ...img];
+  useEffect(() => {
+    async function loadImages() {
+      const res = await fetchTeamProfile(year);
+      if (res) {
+        const repeated = [...res, ...res, ...res]; // 반복으로 무한 루프 느낌
+        setImages(repeated);
+      }
+    }
+    loadImages();
+  }, [year]);
 
   return (
-    <MarqueeContainer>
-      <MarqueeWrapper>
-        {repeatedImages.map((image, index) => (
-          <MarqueeImage key={index} src={`data:image/jpeg;base64,${image}`} alt={`image ${index + 1}`} />
-        ))}
-      </MarqueeWrapper>
-    </MarqueeContainer>
+    <>
+      <SliderWrapper>
+        <SlideTrack>
+          {images.map((src, idx) => (
+            <SliderImage key={`row1-${idx}`} src={`data:image/jpeg;base64,${src}`} />
+          ))}
+        </SlideTrack>
+      </SliderWrapper>
+      <SliderWrapper>
+        <SlideTrack reverse>
+          {images.map((src, idx) => (
+            <SliderImage key={`row2-${idx}`} src={`data:image/jpeg;base64,${src}`} />
+          ))}
+        </SlideTrack>
+      </SliderWrapper>
+    </>
   );
 };
 

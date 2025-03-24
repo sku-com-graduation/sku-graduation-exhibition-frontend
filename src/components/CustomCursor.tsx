@@ -32,13 +32,13 @@ const CustomCursor: React.FC = () => {
 
   return (
     <>
-      <GlobalStyle />
+      {/* <GlobalStyle />
       <Cursor
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
         }}
-      />
+      /> */}
     </>
   );
 };

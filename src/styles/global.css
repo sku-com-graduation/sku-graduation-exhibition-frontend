@@ -4,11 +4,14 @@
   src: url("../assets/fonts/Pretendard-Regular.woff2") format("woff2");
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   box-sizing: border-box;
   font-family: "Pretendard-Regular", sans-serif;
-  cursor: none;
 }
 
 ::-webkit-scrollbar-track {

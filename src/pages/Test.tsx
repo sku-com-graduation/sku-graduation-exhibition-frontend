@@ -44,7 +44,6 @@ const Test = () => {
         }}
       >
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          {/* <motion.h1 variants={textVariants}>{`title`}</motion.h1> */}
           <motion.p variants={textVariants}>{`WHERE`}</motion.p>
           <motion.p variants={textVariants}>{`IDEAS`}</motion.p>
           <motion.p variants={textVariants}>{`BECOME`}</motion.p>

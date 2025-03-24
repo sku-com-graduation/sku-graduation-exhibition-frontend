@@ -14,15 +14,19 @@ import { SelectCS } from "./Select";
 const Container = styled(motion.div)`
   position: fixed;
   top: 0;
-  width: 100%;
+  left: 1rem;
+  right: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0rem 3rem;
   height: 4rem;
   z-index: 1000;
-  background: #fff;
+  /* background: #d1d1d1; */
+  /* border: 0.3rem solid #fff; */
+  border-radius: 5rem;
   box-sizing: border-box;
+  margin: 1rem;
 `;
 
 const LeftContainer = styled.div`
@@ -68,22 +72,22 @@ const Header = () => {
   const { openModal, Modal } = useModal();
 
   const controls = useAnimation();
-  const { scrollY } = useViewportScroll();
-  const lastScrollY = useRef(0);
+  // const { scrollY } = useViewportScroll();
+  // const lastScrollY = useRef(0);
 
-  useEffect(() => {
-    const unsubscribe = scrollY.onChange((currentY) => {
-      if (currentY > lastScrollY.current) {
-        // 스크롤 다운 시 헤더 숨김
-        controls.start({ y: "-100%" });
-      } else {
-        // 스크롤 업 시 헤더 표시
-        controls.start({ y: 0 });
-      }
-      lastScrollY.current = currentY;
-    });
-    return () => unsubscribe();
-  }, [scrollY, controls]);
+  // useEffect(() => {
+  //   const unsubscribe = scrollY.onChange((currentY) => {
+  //     if (currentY > lastScrollY.current) {
+  //       // 스크롤 다운 시 헤더 숨김
+  //       controls.start({ y: "-100%" });
+  //     } else {
+  //       // 스크롤 업 시 헤더 표시
+  //       controls.start({ y: 0 });
+  //     }
+  //     lastScrollY.current = currentY;
+  //   });
+  //   return () => unsubscribe();
+  // }, [scrollY, controls]);
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = e.target.value;

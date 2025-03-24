@@ -12,6 +12,7 @@ import CustomCursor from "./components/CustomCursor";
 import { AdminPage, MainPage, TeamPage, TeamEditPage, ProjectPage, YearHomePage } from "./pages";
 import Test from "./pages/Test";
 import MainUI from "./pages/MainUI";
+import MainUI2 from "./pages/MainUI2";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -90,6 +91,8 @@ function AnimatedRoutes() {
         />
         <Route path="/test" element={<Test />} />
         <Route path="/test2" element={<MainUI />} />
+        <Route path="/test3" element={<MainUI2 />} />
+
         <Route path="*" element={<>NOT FOUND</>} />
       </Routes>
     </AnimatePresence>
