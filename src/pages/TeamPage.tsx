@@ -6,7 +6,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
 import { IProject, ITeamPost, ITeamStudent } from "../interface";
-import SlideImage from "../components/SlideImage";
+// import SlideImage from "../components/SlideImage";
 import { useModal } from "../hooks/useModal";
 import Profile from "../components/Profile";
 import empty from "../assets/image/empty.png";
@@ -219,6 +219,13 @@ const StudentName = styled.div`
   margin-top: 0.5rem;
 `;
 
+const SlideImage = styled.img`
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+`;
+
 const TeamPage = () => {
   const { year, team_uuid } = useParams();
   const { openModal, Modal } = useModal();
@@ -322,7 +329,7 @@ const TeamPage = () => {
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
-        <SlideImage img={teampost?.teamInfo.slideImages} />
+        {/* <SlideImage img={teampost?.teamInfo.slideImages} /> */}
 
         <SectionTitle>Members</SectionTitle>
         <StudentList>
