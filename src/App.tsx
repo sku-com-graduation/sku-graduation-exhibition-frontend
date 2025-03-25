@@ -13,6 +13,7 @@ import { AdminPage, MainPage, TeamPage, TeamEditPage, ProjectPage, YearHomePage 
 import Test from "./pages/Test";
 import MainUI from "./pages/MainUI";
 import MainUI2 from "./pages/MainUI2";
+import MainUI3 from "./pages/MainUI3";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -92,6 +93,7 @@ function AnimatedRoutes() {
         <Route path="/test" element={<Test />} />
         <Route path="/test2" element={<MainUI />} />
         <Route path="/test3" element={<MainUI2 />} />
+        <Route path="/test4" element={<MainUI3 />} />
 
         <Route path="*" element={<>NOT FOUND</>} />
       </Routes>
