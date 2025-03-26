@@ -45,6 +45,7 @@ const Logo = styled.div`
   font-size: 1.2rem;
   font-weight: bold;
   color: #555;
+  cursor: pointer;
 
   transition: color 0.3s;
 
