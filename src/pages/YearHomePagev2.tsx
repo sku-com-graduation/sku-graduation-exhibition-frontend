@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import styled, { keyframes } from "styled-components";
-import v5 from "../assets/video/v5.mp4";
+import v5 from "../assets/video/v1.mp4";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
