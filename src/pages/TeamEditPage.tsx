@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { postGetTeampost, putTeampost, putTeampostSlideImage } from "../api/teamPost";
 import { ITeamPost } from "../interface";
-import empty from "../assets/image/empty.png";
+import empty from "../assets/image/img3.png";
 import SlideImageEditor from "@components/SlideImageEditor";
 import DemoVideoEditor from "@components/DemoVideoEditor";
 import { AddArea, EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";

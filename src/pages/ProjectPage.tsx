@@ -3,17 +3,34 @@ import { getProjects } from "../api/team";
 import { IProject } from "../interface";
 import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import empty from "../assets/image/empty.png";
+import empty from "../assets/image/img3.png";
 import { categories, CategoryType } from "../constant/categorys";
 import { AnimatePresence, motion } from "framer-motion";
 
-// 기존 스타일 컴포넌트들은 그대로 유지
+import i1 from "../assets/image/i2.png";
+
+// 추가: 고정된 배경 이미지 요소
+const Background = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50vw;
+  height: 100vh;
+  background-image: url(${i1});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right center;
+  z-index: -1;
+  pointer-events: none;
+`;
 
 const Wrapper = styled.div`
+  position: relative;
   width: 100%;
   display: grid;
   grid-template-rows: auto;
   box-sizing: border-box;
+  z-index: 1;
 `;
 
 const Container = styled.div`
@@ -103,20 +120,32 @@ const CategoryContainer = styled.div`
   }
 `;
 
-const CategoryBox = styled.div<{ color: string }>`
-  border-radius: 2rem;
-  font-size: 1.5rem;
-  padding: 0.5rem;
-  background: ${(props) => props.color};
-  color: #fff;
-  transition: background 0.1s ease-in-out;
+const ProjectButton = styled(motion.button)`
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7fbfff, #a389f4);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 
   &:hover {
-    background: #85b4ff;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #6faeff, #9279f1);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
   }
 `;
 
@@ -172,17 +201,17 @@ const ProjectPage = () => {
     setCategory(category);
   }, []);
 
-  // 카테고리별로 필터링
   const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
 
   return (
     <Wrapper>
+      <Background />
       <Title>PROJECT</Title>
       <CategoryContainer>
         {categories.map((c) => (
-          <CategoryBox key={c} onClick={() => handleCategoryChange(c)} color={category === c ? "#85b4ff" : "#b1b1b1"}>
+          <ProjectButton key={c} onClick={() => handleCategoryChange(c)} color={category === c ? "#85b4ff" : "#b1b1b1"}>
             {c}
-          </CategoryBox>
+          </ProjectButton>
         ))}
       </CategoryContainer>
       <Container>

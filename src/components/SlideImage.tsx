@@ -1,12 +1,12 @@
 import { getTeamProflies } from "@src/api/team";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const SliderWrapper = styled.div`
-  overflow: hidden;
+  overflow-x: hidden; /* 수평 스크롤 방지 */
   width: 100%;
   margin: 3rem 0;
+  box-sizing: border-box;
 `;
 
 const SlideTrack = styled.div<{ reverse?: boolean }>`
@@ -40,6 +40,10 @@ const SliderImage = styled.img`
   flex-shrink: 0;
   border-radius: 10px;
   margin-right: 1rem;
+
+  &:last-child {
+    margin-right: 0; /* 마지막 요소의 오른쪽 여백 제거 */
+  }
 
   @media (max-width: 768px) {
     width: 100px;

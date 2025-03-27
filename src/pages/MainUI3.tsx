@@ -1,7 +1,7 @@
 import { motion, useViewportScroll, useTransform } from "framer-motion";
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import v from "../assets/video/v3.mp4";
+import v from "../assets/video/v1.mp4";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -21,7 +21,6 @@ const LogoWrapper = styled(motion.div)`
 `;
 
 const Logo = styled(motion.div)`
-  font-size: 5vw;
   mix-blend-mode: color-burn;
   color: white;
   position: absolute;

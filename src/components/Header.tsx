@@ -10,58 +10,93 @@ import { clearAuth } from "../store/reducers/auth";
 import { getLogout } from "../api/auth";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { SelectCS } from "./Select";
+import logo from "../assets/image/logo2.png";
+import { START_YEAR } from "@src/constant/years";
+import { getYearRange } from "@src/utils/year";
 
 const Container = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  left: 1rem;
-  right: 1rem;
   display: flex;
   justify-content: space-between;
+
   align-items: center;
-  padding: 0rem 3rem;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
   height: 4rem;
-  z-index: 1000;
-  /* background: #d1d1d1; */
-  /* border: 0.3rem solid #fff; */
-  border-radius: 5rem;
+  padding: 0 3rem;
   box-sizing: border-box;
-  margin: 1rem;
+  z-index: 1000;
+  border-radius: 2rem;
+
+  /* background: #dabce4; */
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  @media (max-width: 430px) {
+    height: auto;
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
+  }
 `;
 
 const LeftContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+
+  @media (max-width: 430px) {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 `;
 
 const RightContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  cursor: pointer;
+
+  @media (max-width: 430px) {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 `;
 
-const Logo = styled.div`
-  font-size: 1.2rem;
+const Logo = styled.img`
+  width: 5rem;
   font-weight: bold;
   color: #555;
   cursor: pointer;
-
   transition: color 0.3s;
 
   &:hover {
     color: #0077fe;
+  }
+
+  @media (max-width: 430px) {
+    font-size: 1rem;
   }
 `;
 
 const NavItem = styled.div`
   font-size: 1rem;
   color: #555;
-
   transition: color 0.3s;
 
   &:hover {
     color: #0077fe;
+  }
+
+  @media (max-width: 430px) {
+    font-size: 0.9rem;
   }
 `;
 
@@ -73,22 +108,22 @@ const Header = () => {
   const { openModal, Modal } = useModal();
 
   const controls = useAnimation();
-  // const { scrollY } = useViewportScroll();
-  // const lastScrollY = useRef(0);
+  const { scrollY } = useViewportScroll();
+  const lastScrollY = useRef(0);
 
-  // useEffect(() => {
-  //   const unsubscribe = scrollY.onChange((currentY) => {
-  //     if (currentY > lastScrollY.current) {
-  //       // 스크롤 다운 시 헤더 숨김
-  //       controls.start({ y: "-100%" });
-  //     } else {
-  //       // 스크롤 업 시 헤더 표시
-  //       controls.start({ y: 0 });
-  //     }
-  //     lastScrollY.current = currentY;
-  //   });
-  //   return () => unsubscribe();
-  // }, [scrollY, controls]);
+  useEffect(() => {
+    const unsubscribe = scrollY.onChange((currentY) => {
+      if (currentY > lastScrollY.current) {
+        // 스크롤 다운 시 헤더 숨김
+        controls.start({ y: "-100%" });
+      } else {
+        // 스크롤 업 시 헤더 표시
+        controls.start({ y: 0 });
+      }
+      lastScrollY.current = currentY;
+    });
+    return () => unsubscribe();
+  }, [scrollY, controls]);
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = e.target.value;
@@ -111,16 +146,18 @@ const Header = () => {
     }
   };
 
+  const years = getYearRange();
+
   return (
     <>
       <Container animate={controls} initial={{ y: 0 }} transition={{ type: "tween", duration: 0.3 }}>
         <LeftContainer>
-          <Logo onClick={() => navigate(`/${year}`)}>SKU</Logo>
+          <Logo src={logo} onClick={() => navigate(`/${year}`)} />
           <SelectCS value={year} onChange={handleYearChange}>
             <option value="" disabled hidden>
               전시 연도
             </option>
-            {["2025", "2024", "2023"].map((y) => (
+            {years.map((y) => (
               <option key={y} value={y}>
                 {y}
               </option>

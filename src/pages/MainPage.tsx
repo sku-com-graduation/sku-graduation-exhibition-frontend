@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
+import { START_YEAR } from "../constant/years";
+
 // 그라데이션 애니메이션 키프레임
 const gradientAnimation = keyframes`
   0% {
@@ -64,12 +66,9 @@ const YearButton = styled.button`
 
 const MainPage = () => {
   const navigate = useNavigate();
-  const [years, setYears] = useState<number[]>([]);
+  const currentYear = new Date().getFullYear();
 
-  useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    setYears([currentYear, currentYear - 1, currentYear - 2]);
-  }, []);
+  const years = Array.from({ length: currentYear - START_YEAR + 1 }, (_, i) => currentYear - i);
 
   return (
     <Wrapper>

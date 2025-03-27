@@ -22,6 +22,7 @@ const Container = styled.div`
 `;
 
 const MenuContainer = styled.div`
+  margin-top: 5rem;
   display: grid;
   width: 50%;
   grid-template-columns: repeat(4, 1fr);
