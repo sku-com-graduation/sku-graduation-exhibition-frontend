@@ -13,7 +13,11 @@ import { AdminPage, MainPage, TeamPage, TeamEditPage, ProjectPage, YearHomePage 
 import Test from "./pages/Test";
 import MainUI from "./pages/MainUI";
 import MainUI2 from "./pages/MainUI2";
+<<<<<<< HEAD
 import MainUI3 from "./pages/MainUI3";
+=======
+import YearHomePagev2 from "./pages/YearHomePagev2";
+>>>>>>> 0abcb7be82597857d1f01ae8c8157ecde6c6a216
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -24,7 +28,7 @@ const LayoutContainer = styled.div`
 const Content = styled(motion.div)`
   flex: 1;
   box-sizing: border-box;
-  margin-top: 5rem;
+  /* margin-top: 5rem; */
 `;
 
 const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -87,6 +91,14 @@ function AnimatedRoutes() {
           element={
             <DefaultLayout>
               <TeamEditPage />
+            </DefaultLayout>
+          }
+        />
+        <Route
+          path="/2026"
+          element={
+            <DefaultLayout>
+              <YearHomePagev2 />
             </DefaultLayout>
           }
         />

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import v4 from "../assets/video/v4.mp4";
+import v4 from "../assets/video/v1.mp4";
 import mainImg from "../assets/image/main.jpg";
 
 import BlackHoleImage from "@components/BlackHoleImage";

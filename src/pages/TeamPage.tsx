@@ -279,7 +279,10 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
+    const newIndex =
+      direction === "prev"
+        ? (currentIndex - 1 + projects.length) % projects.length
+        : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -300,7 +303,9 @@ const TeamPage = () => {
 
   return (
     <>
-      {(auth.uuid === team_uuid || auth.teamName === "admin") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+      {(auth.uuid === team_uuid || auth.teamName === "admin") && (
+        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
+      )}
 
       <PrevButton
         variants={buttonVariants}
@@ -325,7 +330,13 @@ const TeamPage = () => {
       <Container>
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
-          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
+          <TeamProfile
+            src={
+              teampost?.teamInfo.teamProfileImage
+                ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}`
+                : empty
+            }
+          />
           <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
         </TeamIntro>
 
@@ -354,7 +365,9 @@ const TeamPage = () => {
 
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
+          <PosterImg
+            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty}
+          />
         </PosterIntro>
       </Container>
     </>

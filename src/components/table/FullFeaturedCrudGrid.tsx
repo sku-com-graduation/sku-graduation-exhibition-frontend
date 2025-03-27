@@ -1,4 +1,8 @@
 import React from "react";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0abcb7be82597857d1f01ae8c8157ecde6c6a216
 const FullFeaturedCrudGrid = ({ mode }: { mode: "student" | "team" | "account" | "professor" }) => {
   return <div>FullFeaturedCrudGrid</div>;
 };
