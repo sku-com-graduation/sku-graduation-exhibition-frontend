@@ -12,9 +12,11 @@ export const getProfessor = async (): Promise<IProfessor[]> => {
 };
 
 /** 교수 정보 생성 */
-export const postProfessor = async (professor: IProfessor) => {
+export const postProfessor = async (data: FormData) => {
   try {
-    const result = await api.post(`/admin/professor/regist`, professor);
+    const result = await api.post(`/admin/professor/regist`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     if (result.status === 201) {
       return result.data;
     }
@@ -24,9 +26,9 @@ export const postProfessor = async (professor: IProfessor) => {
 };
 
 /** 교수 정보 수정 */
-export const putProfessor = async (professor: IProfessor) => {
+export const putProfessor = async (data: FormData) => {
   try {
-    const result = await api.put(`/admin/professor/update`, professor);
+    const result = await api.put(`/admin/professor/update`, data, { headers: { "Content-Type": "multipart/form-data" } });
     if (result.status === 201) {
       return result.data;
     }

@@ -44,7 +44,7 @@ const Profile = ({ selectedStudent, teamUuid }: { selectedStudent: ITeamStudent;
             <Name>{editedStudent.name}</Name>
           )}
           <RoleBadge>{editedStudent.role}</RoleBadge>
-          {auth.uuid === teamUuid && (
+          {(auth.uuid === teamUuid || auth.role === "ADMIN") && (
             <ButtonGroup>
               {isEditing ? (
                 <>

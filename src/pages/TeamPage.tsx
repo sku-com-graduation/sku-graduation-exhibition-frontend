@@ -298,9 +298,13 @@ const TeamPage = () => {
     visible: { opacity: 1, scale: 1 },
   };
 
+  useEffect(() => {
+    console.log(auth);
+  }, [auth]);
+
   return (
     <>
-      {(auth.uuid === team_uuid || auth.teamName === "admin") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+      {(auth.uuid === team_uuid || auth.role === "ADMIN") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
 
       <PrevButton
         variants={buttonVariants}
@@ -309,7 +313,7 @@ const TeamPage = () => {
         transition={{ duration: 1, ease: "easeOut" }}
         onClick={() => navigateProject("prev")}
       >
-        ←{/* <ArrowleftIcon /> */}
+        ←
       </PrevButton>
 
       <NextButton

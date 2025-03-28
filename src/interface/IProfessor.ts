@@ -3,5 +3,5 @@ export default interface IProfessor {
   name: string;
   email: string;
   tenure: boolean;
-  profileImg: File | string;
+  profileImage: File | string;
 }

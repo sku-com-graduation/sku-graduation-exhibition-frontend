@@ -12,7 +12,6 @@ export const getTeams = async (year: string): Promise<ITeam[]> => {
 
 export const putTeams = async (teams: ITeam[]) => {
   try {
-    console.log("put");
     const result = await api.put(`/admin/team/update`, teams);
     return result.data;
   } catch (error) {

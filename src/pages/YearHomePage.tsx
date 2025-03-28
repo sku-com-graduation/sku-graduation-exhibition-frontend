@@ -219,17 +219,23 @@ const YearHomePage = () => {
           GRADUATION EXHIBITION
         </Title>
 
-        <VideoCircle
-          src={v5}
-          autoPlay
-          loop
-          muted
-          playsInline
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1 }}
-          onClick={() => setIsExpanded(true)}
-        />
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 1 }}>
+          <VideoCircle
+            src={v5}
+            autoPlay
+            loop
+            muted
+            playsInline
+            animate={{ y: [0, -10, 0, 10, 0] }}
+            transition={{
+              duration: 3,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+            // whileHover={{ scale: 1.5 }}
+            onClick={() => setIsExpanded(true)}
+          />
+        </motion.div>
 
         <SubInfo initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5, duration: 0.6 }}>
           SUNGKYUL COMPUTER ENGINEERING

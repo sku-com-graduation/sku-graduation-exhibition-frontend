@@ -1,7 +1,10 @@
 // AdminPage.tsx
 import { useState } from "react";
 import styled from "styled-components";
-import FullFeaturedCrudGrid from "../components/table/FullFeaturedCrudGrid";
+import StudentGrid from "../components/table/StudentGrid";
+import AccountGrid from "@components/table/AccountGrid";
+import TeamGrid from "@components/table/TeamGrid";
+import ProfessorGrid from "@components/table/ProfessorGrid";
 
 const adminMenus: {
   id: "student" | "team" | "account" | "professor";
@@ -76,7 +79,10 @@ const AdminPage = () => {
         })}
       </MenuContainer>
       <WorkContainer>
-        <FullFeaturedCrudGrid mode={selectedMenu} />
+        {selectedMenu === "student" && <StudentGrid />}
+        {selectedMenu === "account" && <AccountGrid />}
+        {selectedMenu === "team" && <TeamGrid />}
+        {selectedMenu === "professor" && <ProfessorGrid />}
       </WorkContainer>
     </Container>
   );
