@@ -17,11 +17,13 @@ const adminMenus: {
 ];
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100vh;
   padding: 1rem;
   box-sizing: border-box;
-  background-color: #eff5ff;
+  background-color: rgb(236, 238, 252);
 `;
 
 const MenuContainer = styled.div`
@@ -39,14 +41,15 @@ const MenuContainer = styled.div`
 const MenuItem = styled.div<{ $isSelected: boolean }>`
   display: grid;
   padding: 10px;
-  background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#F3F3F3")};
+  margin-right: 0.5rem;
+  background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#e2e2e2")};
   border-radius: 1rem 1rem 0 0;
   place-items: center;
 
   transition: background-color 0.25s;
 
   &:hover {
-    background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#dfdfdf")};
+    background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#acacac")};
   }
 
   @media (max-width: 768px) {
@@ -56,13 +59,14 @@ const MenuItem = styled.div<{ $isSelected: boolean }>`
 `;
 
 const WorkContainer = styled.div`
-  width: 100%;
-  height: 95%;
+  flex: 1;
+  overflow: hidden;
   background-color: #ffffff;
   padding: 1rem;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 `;
-
 const AdminPage = () => {
   const [selectedMenu, setSelectedMenu] = useState<"student" | "team" | "account" | "professor">(adminMenus[0].id);
 

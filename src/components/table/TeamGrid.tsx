@@ -121,7 +121,7 @@ const TeamGrid = () => {
     }));
 
   return (
-    <Box sx={{ height: 500, width: "100%" }}>
+    <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Toolbar>
         <YearSelect />
         <StyledButton startIcon={<SaveIcon />} variant="outlined" onClick={handleSave}>

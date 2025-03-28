@@ -29,7 +29,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      console.warn("토큰이 만료되었습니다. 다시 로그인하세요.");
+      alert("로그인이 만료되었습니다.");
       sessionStorage.clear();
     }
     return Promise.reject(error);

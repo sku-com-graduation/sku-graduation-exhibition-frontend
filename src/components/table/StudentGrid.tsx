@@ -226,7 +226,7 @@ const StudentGrid = () => {
     });
 
   return (
-    <Box sx={{ height: 500, width: "100%" }}>
+    <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Toolbar />
       <DataGrid
         rows={rowsWithId}
@@ -246,7 +246,6 @@ const StudentGrid = () => {
 
 export default StudentGrid;
 
-// ✅ Styled Components
 const ToolbarBox = styled(Box)({
   display: "flex",
   gap: 8,

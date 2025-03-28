@@ -151,7 +151,7 @@ const ProfessorGrid = () => {
   };
 
   return (
-    <Box sx={{ height: 500, width: "100%" }}>
+    <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Toolbar>
         <StyledButton startIcon={<PersonAddIcon />} variant="outlined" onClick={handleDialogOpen}>
           교수 추가
