@@ -3,7 +3,7 @@ import { getProjects } from "../api/team";
 import { IProject } from "../interface";
 import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import empty from "../assets/image/img3.png";
+import empty from "../assets/image/main_image.png";
 import { categories, CategoryType } from "../constant/categorys";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -110,13 +110,17 @@ const CategoryContainer = styled.div`
   box-sizing: border-box;
   padding: 0rem 10rem 5rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   text-align: center;
 
   @media (max-width: 768px) {
     padding: 0 2rem;
     grid-template-columns: repeat(2, 1fr);
+
+    & > :first-child {
+      grid-column: span 2;
+    }
   }
 `;
 
@@ -153,10 +157,12 @@ const Title = styled.div`
   padding: 5rem 0rem;
   text-align: center;
   font-size: 3rem;
+  color: #424242;
 
   @media (max-width: 768px) {
     font-size: 2rem;
     padding: 2rem 0rem;
+    margin-top: 5rem;
   }
 `;
 
@@ -201,7 +207,9 @@ const ProjectPage = () => {
     setCategory(category);
   }, []);
 
-  const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
+  const filteredProjects = Array.isArray(projects)
+    ? projects.filter((pro) => category === "ALL" || pro.category === category)
+    : [];
 
   return (
     <Wrapper>

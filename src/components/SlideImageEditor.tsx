@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, horizontalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
@@ -70,20 +70,44 @@ const SlideImageEditor = ({ existingImages, newImages, setExistingImages, setNew
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sensors = useSensors(useSensor(PointerSensor));
 
-  // 초기 items는 부모 상태를 기반으로 한 번만 생성합니다.
-  const [items, setItems] = useState<SlideItem[]>(() => [
-    ...existingImages.map((img) => ({ id: `existing-${uuidv4()}`, type: "existing", img } as ExistingImage)),
-    ...newImages.map((file) => ({ id: `new-${uuidv4()}`, type: "new", file } as NewImage)),
-  ]);
+  const [items, setItems] = useState<SlideItem[]>([]);
+
+  // 🧠 상태 동기화: 기존 이미지나 새 이미지가 바뀔 때마다 items 재구성
+  useEffect(() => {
+    const updatedItems: SlideItem[] = [
+      ...existingImages.map(
+        (img) =>
+          ({
+            id: `existing-${uuidv4()}`,
+            type: "existing",
+            img,
+          } as ExistingImage)
+      ),
+      ...newImages.map(
+        (file) =>
+          ({
+            id: `new-${uuidv4()}`,
+            type: "new",
+            file,
+          } as NewImage)
+      ),
+    ];
+    setItems(updatedItems);
+  }, [existingImages, newImages]);
 
   const handleNewImages = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (files.length === 0) return;
 
-    // 새 파일에 고유 id를 부여
-    const newItems = files.map((file) => ({ id: `new-${uuidv4()}`, type: "new", file } as NewImage));
+    const newItems = files.map(
+      (file) =>
+        ({
+          id: `new-${uuidv4()}`,
+          type: "new",
+          file,
+        } as const) // 또는 as NewImage
+    );
 
-    // items와 부모 상태 모두 업데이트
     setItems((prev) => [...prev, ...newItems]);
     setNewImages((prev) => [...prev, ...files]);
   };
@@ -121,7 +145,12 @@ const SlideImageEditor = ({ existingImages, newImages, setExistingImages, setNew
             {items.map((item) => (
               <SortableItem key={item.id} id={item.id}>
                 <ImageWrapper>
-                  <SlideImage src={item.type === "existing" ? `data:image/jpeg;base64,${item.img}` : URL.createObjectURL(item.file)} alt={item.id} />
+                  <SlideImage
+                    src={
+                      item.type === "existing" ? `data:image/jpeg;base64,${item.img}` : URL.createObjectURL(item.file)
+                    }
+                    alt={item.id}
+                  />
                   <DeleteButton
                     onPointerDown={(e) => {
                       e.stopPropagation();

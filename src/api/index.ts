@@ -31,6 +31,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       alert("로그인이 만료되었습니다.");
       sessionStorage.clear();
+      window.location.href = `/${new Date().getFullYear()}`;
     }
     return Promise.reject(error);
   }

@@ -1,5 +1,11 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderEditCellParams,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+} from "@mui/x-data-grid";
 import { Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -29,7 +35,6 @@ const TeamGrid = () => {
     const fetchData = async () => {
       try {
         const data = await getTeams(selectedYear.toString());
-        console.log(data);
         setTeams(data);
       } catch (error) {
         console.error("팀 데이터 로딩 실패", error);
@@ -72,6 +77,7 @@ const TeamGrid = () => {
       const updatedList: ITeam[] = Array.from(modifiedRows.values()).map((row) => ({
         ...row,
         encryptedTeamId: row.id,
+        exhibitionYear: selectedYear,
       }));
 
       await putTeams(updatedList);

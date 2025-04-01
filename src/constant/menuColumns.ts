@@ -25,3 +25,13 @@ export const PROFESSOR = {
   tenure: "재직 여부",
   profileImg: "프로필",
 } as const;
+
+export const ADMIN_MENUS: {
+  id: "student" | "team" | "account" | "professor";
+  title: string;
+}[] = [
+  { id: "student", title: "학생 관리" },
+  { id: "team", title: "팀 관리" },
+  { id: "account", title: "계정 관리" },
+  { id: "professor", title: "교수 관리" },
+];

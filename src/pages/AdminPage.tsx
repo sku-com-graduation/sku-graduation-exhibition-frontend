@@ -67,6 +67,7 @@ const WorkContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
 const AdminPage = () => {
   const [selectedMenu, setSelectedMenu] = useState<"student" | "team" | "account" | "professor">(adminMenus[0].id);
 

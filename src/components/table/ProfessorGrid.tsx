@@ -9,7 +9,6 @@ import {
   Checkbox,
   FormControlLabel,
   Typography,
-  Stack,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Save as SaveIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
@@ -225,8 +224,20 @@ const ProfessorGrid = () => {
 
             {/* 이름 / 이메일 입력 필드 */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
-              <TextField name="name" label="이름" value={newProfessor.name} onChange={handleNewProfessorChange} fullWidth />
-              <TextField name="email" label="이메일" value={newProfessor.email} onChange={handleNewProfessorChange} fullWidth />
+              <TextField
+                name="name"
+                label="이름"
+                value={newProfessor.name}
+                onChange={handleNewProfessorChange}
+                fullWidth
+              />
+              <TextField
+                name="email"
+                label="이메일"
+                value={newProfessor.email}
+                onChange={handleNewProfessorChange}
+                fullWidth
+              />
             </Box>
           </Box>
 
@@ -235,7 +246,13 @@ const ProfessorGrid = () => {
             label="재직 여부"
             sx={{ mt: 2 }}
           />
-          <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
           <Button onClick={handleDialogClose}>취소</Button>

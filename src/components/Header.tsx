@@ -10,8 +10,8 @@ import { clearAuth } from "../store/reducers/auth";
 import { getLogout } from "../api/auth";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { SelectCS } from "./Select";
-import logo from "../assets/image/logo2.png";
-import { START_YEAR } from "@src/constant/years";
+import logo from "../assets/image/logo.png";
+
 import { getYearRange } from "@src/utils/year";
 
 const Container = styled(motion.div)`
@@ -28,8 +28,6 @@ const Container = styled(motion.div)`
   box-sizing: border-box;
   z-index: 1000;
   border-radius: 2rem;
-
-  /* background: #dabce4; */
 
   @media (max-width: 768px) {
     gap: 1rem;
@@ -110,6 +108,17 @@ const Header = () => {
   const controls = useAnimation();
   const { scrollY } = useViewportScroll();
   const lastScrollY = useRef(0);
+
+  const AUTH_KEY_NAME = import.meta.env.VITE_AUTH_KEY_NAME;
+  const acssesToken = (() => {
+    return sessionStorage.getItem(AUTH_KEY_NAME);
+  })();
+
+  useEffect(() => {
+    if (!acssesToken) {
+      dispatch(clearAuth());
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     const unsubscribe = scrollY.onChange((currentY) => {

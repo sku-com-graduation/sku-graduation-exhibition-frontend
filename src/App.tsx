@@ -1,4 +1,7 @@
 import React from "react";
+import { Helmet } from "react-helmet";
+import img from "./assets/image/main_image.png";
+
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,14 +10,7 @@ import theme from "./styles/theme";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
-import CustomCursor from "./components/CustomCursor";
-
-import { AdminPage, MainPage, TeamPage, TeamEditPage, ProjectPage, YearHomePage } from "./pages";
-import Test from "./pages/Test";
-import MainUI from "./pages/MainUI";
-import MainUI2 from "./pages/MainUI2";
-import MainUI3 from "./pages/MainUI3";
-import YearHomePagev2 from "./pages/YearHomePagev2";
+import { AdminPage, NotfoundPage, TeamPage, TeamEditPage, ProjectPage, YearHomePage } from "./pages";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -25,7 +21,6 @@ const LayoutContainer = styled.div`
 const Content = styled(motion.div)`
   flex: 1;
   box-sizing: border-box;
-  /* margin-top: 5rem; */
 `;
 
 const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -48,9 +43,8 @@ function AnimatedRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      <CustomCursor />
       <Routes key={location.pathname} location={location}>
-        <Route path="/" element={<MainPage />} />
+        {/* <Route path="/" element={<MainPage />} /> */}
         <Route
           path="/:year/admin"
           element={
@@ -91,20 +85,8 @@ function AnimatedRoutes() {
             </DefaultLayout>
           }
         />
-        {/* <Route
-          path="/2026"
-          element={
-            <DefaultLayout>
-              <YearHomePagev2 />
-            </DefaultLayout>
-          }
-        />
-        <Route path="/test" element={<Test />} />
-        <Route path="/test2" element={<MainUI />} />
-        <Route path="/test3" element={<MainUI2 />} />
-        <Route path="/test4" element={<MainUI3 />} /> */}
 
-        <Route path="*" element={<>NOT FOUND</>} />
+        <Route path="*" element={<NotfoundPage />} />
       </Routes>
     </AnimatePresence>
   );
@@ -113,6 +95,11 @@ function AnimatedRoutes() {
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <Helmet>
+        <meta property="og:image" content={img} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </Helmet>
       <Router>
         <AnimatedRoutes />
       </Router>

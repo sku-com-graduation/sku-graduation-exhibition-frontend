@@ -6,14 +6,13 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setExhibitionYear } from "../store/reducers/exhibitionYear";
 import { postGetTeampost } from "../api/teamPost";
 import { IProject, ITeamPost, ITeamStudent } from "../interface";
-// import SlideImage from "../components/SlideImage";
+
 import { useModal } from "../hooks/useModal";
-import Profile from "../components/Profile";
-import empty from "../assets/image/img3.png";
-import userEmpty from "../assets/image/userEmpty.png";
+import empty from "../assets/image/main_image.png";
+import userEmpty from "../assets/image/main_image.png";
 import { getProjects } from "@src/api/team";
-import { ArrowleftIcon, ArrowRightIcon } from "@components/Icons";
 import { motion } from "framer-motion";
+import ProfileView from "@components/ProfileView";
 
 const Container = styled.div`
   width: 100%;
@@ -21,6 +20,7 @@ const Container = styled.div`
   grid-template-rows: repeat(5, auto);
   gap: 3rem;
   place-items: center;
+  padding-top: 5rem;
 `;
 
 const SectionTitle = styled.h2`
@@ -219,12 +219,60 @@ const StudentName = styled.div`
   margin-top: 0.5rem;
 `;
 
-const SlideImage = styled.img`
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 0.5rem;
+const SlideWrapper = styled.div`
+  width: 100%;
+  overflow: hidden;
+  max-width: 100rem;
 `;
+
+const SlideTrack = styled(motion.div)`
+  display: flex;
+  width: fit-content;
+  gap: 1rem;
+`;
+
+const SlideImageItem = styled.img`
+  width: 15rem;
+  height: 10rem;
+  object-fit: cover;
+  border-radius: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+`;
+
+const SlideCarousel = ({ images }: { images: string[] }) => {
+  const duplicatedImages = [
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+  ]; // 무한 루프 효과용
+  const totalWidth = images.length * 16; // rem 단위로 대충 계산
+
+  return (
+    <SlideWrapper>
+      <SlideTrack
+        animate={{ x: [`0%`, `-${totalWidth}rem`] }}
+        transition={{
+          repeat: Infinity,
+          ease: "linear",
+          duration: 30,
+        }}
+      >
+        {duplicatedImages.map((img, index) => (
+          <SlideImageItem key={index} src={`data:image/jpeg;base64,${img}`} />
+        ))}
+      </SlideTrack>
+    </SlideWrapper>
+  );
+};
 
 const TeamPage = () => {
   const { year, team_uuid } = useParams();
@@ -279,7 +327,10 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
+    const newIndex =
+      direction === "prev"
+        ? (currentIndex - 1 + projects.length) % projects.length
+        : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -298,13 +349,11 @@ const TeamPage = () => {
     visible: { opacity: 1, scale: 1 },
   };
 
-  useEffect(() => {
-    console.log(auth);
-  }, [auth]);
-
   return (
     <>
-      {(auth.uuid === team_uuid || auth.role === "ADMIN") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+      {(auth.uuid === team_uuid || auth.role === "ADMIN") && (
+        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
+      )}
 
       <PrevButton
         variants={buttonVariants}
@@ -323,17 +372,31 @@ const TeamPage = () => {
         transition={{ duration: 1, ease: "easeOut" }}
         onClick={() => navigateProject("next")}
       >
-        →{/* <ArrowRightIcon /> */}
+        →
       </NextButton>
 
       <Container>
         <TeamIntro>
-          <TeamTitle>{teampost?.teamInfo.projectName}</TeamTitle>
-          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
-          <TeamContent>{teampost?.teamInfo.explanation}</TeamContent>
+          <TeamTitle>
+            {teampost?.teamInfo.projectName === "null" ? "PROJECT TITLE" : teampost?.teamInfo.projectName}
+          </TeamTitle>
+          <TeamProfile
+            src={
+              teampost?.teamInfo.teamProfileImage
+                ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}`
+                : empty
+            }
+          />
+          <TeamContent>
+            {teampost?.teamInfo.explanation === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.explanation}
+          </TeamContent>
         </TeamIntro>
 
-        {/* <SlideImage img={teampost?.teamInfo.slideImages} /> */}
+        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && (
+          <>
+            <SlideCarousel images={teampost.teamInfo.slideImages} />
+          </>
+        )}
 
         <SectionTitle>Members</SectionTitle>
         <StudentList>
@@ -344,7 +407,7 @@ const TeamPage = () => {
             </StudentItem>
           ))}
         </StudentList>
-        <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} />}</Modal>
+        <Modal>{selectedStudent && <ProfileView student={selectedStudent} />}</Modal>
 
         <SectionTitle>Project Video</SectionTitle>
         <VideoIntro>
@@ -358,7 +421,9 @@ const TeamPage = () => {
 
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
+          <PosterImg
+            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty}
+          />
         </PosterIntro>
       </Container>
     </>

@@ -36,10 +36,6 @@ const AccountGrid = () => {
     fetchData();
   }, [selectedYear]);
 
-  useEffect(() => {
-    console.log(accounts);
-  }, [accounts]);
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
   };
@@ -49,8 +45,6 @@ const AccountGrid = () => {
     setLoading(true);
     try {
       const result = await postAccount(file);
-      console.log("Uploaded:", result);
-
       alert("업로드 성공");
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");

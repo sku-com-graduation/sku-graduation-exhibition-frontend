@@ -1,5 +1,11 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderEditCellParams,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+} from "@mui/x-data-grid";
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import { getStudent, postStudent, putStudent } from "@src/api/student";
 import { getTeams } from "@src/api/team";
@@ -55,7 +61,6 @@ const StudentGrid = () => {
     setLoading(true);
     try {
       const result = await postStudent(file);
-      console.log("Uploaded:", result);
       alert("업로드 성공");
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");
@@ -178,11 +183,10 @@ const StudentGrid = () => {
     const handleChange = (event: SelectChangeEvent<number>) => {
       api.setEditCellValue({ id, field, value: parseInt(event.target.value as string, 10) }, event);
     };
-    const currentYear = new Date().getFullYear();
-    const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
     return (
       <Select value={value ?? ""} onChange={handleChange} fullWidth>
-        {yearOptions.map((year) => (
+        {years.map((year) => (
           <MenuItem key={year} value={year}>
             {year}
           </MenuItem>

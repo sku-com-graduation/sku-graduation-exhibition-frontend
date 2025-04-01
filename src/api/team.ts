@@ -21,8 +21,6 @@ export const putTeams = async (teams: ITeam[]) => {
 
 export const deleteTeams = async (teamIds: string[]) => {
   try {
-    console.log("delete");
-
     const result = await api.delete(`/admin/team/delete`, { data: teamIds });
     return result.data;
   } catch (error) {
