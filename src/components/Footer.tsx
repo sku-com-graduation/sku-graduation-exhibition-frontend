@@ -3,7 +3,7 @@ import { HomeIcon } from "./Icons"; // 아이콘 import
 
 const FooterContainer = styled.footer`
   width: 100%;
-  padding: 16px;
+  padding: 1rem;
   background-color: #f8f9fa;
   font-size: 14px;
   color: #6c757d;
@@ -12,6 +12,9 @@ const FooterContainer = styled.footer`
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
 `;
 
 const FooterText = styled.p`
@@ -23,6 +26,11 @@ const FooterText = styled.p`
 
   &:hover {
     color: #4d8ecf;
+  }
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+    font-size: 0.5rem;
   }
 `;
 

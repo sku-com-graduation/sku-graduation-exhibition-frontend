@@ -1,16 +1,10 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderEditCellParams,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import { getStudent, postStudent, putStudent } from "@src/api/student";
 import { getTeams } from "@src/api/team";
 import { IStudent, ITeam } from "@src/interface";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { getYearRange } from "@src/utils/year";
 
@@ -35,22 +29,23 @@ const StudentGrid = () => {
   const years = getYearRange();
   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const studentData = await getStudent(selectedYear.toString());
-        const teamData = await getTeams(selectedYear.toString());
-        setStudents(studentData);
-        setTeams(teamData);
-      } catch (error) {
-        console.error("데이터 로딩 실패", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const studentData = await getStudent(selectedYear.toString());
+      const teamData = await getTeams(selectedYear.toString());
+      setStudents(studentData);
+      setTeams(teamData);
+    } catch (error) {
+      console.error("데이터 로딩 실패", error);
+    } finally {
+      setLoading(false);
+    }
   }, [selectedYear]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
@@ -60,12 +55,14 @@ const StudentGrid = () => {
     if (!file) return alert("파일을 선택하세요.");
     setLoading(true);
     try {
-      const result = await postStudent(file);
+      await postStudent(file);
       alert("업로드 성공");
+
+      await fetchData();
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");
     } finally {
-      window.location.reload();
+      setLoading(false);
     }
   };
 
@@ -85,7 +82,7 @@ const StudentGrid = () => {
       await putStudent(updatedList);
       alert("저장 완료");
       setModifiedRows(new Map());
-      window.location.reload();
+      // window.location.reload();
     } catch (err) {
       console.error("저장 실패", err);
       alert("저장 중 오류 발생");
@@ -116,38 +113,6 @@ const StudentGrid = () => {
       </Select>
     );
   };
-
-  const Toolbar = () => (
-    <ToolbarBox>
-      <UploaderBox>
-        <Typography
-          variant="h6"
-          sx={{
-            color: "#333",
-            fontSize: "1rem",
-            fontWeight: 500,
-            whiteSpace: "nowrap",
-          }}
-        >
-          등록 업로더
-        </Typography>
-        <StyledInput type="file" accept=".csv" onChange={handleFileChange} />
-        <StyledButton variant="contained" color="primary" onClick={handleUpload}>
-          업로드
-        </StyledButton>
-      </UploaderBox>
-      <YearSelect />
-      <StyledButton startIcon={<AddIcon />} variant="outlined">
-        추가
-      </StyledButton>
-      <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error">
-        삭제
-      </StyledButton>
-      <StyledButton startIcon={<SaveIcon />} variant="outlined" onClick={handleSave}>
-        저장
-      </StyledButton>
-    </ToolbarBox>
-  );
 
   const TeamSelectEditCell = (props: GridRenderEditCellParams<StudentRow>) => {
     const { id, value, field, api } = props;
@@ -200,38 +165,71 @@ const StudentGrid = () => {
       field: "teamName",
       headerName: "팀",
       editable: true,
+      flex: 1,
       renderEditCell: (params) => <TeamSelectEditCell {...params} />,
     },
-    { field: "name", headerName: "이름", editable: true },
-    { field: "studentNumber", headerName: "학번", editable: true },
+    { field: "name", headerName: "이름", editable: true, flex: 1 },
+    { field: "studentNumber", headerName: "학번", editable: true, flex: 1 },
     {
       field: "role",
       headerName: "역할",
       editable: true,
+      flex: 1,
       renderEditCell: (params) => <RoleSelectEditCell {...params} />,
     },
     {
       field: "exhibitionYear",
       headerName: "전시연도",
       editable: true,
+      flex: 1,
       renderEditCell: (params) => <YearCellEdit {...params} />,
     },
   ];
 
-  const rowsWithId: StudentRow[] =
-    students &&
-    students.map((student) => {
-      const team = teams.find((t) => t.encryptedTeamId === student.encryptedTeamId);
-      return {
-        ...student,
-        id: student.encryptedStudentId,
-        teamName: team ? team.name : "",
-      };
-    });
+  const rowsWithId: StudentRow[] = Array.isArray(students)
+    ? students.map((student) => {
+        const modifiedRow = modifiedRows.get(student.encryptedStudentId);
+        if (modifiedRow) return modifiedRow;
+        const team = teams.find((t) => t.encryptedTeamId === student.encryptedTeamId);
+        return {
+          ...student,
+          id: student.encryptedStudentId,
+          teamName: team ? team.name : "",
+        };
+      })
+    : [];
 
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <Toolbar />
+      <ToolbarBox>
+        <UploaderBox>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#333",
+              fontSize: "1rem",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+            }}
+          >
+            등록 업로더
+          </Typography>
+          <StyledInput type="file" accept=".csv" onChange={handleFileChange} />
+          <StyledButton variant="contained" color="primary" onClick={handleUpload}>
+            업로드
+          </StyledButton>
+        </UploaderBox>
+        <YearSelect />
+        <StyledButton startIcon={<AddIcon />} variant="outlined">
+          추가
+        </StyledButton>
+        <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error">
+          삭제
+        </StyledButton>
+        <StyledButton startIcon={<SaveIcon />} variant="outlined" onClick={handleSave}>
+          저장
+        </StyledButton>
+      </ToolbarBox>
       <DataGrid
         rows={rowsWithId}
         columns={columns}

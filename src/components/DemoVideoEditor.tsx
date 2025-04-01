@@ -89,10 +89,7 @@ const DemoVideoEditor = ({ base, handleFileChange }: DemoVideoEditorProps) => {
       {videoSrc || base ? (
         <>
           <SlideMedia ref={videoRef} controls>
-            <source
-              src={videoSrc || (typeof base === "string" ? `data:video/mp4;base64,${base}` : "")}
-              type="video/mp4"
-            />
+            <source src={videoSrc || (typeof base === "string" ? `data:video/mp4;base64,${base}` : "")} type="video/mp4" />
             Your browser does not support the video tag.
           </SlideMedia>
           <ChangeButton onClick={openFileInput}>영상 수정</ChangeButton>
@@ -100,7 +97,7 @@ const DemoVideoEditor = ({ base, handleFileChange }: DemoVideoEditorProps) => {
       ) : (
         <AddMediaButton onClick={openFileInput}>+</AddMediaButton>
       )}
-      <HiddenFileInput name="demo" ref={fileInputRef} type="file" accept="video/*" onChange={onFileChange} />
+      <HiddenFileInput name="demoVideo" ref={fileInputRef} type="file" accept="video/*" onChange={onFileChange} />
     </Wrapper>
   );
 };

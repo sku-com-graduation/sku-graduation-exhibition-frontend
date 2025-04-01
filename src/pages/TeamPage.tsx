@@ -78,7 +78,7 @@ const TeamContent = styled.div`
   margin-top: 1rem;
 
   @media (max-width: 768px) {
-    text-align: center;
+    margin: 0px auto;
   }
 `;
 
@@ -119,20 +119,22 @@ const TeamVideo = styled.video`
 `;
 
 const PosterIntro = styled.div`
-  width: 100%;
+  width: 50%;
   display: grid;
   place-items: center;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const PosterImg = styled.img`
-  width: 50%;
-  height: auto;
-  object-fit: cover;
-  max-width: 100%;
+  width: 100%;
+  aspect-ratio: 3 / 4; // 포스터 비율에 맞게 조정
+  object-fit: contain;
+  border-radius: 1rem;
 
   @media (max-width: 768px) {
-    width: 15rem;
-    height: 15rem;
+    width: 100%;
   }
 `;
 
@@ -241,19 +243,7 @@ const SlideImageItem = styled.img`
 `;
 
 const SlideCarousel = ({ images }: { images: string[] }) => {
-  const duplicatedImages = [
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-  ]; // 무한 루프 효과용
+  const duplicatedImages = [...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images]; // 무한 루프 효과용
   const totalWidth = images.length * 16; // rem 단위로 대충 계산
 
   return (
@@ -327,10 +317,7 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex =
-      direction === "prev"
-        ? (currentIndex - 1 + projects.length) % projects.length
-        : (currentIndex + 1) % projects.length;
+    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -351,9 +338,7 @@ const TeamPage = () => {
 
   return (
     <>
-      {(auth.uuid === team_uuid || auth.role === "ADMIN") && (
-        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
-      )}
+      {(auth.uuid === team_uuid || auth.role === "ADMIN") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
 
       <PrevButton
         variants={buttonVariants}
@@ -377,19 +362,9 @@ const TeamPage = () => {
 
       <Container>
         <TeamIntro>
-          <TeamTitle>
-            {teampost?.teamInfo.projectName === "null" ? "PROJECT TITLE" : teampost?.teamInfo.projectName}
-          </TeamTitle>
-          <TeamProfile
-            src={
-              teampost?.teamInfo.teamProfileImage
-                ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}`
-                : empty
-            }
-          />
-          <TeamContent>
-            {teampost?.teamInfo.explanation === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.explanation}
-          </TeamContent>
+          <TeamTitle>{teampost?.teamInfo.title === "null" ? "PROJECT TITLE" : teampost?.teamInfo.title}</TeamTitle>
+          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
+          <TeamContent>{teampost?.teamInfo.content === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.content}</TeamContent>
         </TeamIntro>
 
         {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && (
@@ -421,9 +396,7 @@ const TeamPage = () => {
 
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg
-            src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty}
-          />
+          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
         </PosterIntro>
       </Container>
     </>

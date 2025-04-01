@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-import { postGetTeampost, putTeampost, putTeampostSlideImage, putTeamStudent } from "../api/teamPost";
+import { postGetTeampost, postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent } from "../api/teamPost";
 import { ITeamPost, ITeamStudent } from "../interface";
 import empty from "../assets/image/main_image.png";
 import SlideImageEditor from "@components/SlideImageEditor";
@@ -13,6 +13,7 @@ import { useModal } from "@src/hooks/useModal";
 import Profile from "@components/Profile";
 
 import userEmpty from "../assets/image/main_image.png";
+import { ITeamPostEdit, ITeamPostEditStudent } from "@src/interface/ITeamPostEdit";
 
 const Container = styled.div`
   width: 100%;
@@ -186,34 +187,34 @@ const CategorySelect = styled.select`
   }
 `;
 
-interface IEditData {
+interface IEditForm {
   encryptedTeamId: string;
   title: string;
   content: string;
   category: string;
   teamProfileImage: File | string;
-  demo: File | string;
-  posterImg: File | string;
+  demoVideo: File | string;
+  posterImage: File | string;
 }
 
 const TeamEditPage = () => {
   const { team_uuid } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [teampost, setTeampost] = useState<ITeamPost | null>(null);
-  const [editData, setEditData] = useState<IEditData>({
+  const [teampostEdit, setTeampostEdit] = useState<ITeamPostEdit | null>(null);
+  const [editData, setEditData] = useState<IEditForm>({
     encryptedTeamId: "",
     title: "",
     content: "",
     category: "",
     teamProfileImage: "",
-    demo: "",
-    posterImg: "",
+    demoVideo: "",
+    posterImage: "",
   });
 
   // 상위에서 관리할 학생(멤버) 수정 배열
-  const [editedStudents, setEditedStudents] = useState<ITeamStudent[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<(ITeamStudent & { index: number }) | null>(null);
+  const [editedStudents, setEditedStudents] = useState<ITeamPostEditStudent[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<(ITeamPostEditStudent & { index: number }) | null>(null);
   const { openModal, Modal } = useModal();
 
   const [existingSlideImages, setExistingSlideImages] = useState<string[]>([]);
@@ -222,33 +223,34 @@ const TeamEditPage = () => {
   const posterInputRef = useRef<HTMLInputElement>(null);
 
   // 데이터 가져오기
-  const getTeampost = async (team_id: string) => {
-    const res = await postGetTeampost(team_id);
-    setTeampost(res);
+  const getTeampostEdit = async (team_id: string) => {
+    const res = await postGetTeampostEdit(team_id);
+    setTeampostEdit(res);
+    console.log(res);
   };
 
   useEffect(() => {
     if (team_uuid) {
-      getTeampost(team_uuid);
+      getTeampostEdit(team_uuid);
     }
   }, [team_uuid]);
 
   // teampost 로드 시 팀 정보와 학생 데이터를 상태에 저장
   useEffect(() => {
-    if (teampost) {
+    if (teampostEdit) {
       setEditData({
         encryptedTeamId: "test",
-        title: teampost.teamInfo.projectName,
-        content: teampost.teamInfo.explanation,
-        category: teampost.teamInfo.category,
-        teamProfileImage: teampost.teamInfo.teamProfileImage,
-        demo: teampost.teamInfo.demoVideo,
-        posterImg: teampost.teamInfo.posterImage,
+        title: teampostEdit.title,
+        content: teampostEdit.content,
+        category: teampostEdit.category,
+        teamProfileImage: teampostEdit.teamProfileImage,
+        demoVideo: teampostEdit.demoVideo,
+        posterImage: teampostEdit.posterImage,
       });
-      setExistingSlideImages(teampost.teamInfo.slideImages || []);
-      setEditedStudents(teampost.students);
+      setExistingSlideImages(teampostEdit.slideImages || []);
+      setEditedStudents(teampostEdit.students);
     }
-  }, [teampost]);
+  }, [teampostEdit]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setEditData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -261,7 +263,6 @@ const TeamEditPage = () => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      console.log(e.target.name);
       setEditData((prev) => ({
         ...prev,
         [e.target.name]: file,
@@ -270,13 +271,13 @@ const TeamEditPage = () => {
   };
 
   // 학생 클릭 시 해당 학생과 인덱스를 함께 선택하여 모달 오픈
-  const handleStudentClick = (student: ITeamStudent, index: number) => {
+  const handleStudentClick = (student: ITeamPostEditStudent, index: number) => {
     setSelectedStudent({ ...student, index });
     openModal();
   };
 
   // 수정된 학생 데이터를 상위 상태에 업데이트
-  const updateStudent = (updatedStudent: ITeamStudent & { index: number }) => {
+  const updateStudent = (updatedStudent: ITeamPostEditStudent & { index: number }) => {
     setEditedStudents((prev) => prev.map((stu, idx) => (idx === updatedStudent.index ? updatedStudent : stu)));
 
     setSelectedStudent(null);
@@ -291,15 +292,10 @@ const TeamEditPage = () => {
         : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
 
     const demoFile =
-      editData.demo instanceof File ? editData.demo : base64ToFile(editData.demo as string, "demo.mp4", "video/mp4");
-    console.log(demoFile);
+      editData.demoVideo instanceof File ? editData.demoVideo : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
 
     const posterFile =
-      editData.posterImg instanceof File
-        ? editData.posterImg
-        : base64ToFile(editData.posterImg as string, "poster.jpg", "image/jpeg");
-
-    console.log(editData);
+      editData.posterImage instanceof File ? editData.posterImage : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
 
     const formData = new FormData();
     formData.append("teamUuid", team_uuid);
@@ -307,13 +303,8 @@ const TeamEditPage = () => {
     formData.append("content", editData.content);
     formData.append("category", editData.category);
     formData.append("teamProfileImage", teamProfileFile);
-    formData.append("demo", demoFile);
-    formData.append("posterImg", posterFile);
-
-    // 수정된 학생 배열을 JSON 문자열로 변환하여 함께 전송
-    const formData2 = new FormData();
-    formData2.append("students", JSON.stringify(editedStudents));
-    console.log(editedStudents);
+    formData.append("demoVideo", demoFile);
+    formData.append("posterImage", posterFile);
 
     const res = await putTeampost(formData);
 
@@ -331,7 +322,20 @@ const TeamEditPage = () => {
 
     const res2 = await putTeampostSlideImage(formDataSlide);
 
-    // const res3 = await putTeamStudent();
+    // 수정된 학생 배열을 JSON 문자열로 변환하여 함께 전송
+    for (const student of editedStudents) {
+      const formData = new FormData();
+      formData.append("encryptedStudentId", student.encryptedStudentProfileId);
+      formData.append("githubUrl", student.githubUrl);
+      formData.append("info", student.info);
+      formData.append("teamUuid", team_uuid);
+      const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
+      formData.append("profileImage", profileImage);
+      formData.append("studentBlog", student.studentBlog);
+      formData.append("studentEmail", student.studentEmail);
+
+      await putTeamStudent(formData);
+    }
 
     if (res && res2) {
       navigate(-1);
@@ -346,16 +350,9 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <EditableTitle
-            type="text"
-            name="title"
-            value={editData.title}
-            onChange={handleInputChange}
-            placeholder="PROJECT TITLE"
-          />
+          <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
             <option value="WEB">WEB</option>
-            <option value="APP">APP</option>
             <option value="MOBILE">MOBILE</option>
             <option value="GAME">GAME</option>
           </CategorySelect>
@@ -414,27 +411,25 @@ const TeamEditPage = () => {
           </StudentItem>
         ))}
       </StudentList>
-      <Modal>
-        {selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}
-      </Modal>
+      <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}</Modal>
 
       <SectionTitle>Project Video</SectionTitle>
-      <DemoVideoEditor base={editData.demo as string} handleFileChange={handleFileChange} />
+      <DemoVideoEditor base={editData.demoVideo as string} handleFileChange={handleFileChange} />
 
       <SectionTitle>Poster</SectionTitle>
       <PosterIntro>
         <PosterImg
           src={
-            editData.posterImg
-              ? typeof editData.posterImg === "string"
-                ? `data:image/jpeg;base64,${editData.posterImg}`
-                : URL.createObjectURL(editData.posterImg)
+            editData.posterImage
+              ? typeof editData.posterImage === "string"
+                ? `data:image/jpeg;base64,${editData.posterImage}`
+                : URL.createObjectURL(editData.posterImage)
               : empty
           }
           alt="Poster"
         />
         <AddArea onClick={() => posterInputRef.current?.click()}>Add Poster</AddArea>
-        <FileInput ref={posterInputRef} type="file" name="posterImg" accept="image/*" onChange={handleFileChange} />
+        <FileInput ref={posterInputRef} type="file" name="posterImage" accept="image/*" onChange={handleFileChange} />
       </PosterIntro>
 
       <SaveButton onClick={handleSave}>SAVE</SaveButton>

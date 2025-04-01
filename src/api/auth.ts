@@ -6,9 +6,6 @@ export const postAuth = async (userName: string, password: string): Promise<IAut
   try {
     const result = await api.post("/public/account/login", { userName, password });
 
-    const AUTH_KEY_NAME = import.meta.env.VITE_AUTH_KEY_NAME;
-    sessionStorage.setItem(AUTH_KEY_NAME, result.data.accessToken);
-
     return result.data;
   } catch (error: unknown) {
     throw new Error(`${error}`);

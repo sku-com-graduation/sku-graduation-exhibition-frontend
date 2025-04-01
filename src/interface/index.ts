@@ -7,3 +7,4 @@ export type { default as ITeam } from "./ITeam";
 export type { ITeamPost } from "./ITeamPost";
 export type { ITeamStudent } from "./ITeamPost";
 export type { ITeamInfo } from "./ITeamPost";
+export type { ITeamPostEditStudent, ITeamPostEdit } from "./ITeamPostEdit";

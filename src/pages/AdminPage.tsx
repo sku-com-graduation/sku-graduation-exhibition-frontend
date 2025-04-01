@@ -5,16 +5,7 @@ import StudentGrid from "../components/table/StudentGrid";
 import AccountGrid from "@components/table/AccountGrid";
 import TeamGrid from "@components/table/TeamGrid";
 import ProfessorGrid from "@components/table/ProfessorGrid";
-
-const adminMenus: {
-  id: "student" | "team" | "account" | "professor";
-  title: string;
-}[] = [
-  { id: "student", title: "학생 관리" },
-  { id: "team", title: "팀 관리" },
-  { id: "account", title: "계정 관리" },
-  { id: "professor", title: "교수 관리" },
-];
+import { ADMIN_MENUS } from "@src/constant/menuColumns";
 
 const Container = styled.div`
   display: flex;
@@ -30,18 +21,18 @@ const MenuContainer = styled.div`
   margin-top: 5rem;
   display: grid;
   width: 50%;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   text-align: center;
+  gap: 0.5rem;
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    width: 100%;
   }
 `;
 
 const MenuItem = styled.div<{ $isSelected: boolean }>`
   display: grid;
-  padding: 10px;
-  margin-right: 0.5rem;
+  padding: 1rem;
   background-color: ${(props) => (props.$isSelected ? "#ffffff" : "#e2e2e2")};
   border-radius: 1rem 1rem 0 0;
   place-items: center;
@@ -53,8 +44,8 @@ const MenuItem = styled.div<{ $isSelected: boolean }>`
   }
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
-    padding: 12px;
+    font-size: 1rem;
+    padding: 0.5rem;
   }
 `;
 
@@ -69,12 +60,12 @@ const WorkContainer = styled.div`
 `;
 
 const AdminPage = () => {
-  const [selectedMenu, setSelectedMenu] = useState<"student" | "team" | "account" | "professor">(adminMenus[0].id);
+  const [selectedMenu, setSelectedMenu] = useState<"student" | "team" | "account" | "professor" | "home">(ADMIN_MENUS[0].id);
 
   return (
     <Container>
       <MenuContainer>
-        {adminMenus.map((menu) => {
+        {ADMIN_MENUS.map((menu) => {
           const isSelected = selectedMenu === menu.id;
           return (
             <MenuItem key={menu.id} onClick={() => setSelectedMenu(menu.id)} $isSelected={isSelected}>

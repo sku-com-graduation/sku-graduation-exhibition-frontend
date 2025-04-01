@@ -10,8 +10,8 @@ export interface ITeamStudent {
 
 export interface ITeamInfo {
   category: string;
-  projectName: string;
-  explanation: string;
+  title: string;
+  content: string;
   teamProfileImage: string;
   slideImages: string[];
   posterImage: string;

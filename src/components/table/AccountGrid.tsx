@@ -49,7 +49,9 @@ const AccountGrid = () => {
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");
     } finally {
-      window.location.reload();
+      const updatedData = await getAccount(selectedYear.toString());
+      setAccounts(updatedData);
+      setLoading(false);
     }
   };
 
@@ -69,8 +71,23 @@ const AccountGrid = () => {
     );
   };
 
-  const Toolbar = () => {
-    return (
+  const columns: GridColDef<IAccount>[] = [
+    { field: "teamName", headerName: "팀명", editable: true, flex: 1 },
+    { field: "userEmail", headerName: "계정", editable: true, flex: 1 },
+    { field: "recent", headerName: "최근 접속일", editable: true, flex: 1 },
+  ];
+
+  const rowsWithId =
+    accounts &&
+    accounts.map((student) => {
+      return {
+        ...student,
+        id: student.encryptedAccountId,
+      };
+    });
+
+  return (
+    <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <ToolbarBox>
         <UploaderBox>
           <Typography variant="h6" sx={{ color: "#333", fontSize: "1rem", fontWeight: 500, whiteSpace: "nowrap" }}>
@@ -91,28 +108,7 @@ const AccountGrid = () => {
         <StyledButton startIcon={<SaveIcon />} variant="outlined">
           저장
         </StyledButton>
-      </ToolbarBox>
-    );
-  };
-
-  const columns: GridColDef<IAccount>[] = [
-    { field: "teamName", headerName: "팀명", editable: true },
-    { field: "userEmail", headerName: "계정", editable: true },
-    { field: "recent", headerName: "최근 접속일", editable: true },
-  ];
-
-  const rowsWithId =
-    accounts &&
-    accounts.map((student) => {
-      return {
-        ...student,
-        id: student.encryptedAccountId,
-      };
-    });
-
-  return (
-    <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <Toolbar />
+      </ToolbarBox>{" "}
       <DataGrid
         rows={rowsWithId}
         columns={columns}
@@ -152,13 +148,13 @@ const UploaderBox = styled(Box)({
   gap: 16,
 });
 
-const StyledInput = styled("input")({
-  fontSize: "0.85rem",
-  borderRadius: "4px",
-  border: "1px solid #ccc",
-  padding: "0.3rem 0.5rem",
-  width: 180,
-});
+const StyledInput = styled.input.attrs({ type: "file", accept: ".csv" })`
+  font-size: 0.85rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 0.3rem 0.5rem;
+  width: 180px;
+`;
 
 const StyledButton = styled(Button)({
   fontSize: "0.85rem",

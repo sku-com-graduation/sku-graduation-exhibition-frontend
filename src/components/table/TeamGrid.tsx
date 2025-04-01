@@ -1,21 +1,16 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderEditCellParams,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getTeams, putTeams } from "@src/api/team";
-import { ITeam } from "@src/interface";
+import { IProfessor, ITeam } from "@src/interface";
 import { getYearRange } from "@src/utils/year";
+import { getProfessor } from "@src/api/professor";
 
-// ✅ Row 타입
 interface TeamRow extends ITeam {
   id: string;
+  professor: string; // 지도교수의 이름을 표시하기 위한 필드
 }
 
 const EditToolbar = () => (
@@ -26,6 +21,7 @@ const EditToolbar = () => (
 
 const TeamGrid = () => {
   const [teams, setTeams] = useState<ITeam[]>([]);
+  const [professors, setProfessors] = useState<IProfessor[]>([]);
   const [loading, setLoading] = useState(true);
   const [modifiedRows, setModifiedRows] = useState<Map<string, TeamRow>>(new Map());
   const years = getYearRange();
@@ -33,9 +29,10 @@ const TeamGrid = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const data = await getTeams(selectedYear.toString());
-        setTeams(data);
+        const teamData = await getTeams(selectedYear.toString());
+        setTeams(teamData);
       } catch (error) {
         console.error("팀 데이터 로딩 실패", error);
       } finally {
@@ -44,6 +41,18 @@ const TeamGrid = () => {
     };
     fetchData();
   }, [selectedYear]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const profData = await getProfessor();
+        setProfessors(profData);
+      } catch (error) {
+        console.error("교수 데이터 로딩 실패", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const YearSelect = () => {
     const handleChange = (event: SelectChangeEvent<number>) => {
@@ -74,16 +83,23 @@ const TeamGrid = () => {
     if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
 
     try {
-      const updatedList: ITeam[] = Array.from(modifiedRows.values()).map((row) => ({
-        ...row,
-        encryptedTeamId: row.id,
-        exhibitionYear: selectedYear,
-      }));
+      const updatedList: ITeam[] = Array.from(modifiedRows.values()).map((row) => {
+        const prof = professors.find((p) => p.name === row.professor);
+        return {
+          encryptedTeamId: row.id,
+          encryptedProfessorId: prof ? prof.encryptedProfessorId : row.encryptedProfessorId,
+          name: row.name,
+          exhibitionYear: selectedYear,
+          category: row.category,
+        };
+      });
+
+      console.log(JSON.stringify(updatedList, null, 4));
 
       await putTeams(updatedList);
       alert("저장 완료");
-      setModifiedRows(new Map());
-      window.location.reload();
+      // setModifiedRows(new Map());
+      // window.location.reload();
     } catch (err) {
       console.error("팀 저장 실패", err);
       alert("저장 중 오류 발생");
@@ -102,29 +118,61 @@ const TeamGrid = () => {
       <Select value={value ?? ""} onChange={handleChange} fullWidth>
         <MenuItem value="MOBILE">MOBILE</MenuItem>
         <MenuItem value="WEB">WEB</MenuItem>
-        <MenuItem value="APP">APP</MenuItem>
         <MenuItem value="GAME">GAME</MenuItem>
       </Select>
     );
   };
 
+  // 교수 리스트를 드롭다운으로 수정할 수 있도록 하는 편집 셀
+  const ProfessorSelectEditCell = (props: GridRenderEditCellParams<TeamRow>) => {
+    const { id, value, field, api } = props;
+
+    const handleChange = (event: SelectChangeEvent<string>) => {
+      api.setEditCellValue({ id, field, value: event.target.value }, event);
+    };
+
+    return (
+      <Select value={value ?? ""} onChange={handleChange} fullWidth>
+        {professors.map((prof) => (
+          <MenuItem key={prof.encryptedProfessorId} value={prof.name}>
+            {prof.name}
+          </MenuItem>
+        ))}
+      </Select>
+    );
+  };
+
   const columns: GridColDef<TeamRow>[] = [
-    { field: "name", headerName: "팀명", editable: true, width: 200 },
+    { field: "name", headerName: "팀명", editable: true, flex: 1 },
     {
       field: "category",
       headerName: "카테고리",
       editable: true,
       renderEditCell: (params) => <CategorySelectEditCell {...params} />,
-      width: 160,
+      flex: 1,
+    },
+    {
+      field: "professor",
+      headerName: "지도교수",
+      editable: true,
+      renderEditCell: (params) => <ProfessorSelectEditCell {...params} />,
+      flex: 1,
     },
   ];
 
+  // 팀 데이터를 표시할 때, encryptedProfessorId로 교수 이름을 매핑
   const rowsWithId: TeamRow[] =
     teams &&
-    teams.map((team) => ({
-      ...team,
-      id: team.encryptedTeamId,
-    }));
+    teams.map((team) => {
+      const modifiedTeam = modifiedRows.get(team.encryptedTeamId);
+      if (modifiedTeam) return modifiedTeam;
+      const prof = professors.find((p) => p.encryptedProfessorId === team.encryptedProfessorId);
+      return {
+        ...team,
+        id: team.encryptedTeamId,
+        professor: prof ? prof.name : "",
+      };
+    });
 
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>

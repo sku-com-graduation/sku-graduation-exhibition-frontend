@@ -110,7 +110,7 @@ const CategoryContainer = styled.div`
   box-sizing: border-box;
   padding: 0rem 10rem 5rem;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   text-align: center;
 
@@ -207,9 +207,7 @@ const ProjectPage = () => {
     setCategory(category);
   }, []);
 
-  const filteredProjects = Array.isArray(projects)
-    ? projects.filter((pro) => category === "ALL" || pro.category === category)
-    : [];
+  const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
 
   return (
     <Wrapper>

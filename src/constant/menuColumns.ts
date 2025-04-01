@@ -27,11 +27,12 @@ export const PROFESSOR = {
 } as const;
 
 export const ADMIN_MENUS: {
-  id: "student" | "team" | "account" | "professor";
+  id: "student" | "team" | "account" | "professor" | "home";
   title: string;
 }[] = [
   { id: "student", title: "학생 관리" },
   { id: "team", title: "팀 관리" },
   { id: "account", title: "계정 관리" },
   { id: "professor", title: "교수 관리" },
+  { id: "home", title: "홈 관리" },
 ];
