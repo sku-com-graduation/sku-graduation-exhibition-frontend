@@ -19,7 +19,7 @@ const ModalOverlay = styled.div`
   top: 0;
   left: 0;
   background-color: rgba(81, 81, 81, 0.3);
-  z-index: 1100; /* Header보다 높은 값 */
+  z-index: 1100;
   display: flex;
   justify-content: center;
   align-items: center;

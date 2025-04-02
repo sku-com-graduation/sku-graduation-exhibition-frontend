@@ -12,13 +12,26 @@ export const getStudent = async (year: string): Promise<IStudent[]> => {
   }
 };
 
-/**학생 등록 API */
-export const postStudent = async (csvStudent: File) => {
+/**학생 등록 API (개별) */
+export const postStudent = async (data: { studentName: string; studentNumber: string }) => {
+  try {
+    const result = await api.post(`/admin/student/save`, data);
+    if (result.status === 201) {
+      return result.data;
+    }
+    throw new Error(`에러 상태 코드: ${result.status} - ${result.statusText}`);
+  } catch (error) {
+    if (error instanceof AxiosError) throw new Error(`${error}`);
+  }
+};
+
+/**학생 등록 API (csv) */
+export const postStudents = async (csvStudent: File) => {
   try {
     const formData = new FormData();
     formData.append("file", csvStudent);
 
-    const result = await api.post(`/admin/student/save`, formData, {
+    const result = await api.post(`/admin/student/s/save`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     if (result.status === 201) {

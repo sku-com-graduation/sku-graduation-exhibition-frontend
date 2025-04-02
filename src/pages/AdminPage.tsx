@@ -6,6 +6,7 @@ import AccountGrid from "@components/table/AccountGrid";
 import TeamGrid from "@components/table/TeamGrid";
 import ProfessorGrid from "@components/table/ProfessorGrid";
 import { ADMIN_MENUS } from "@src/constant/menuColumns";
+// import HomeGrid from "@components/table/HomeGrid";
 
 const Container = styled.div`
   display: flex;
@@ -79,6 +80,7 @@ const AdminPage = () => {
         {selectedMenu === "account" && <AccountGrid />}
         {selectedMenu === "team" && <TeamGrid />}
         {selectedMenu === "professor" && <ProfessorGrid />}
+        {/* {selectedMenu === "home" && <HomeGrid />} */}
       </WorkContainer>
     </Container>
   );

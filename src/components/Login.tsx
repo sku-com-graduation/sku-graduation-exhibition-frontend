@@ -101,7 +101,11 @@ const Button = styled.button`
   }
 `;
 
-export const Login = () => {
+interface LoginProps {
+  onSuccess: () => void;
+}
+
+export const Login = ({ onSuccess }: LoginProps) => {
   const dispatch = useDispatch();
 
   const [username, setUsername] = useState<string>("");
@@ -112,7 +116,7 @@ export const Login = () => {
     try {
       const user = await postAuth(username, password);
       dispatch(setAuth(user));
-      window.location.reload();
+      onSuccess();
     } catch (error) {
       console.log(error);
       setFailedLogin(true);

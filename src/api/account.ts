@@ -11,8 +11,20 @@ export const getAccount = async (year: string): Promise<IAccount[]> => {
   }
 };
 
-/** 계정 생성 API */
-export const postAccount = async (csvAccount: File) => {
+/** 계정 생성 API (개별)*/
+export const postAccount = async () => {
+  try {
+    const result = await api.post(`/admin/account/regist/single`);
+    if (result.status === 201) {
+      return result.data;
+    }
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
+};
+
+/** 계정 생성 API (csv)*/
+export const postAccounts = async (csvAccount: File) => {
   try {
     const formData = new FormData();
     formData.append(`file`, csvAccount);

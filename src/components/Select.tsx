@@ -11,7 +11,6 @@ export const SelectCS = styled.select`
   text-align: center;
   cursor: pointer;
   background: none;
-  /* background-image: url("data:image/svg+xml,%3Csvg fill='%23666' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 7l3-3 3 3H7zm0 6l3 3 3-3H7z'/%3E%3C/svg%3E"); */
   background-repeat: no-repeat;
   background-position: right 0.8rem center;
   background-size: 1rem;
@@ -28,12 +27,7 @@ export const SelectCS = styled.select`
   }
 
   @media (max-width: 768px) {
-    font-size: 0.8%;
-    padding: 0.5rem;
-  }
-
-  @media (max-width: 430px) {
-    font-size: 0.8%;
-    padding: 0.5rem;
+    font-size: 100%;
+    padding: 0.5rem 1rem;
   }
 `;

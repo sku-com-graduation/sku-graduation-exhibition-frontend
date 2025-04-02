@@ -43,7 +43,7 @@ const Container = styled.div`
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: 2rem;
+    gap: 3rem;
     padding: 2rem;
   }
 `;
@@ -62,7 +62,7 @@ const TeamBox = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding-bottom: 120%;
+    /* padding-bottom: 120%; */
   }
 `;
 
@@ -117,10 +117,6 @@ const CategoryContainer = styled.div`
   @media (max-width: 768px) {
     padding: 0 2rem;
     grid-template-columns: repeat(2, 1fr);
-
-    & > :first-child {
-      grid-column: span 2;
-    }
   }
 `;
 
@@ -175,7 +171,7 @@ const TeamName = styled.div`
 
   @media (max-width: 768px) {
     font-size: 1rem;
-    bottom: -1rem;
+    bottom: -2rem;
   }
 `;
 

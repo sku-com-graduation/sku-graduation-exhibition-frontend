@@ -1,7 +1,7 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
-import { getStudent, postStudent, putStudent } from "@src/api/student";
+import { deleteStudent, getStudent, postStudent, postStudents, putStudent } from "@src/api/student";
 import { getTeams } from "@src/api/team";
 import { IStudent, ITeam } from "@src/interface";
 import { useCallback, useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import { getYearRange } from "@src/utils/year";
 interface StudentRow extends IStudent {
   id: string;
   teamName: string;
+  isNew?: boolean;
 }
 
 const EditToolbar = () => (
@@ -25,6 +26,7 @@ const StudentGrid = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [modifiedRows, setModifiedRows] = useState<Map<string, StudentRow>>(new Map());
+  const [selectionModel, setSelectionModel] = useState<string[]>([]);
 
   const years = getYearRange();
   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
@@ -47,6 +49,48 @@ const StudentGrid = () => {
     fetchData();
   }, [fetchData]);
 
+  const handleAddRow = () => {
+    const newId = crypto.randomUUID();
+    const newStudent: StudentRow = {
+      id: newId,
+      encryptedStudentId: newId,
+      name: "",
+      studentNumber: "",
+      role: "MEMBER",
+      exhibitionYear: selectedYear.toString(),
+      encryptedTeamId: "",
+      teamName: "",
+      isNew: true,
+    };
+
+    setStudents((prev) => [...prev, newStudent]);
+    setModifiedRows((prev) => {
+      const updated = new Map(prev);
+      updated.set(newId, newStudent);
+      return updated;
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectionModel.length === 0) {
+      alert("삭제할 항목을 선택하세요.");
+      return;
+    }
+    console.log(selectionModel);
+    await deleteStudent(selectionModel);
+
+    const confirmed = window.confirm(`${selectionModel.length}명 학생을 삭제하시겠습니까?`);
+    if (!confirmed) return;
+
+    setStudents((prev) => prev.filter((student) => !selectionModel.includes(student.encryptedStudentId)));
+    setModifiedRows((prev) => {
+      const updated = new Map(prev);
+      selectionModel.forEach((id) => updated.delete(id));
+      return updated;
+    });
+    setSelectionModel([]);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
   };
@@ -55,9 +99,8 @@ const StudentGrid = () => {
     if (!file) return alert("파일을 선택하세요.");
     setLoading(true);
     try {
-      await postStudent(file);
+      await postStudents(file);
       alert("업로드 성공");
-
       await fetchData();
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");
@@ -70,19 +113,52 @@ const StudentGrid = () => {
     if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
 
     try {
-      const updatedList: IStudent[] = Array.from(modifiedRows.values()).map((row) => {
-        const team = teams.find((t) => t.name === row.teamName);
-        return {
-          ...row,
-          encryptedTeamId: team?.encryptedTeamId || "",
-          encryptedStudentId: row.id,
-        };
-      });
+      const modifiedList = Array.from(modifiedRows.values());
 
-      await putStudent(updatedList);
+      const newStudents = modifiedList
+        .filter((row) => row.isNew)
+        .map((row) => {
+          const team = teams.find((t) => t.name === row.teamName);
+          return {
+            studentName: row.name,
+            studentNumber: row.studentNumber,
+            // encryptedStudentId: row.id,
+            // encryptedTeamId: team?.encryptedTeamId || "",
+            // name: row.name,
+            // studentNumber: row.studentNumber,
+            // role: row.role,
+            // exhibitionYear: selectedYear.toString(),
+          };
+        });
+
+      const updatedStudents: IStudent[] = modifiedList
+        .filter((row) => !row.isNew)
+        .map((row) => {
+          const team = teams.find((t) => t.name === row.teamName);
+          return {
+            encryptedStudentId: row.id,
+            encryptedTeamId: team ? team?.encryptedTeamId : null,
+            name: row.name,
+            studentNumber: row.studentNumber,
+            role: row.role,
+            exhibitionYear: selectedYear.toString(),
+          };
+        });
+
+      console.log(JSON.stringify(newStudents));
+      console.log(updatedStudents);
+
+      if (newStudents.length > 0) {
+        await Promise.all(newStudents.map((s) => postStudent(s)));
+      }
+
+      if (updatedStudents.length > 0) {
+        await putStudent(updatedStudents);
+      }
+
       alert("저장 완료");
       setModifiedRows(new Map());
-      // window.location.reload();
+      await fetchData();
     } catch (err) {
       console.error("저장 실패", err);
       alert("저장 중 오류 발생");
@@ -117,10 +193,13 @@ const StudentGrid = () => {
   const TeamSelectEditCell = (props: GridRenderEditCellParams<StudentRow>) => {
     const { id, value, field, api } = props;
     const handleChange = (event: SelectChangeEvent<string>) => {
-      api.setEditCellValue({ id, field, value: event.target.value }, event);
+      // 선택된 값이 빈 문자열이면 null로 설정
+      const newValue = event.target.value === "" ? null : event.target.value;
+      api.setEditCellValue({ id, field, value: newValue }, event);
     };
     return (
       <Select value={value ?? ""} onChange={handleChange} fullWidth>
+        <MenuItem value="">선택 안 함</MenuItem>
         {teams.map((team) => (
           <MenuItem key={team.encryptedTeamId} value={team.name}>
             {team.name}
@@ -203,15 +282,7 @@ const StudentGrid = () => {
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <ToolbarBox>
         <UploaderBox>
-          <Typography
-            variant="h6"
-            sx={{
-              color: "#333",
-              fontSize: "1rem",
-              fontWeight: 500,
-              whiteSpace: "nowrap",
-            }}
-          >
+          <Typography variant="h6" sx={{ color: "#333", fontSize: "1rem", fontWeight: 500, whiteSpace: "nowrap" }}>
             등록 업로더
           </Typography>
           <StyledInput type="file" accept=".csv" onChange={handleFileChange} />
@@ -220,10 +291,10 @@ const StudentGrid = () => {
           </StyledButton>
         </UploaderBox>
         <YearSelect />
-        <StyledButton startIcon={<AddIcon />} variant="outlined">
+        <StyledButton startIcon={<AddIcon />} variant="outlined" onClick={handleAddRow}>
           추가
         </StyledButton>
-        <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error">
+        <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error" onClick={handleDeleteSelected}>
           삭제
         </StyledButton>
         <StyledButton startIcon={<SaveIcon />} variant="outlined" onClick={handleSave}>
@@ -235,6 +306,8 @@ const StudentGrid = () => {
         columns={columns}
         loading={loading}
         processRowUpdate={handleRowUpdate}
+        rowSelectionModel={selectionModel}
+        onRowSelectionModelChange={(newSelection) => setSelectionModel(newSelection as string[])}
         initialState={{
           pagination: { paginationModel: { pageSize: 100 } },
         }}
@@ -247,6 +320,8 @@ const StudentGrid = () => {
 };
 
 export default StudentGrid;
+
+// Styled Components
 
 const ToolbarBox = styled(Box)({
   display: "flex",
@@ -280,3 +355,333 @@ const StyledButton = styled(Button)({
   fontSize: "0.85rem",
   padding: "0.4rem 0.7rem",
 });
+
+// import { Box, Button, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+// import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+// import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
+// import { getStudent, postStudent, postStudents, putStudent } from "@src/api/student";
+// import { getTeams } from "@src/api/team";
+// import { IStudent, ITeam } from "@src/interface";
+// import { useCallback, useEffect, useState } from "react";
+// import styled from "styled-components";
+// import { getYearRange } from "@src/utils/year";
+
+// interface StudentRow extends IStudent {
+//   id: string;
+//   teamName: string;
+//   isNew?: boolean;
+// }
+
+// const EditToolbar = () => (
+//   <GridToolbarContainer>
+//     <GridToolbarQuickFilter />
+//   </GridToolbarContainer>
+// );
+
+// const StudentGrid = () => {
+//   const [students, setStudents] = useState<IStudent[]>([]);
+//   const [teams, setTeams] = useState<ITeam[]>([]);
+//   const [file, setFile] = useState<File | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [modifiedRows, setModifiedRows] = useState<Map<string, StudentRow>>(new Map());
+
+//   const years = getYearRange();
+//   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
+
+//   const fetchData = useCallback(async () => {
+//     setLoading(true);
+//     try {
+//       const studentData = await getStudent(selectedYear.toString());
+//       const teamData = await getTeams(selectedYear.toString());
+//       setStudents(studentData);
+//       setTeams(teamData);
+//     } catch (error) {
+//       console.error("데이터 로딩 실패", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [selectedYear]);
+
+//   useEffect(() => {
+//     fetchData();
+//   }, [fetchData]);
+
+//   const handleAddRow = () => {
+//     const newId = crypto.randomUUID(); // 혹은 uuid() 등 사용 가능
+//     const newStudent: StudentRow = {
+//       id: newId,
+//       encryptedStudentId: newId,
+//       name: "",
+//       studentNumber: "",
+//       role: "MEMBER",
+//       exhibitionYear: selectedYear.toString(),
+//       encryptedTeamId: "",
+//       teamName: "",
+//       isNew: true,
+//     };
+
+//     setStudents((prev) => [...prev, newStudent]);
+//     setModifiedRows((prev) => {
+//       const updated = new Map(prev);
+//       updated.set(newId, newStudent);
+//       return updated;
+//     });
+//   };
+
+//   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     if (e.target.files) setFile(e.target.files[0]);
+//   };
+
+//   const handleUpload = async () => {
+//     if (!file) return alert("파일을 선택하세요.");
+//     setLoading(true);
+//     try {
+//       await postStudents(file);
+//       alert("업로드 성공");
+
+//       await fetchData();
+//     } catch (error) {
+//       alert("업로드 실패, 잠시후 다시 시도해주세요.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleSave = async () => {
+//     if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
+
+//     try {
+//       const modifiedList = Array.from(modifiedRows.values());
+
+//       const newStudents: IStudent[] = modifiedList
+//         .filter((row) => row.isNew)
+//         .map((row) => {
+//           const team = teams.find((t) => t.name === row.teamName);
+//           return {
+//             ...row,
+//             encryptedTeamId: team?.encryptedTeamId || "",
+//           };
+//         });
+
+//       const updatedStudents: IStudent[] = modifiedList
+//         .filter((row) => !row.isNew)
+//         .map((row) => {
+//           const team = teams.find((t) => t.name === row.teamName);
+//           return {
+//             encryptedStudentId: row.id,
+//             encryptedTeamId: team?.encryptedTeamId || "",
+//             name: row.name,
+//             studentNumber: row.studentNumber,
+//             role: row.role,
+//             exhibitionYear: selectedYear.toString(),
+//           };
+//         });
+
+//       if (newStudents.length > 0) {
+//         await postStudent(newStudents); // API에서 배열 지원해야 함
+//       }
+
+//       if (updatedStudents.length > 0) {
+//         await putStudent(updatedStudents);
+//       }
+
+//       alert("저장 완료");
+//       setModifiedRows(new Map());
+//       await fetchData(); // 최신화
+//     } catch (err) {
+//       console.error("저장 실패", err);
+//       alert("저장 중 오류 발생");
+//     }
+//   };
+
+//   const handleRowUpdate = (newRow: StudentRow, oldRow: StudentRow) => {
+//     setModifiedRows((prev) => {
+//       const updated = new Map(prev);
+//       updated.set(newRow.id, newRow);
+//       return updated;
+//     });
+//     return newRow;
+//   };
+
+//   const YearSelect = () => {
+//     const handleChange = (event: SelectChangeEvent<number>) => {
+//       setSelectedYear(Number(event.target.value));
+//     };
+
+//     return (
+//       <Select value={selectedYear} onChange={handleChange} size="small" sx={{ width: 100 }}>
+//         {years.map((year) => (
+//           <MenuItem key={year} value={year}>
+//             {year}
+//           </MenuItem>
+//         ))}
+//       </Select>
+//     );
+//   };
+
+//   const TeamSelectEditCell = (props: GridRenderEditCellParams<StudentRow>) => {
+//     const { id, value, field, api } = props;
+//     const handleChange = (event: SelectChangeEvent<string>) => {
+//       api.setEditCellValue({ id, field, value: event.target.value }, event);
+//     };
+//     return (
+//       <Select value={value ?? ""} onChange={handleChange} fullWidth>
+//         {teams.map((team) => (
+//           <MenuItem key={team.encryptedTeamId} value={team.name}>
+//             {team.name}
+//           </MenuItem>
+//         ))}
+//       </Select>
+//     );
+//   };
+
+//   const RoleSelectEditCell = (props: GridRenderEditCellParams<StudentRow>) => {
+//     const { id, value, field, api } = props;
+//     const handleChange = (event: SelectChangeEvent<string>) => {
+//       api.setEditCellValue({ id, field, value: event.target.value }, event);
+//     };
+//     return (
+//       <Select value={value ?? ""} onChange={handleChange} fullWidth>
+//         <MenuItem value="MEMBER">MEMBER</MenuItem>
+//         <MenuItem value="LEADER">LEADER</MenuItem>
+//       </Select>
+//     );
+//   };
+
+//   const YearCellEdit = (props: GridRenderEditCellParams<StudentRow>) => {
+//     const { id, value, field, api } = props;
+//     const handleChange = (event: SelectChangeEvent<number>) => {
+//       api.setEditCellValue({ id, field, value: parseInt(event.target.value as string, 10) }, event);
+//     };
+
+//     return (
+//       <Select value={value ?? ""} onChange={handleChange} fullWidth>
+//         {years.map((year) => (
+//           <MenuItem key={year} value={year}>
+//             {year}
+//           </MenuItem>
+//         ))}
+//       </Select>
+//     );
+//   };
+
+//   const columns: GridColDef<StudentRow>[] = [
+//     {
+//       field: "teamName",
+//       headerName: "팀",
+//       editable: true,
+//       flex: 1,
+//       renderEditCell: (params) => <TeamSelectEditCell {...params} />,
+//     },
+//     { field: "name", headerName: "이름", editable: true, flex: 1 },
+//     { field: "studentNumber", headerName: "학번", editable: true, flex: 1 },
+//     {
+//       field: "role",
+//       headerName: "역할",
+//       editable: true,
+//       flex: 1,
+//       renderEditCell: (params) => <RoleSelectEditCell {...params} />,
+//     },
+//     {
+//       field: "exhibitionYear",
+//       headerName: "전시연도",
+//       editable: true,
+//       flex: 1,
+//       renderEditCell: (params) => <YearCellEdit {...params} />,
+//     },
+//   ];
+
+//   const rowsWithId: StudentRow[] = Array.isArray(students)
+//     ? students.map((student) => {
+//         const modifiedRow = modifiedRows.get(student.encryptedStudentId);
+//         if (modifiedRow) return modifiedRow;
+//         const team = teams.find((t) => t.encryptedTeamId === student.encryptedTeamId);
+//         return {
+//           ...student,
+//           id: student.encryptedStudentId,
+//           teamName: team ? team.name : "",
+//         };
+//       })
+//     : [];
+
+//   return (
+//     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+//       <ToolbarBox>
+//         <UploaderBox>
+//           <Typography
+//             variant="h6"
+//             sx={{
+//               color: "#333",
+//               fontSize: "1rem",
+//               fontWeight: 500,
+//               whiteSpace: "nowrap",
+//             }}
+//           >
+//             등록 업로더
+//           </Typography>
+//           <StyledInput type="file" accept=".csv" onChange={handleFileChange} />
+//           <StyledButton variant="contained" color="primary" onClick={handleUpload}>
+//             업로드
+//           </StyledButton>
+//         </UploaderBox>
+//         <YearSelect />
+//         <StyledButton startIcon={<AddIcon />} variant="outlined" onClick={handleAddRow}>
+//           추가
+//         </StyledButton>
+//         <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error">
+//           삭제
+//         </StyledButton>
+//         <StyledButton startIcon={<SaveIcon />} variant="outlined" onClick={handleSave}>
+//           저장
+//         </StyledButton>
+//       </ToolbarBox>
+//       <DataGrid
+//         rows={rowsWithId}
+//         columns={columns}
+//         loading={loading}
+//         processRowUpdate={handleRowUpdate}
+//         initialState={{
+//           pagination: { paginationModel: { pageSize: 100 } },
+//         }}
+//         checkboxSelection
+//         disableRowSelectionOnClick
+//         slots={{ toolbar: EditToolbar }}
+//       />
+//     </Box>
+//   );
+// };
+
+// export default StudentGrid;
+
+// const ToolbarBox = styled(Box)({
+//   display: "flex",
+//   gap: 8,
+//   alignItems: "center",
+//   justifyContent: "flex-end",
+//   boxSizing: "border-box",
+//   padding: "0.8rem",
+//   borderRadius: "12px",
+//   backgroundColor: "#fff",
+//   width: "100%",
+//   overflow: "hidden",
+//   flexWrap: "wrap",
+// });
+
+// const UploaderBox = styled(Box)({
+//   display: "flex",
+//   alignItems: "center",
+//   gap: 16,
+// });
+
+// const StyledInput = styled("input")({
+//   fontSize: "0.85rem",
+//   borderRadius: "4px",
+//   border: "1px solid #ccc",
+//   padding: "0.3rem 0.5rem",
+//   width: 180,
+// });
+
+// const StyledButton = styled(Button)({
+//   fontSize: "0.85rem",
+//   padding: "0.4rem 0.7rem",
+// });

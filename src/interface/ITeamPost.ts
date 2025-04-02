@@ -18,7 +18,15 @@ export interface ITeamInfo {
   demoVideo: string;
 }
 
+export interface IprofessorInfo {
+  professorImage: string;
+  professorName: string;
+  professorEmail: string;
+  professorTenure: boolean;
+}
+
 export interface ITeamPost {
   students: ITeamStudent[];
   teamInfo: ITeamInfo;
+  professorInfo: IprofessorInfo;
 }

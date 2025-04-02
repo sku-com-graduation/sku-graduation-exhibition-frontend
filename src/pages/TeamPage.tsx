@@ -188,7 +188,7 @@ const NextButton = styled(SideButton)`
   right: 1rem;
 `;
 
-const StudentList = styled.div`
+const MemberList = styled.div`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -196,6 +196,10 @@ const StudentList = styled.div`
 `;
 
 const StudentItem = styled.div`
+  text-align: center;
+`;
+
+const ProfessorItem = styled.div`
   text-align: center;
 `;
 
@@ -219,6 +223,11 @@ const StudentInfo = styled.img`
 
 const StudentName = styled.div`
   margin-top: 0.5rem;
+`;
+
+const ProfessorName = styled(StudentName)`
+  font-weight: 600;
+  color: #2a4fa4;
 `;
 
 const SlideWrapper = styled.div`
@@ -374,14 +383,22 @@ const TeamPage = () => {
         )}
 
         <SectionTitle>Members</SectionTitle>
-        <StudentList>
+        <MemberList>
           {teampost?.students.map((student, index) => (
             <StudentItem key={index} onClick={() => handleStudentClick(student)}>
               <StudentInfo src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty} />
               <StudentName>{student.name}</StudentName>
             </StudentItem>
           ))}
-        </StudentList>
+          {/* {teampost?.professorInfo.professorName !== "이름 없음" && (
+            <ProfessorItem>
+              <StudentInfo
+                src={teampost?.professorInfo.professorImage ? `data:image/jpeg;base64,${teampost?.professorInfo.professorImage}` : userEmpty}
+              />
+              <ProfessorName>{teampost?.professorInfo.professorName}</ProfessorName>
+            </ProfessorItem>
+          )} */}
+        </MemberList>
         <Modal>{selectedStudent && <ProfileView student={selectedStudent} />}</Modal>
 
         <SectionTitle>Project Video</SectionTitle>

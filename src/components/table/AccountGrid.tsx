@@ -4,7 +4,7 @@ import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/ico
 import { IAccount } from "@src/interface";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getAccount, postAccount } from "@src/api/account";
+import { getAccount, postAccounts } from "@src/api/account";
 import { getYearRange } from "@src/utils/year";
 
 const EditToolbar = () => (
@@ -44,7 +44,7 @@ const AccountGrid = () => {
     if (!file) return alert("파일을 선택하세요.");
     setLoading(true);
     try {
-      const result = await postAccount(file);
+      const result = await postAccounts(file);
       alert("업로드 성공");
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");
@@ -72,9 +72,9 @@ const AccountGrid = () => {
   };
 
   const columns: GridColDef<IAccount>[] = [
-    { field: "teamName", headerName: "팀명", editable: true, flex: 1 },
-    { field: "userEmail", headerName: "계정", editable: true, flex: 1 },
-    { field: "recent", headerName: "최근 접속일", editable: true, flex: 1 },
+    { field: "teamName", headerName: "팀명", editable: false, flex: 1 },
+    { field: "userEmail", headerName: "계정", editable: false, flex: 1 },
+    { field: "recent", headerName: "최근 접속일", editable: false, flex: 1 },
   ];
 
   const rowsWithId =
@@ -108,7 +108,7 @@ const AccountGrid = () => {
         <StyledButton startIcon={<SaveIcon />} variant="outlined">
           저장
         </StyledButton>
-      </ToolbarBox>{" "}
+      </ToolbarBox>
       <DataGrid
         rows={rowsWithId}
         columns={columns}
