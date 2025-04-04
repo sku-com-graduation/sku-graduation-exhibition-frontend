@@ -9,8 +9,8 @@ import { IStudent, ITeam } from "@interface";
 import { getYearRange } from "@utils/year";
 
 import { parseCSV } from "@utils/parse";
-
 import CsvUploadDialog from "@components/CsvUploadDialog";
+import useToast from "src/hooks/useToast";
 
 interface StudentRow extends IStudent {
   id: string;
@@ -36,6 +36,8 @@ const StudentGrid = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const { notifySuccess, notifyError, notifyInfo } = useToast();
+
   // 초기 데이터 불러오기
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -45,7 +47,7 @@ const StudentGrid = () => {
       setStudents(studentData);
       setTeams(teamData);
     } catch (error) {
-      console.error("데이터 로딩 실패", error);
+      notifyError("데이터 로딩 실패");
     } finally {
       setLoading(false);
     }
@@ -58,7 +60,7 @@ const StudentGrid = () => {
   const handleAddRow = () => {
     const currentYear = new Date().getFullYear();
     if (selectedYear !== currentYear) {
-      alert("현재 연도에서만 새 행을 추가할 수 있습니다.");
+      notifyInfo("현재 연도에서만 새 행을 추가할 수 있습니다.");
       return;
     }
     const newId = crypto.randomUUID();
@@ -84,14 +86,14 @@ const StudentGrid = () => {
 
   const handleDeleteSelected = async () => {
     if (selectionModel.length === 0) {
-      alert("삭제할 항목을 선택하세요.");
+      notifyInfo("삭제할 항목을 선택하세요.");
       return;
     }
 
     const selectedStudents = students.filter((student) => selectionModel.includes(student.encryptedStudentId));
 
     if (selectedStudents.some((student) => student.encryptedTeamId && student.encryptedTeamId !== "")) {
-      alert("팀에 소속된 학생은 삭제할 수 없습니다.");
+      notifyInfo("팀에 소속된 학생은 삭제할 수 없습니다.");
       return;
     }
 
@@ -109,22 +111,21 @@ const StudentGrid = () => {
     setSelectionModel([]);
   };
 
-  // CsvUploadDialog에서 파일 파싱 완료 시 호출되는 핸들러
   const handleFileParsed = async (data: { studentName: string; studentNumber: string }[], file: File) => {
     setLoading(true);
     try {
       await postStudents(data);
-      alert("업로드 성공");
+      notifySuccess("업로드 성공");
       await fetchData();
     } catch (error) {
-      alert("업로드 실패, 잠시 후 다시 시도해주세요.");
+      notifyError("업로드 실패, 잠시 후 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSave = async () => {
-    if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
+    if (modifiedRows.size === 0) return notifyInfo("수정된 내용이 없습니다.");
 
     try {
       const modifiedList = Array.from(modifiedRows.values());
@@ -160,12 +161,12 @@ const StudentGrid = () => {
         await putStudent(updatedStudents);
       }
 
-      alert("저장 완료");
+      notifySuccess("저장 완료");
       setModifiedRows(new Map());
       await fetchData();
     } catch (err) {
       console.error("저장 실패", err);
-      alert("저장 중 오류 발생");
+      notifyError("저장 중 오류 발생");
     }
   };
 
