@@ -26,8 +26,16 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
+      "@api/*": ["src/api/*"],
       "@components/*": ["src/components/*"],
-      "@src/*": ["src/*"]
+      "@assets/*": ["src/assets/*"],
+      "@constant/*": ["src/constant/*"],
+      "@hooks": ["src/hooks"],
+      "@interface": ["src/interface"],
+      "@pages": ["src/pages"],
+      "@styles": ["src/styles"],
+      "@store/*": ["src/store/*"],
+      "@utils/*": ["src/utils/*"]
     }
   },
   "include": ["src"]

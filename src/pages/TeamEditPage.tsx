@@ -2,18 +2,17 @@ import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-import { postGetTeampost, postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent } from "../api/teamPost";
-import { ITeamPost, ITeamStudent } from "../interface";
+import { postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent } from "../api/teamPost";
 import empty from "../assets/image/main_image.png";
 import SlideImageEditor from "@components/SlideImageEditor";
 import DemoVideoEditor from "@components/DemoVideoEditor";
 import { AddArea, EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
-import base64ToFile from "@src/utils/base64ToFile";
-import { useModal } from "@src/hooks/useModal";
+import base64ToFile from "@utils/base64ToFile";
+import { useModal } from "@hooks";
 import Profile from "@components/Profile";
 
 import userEmpty from "../assets/image/main_image.png";
-import { ITeamPostEdit, ITeamPostEditStudent } from "@src/interface/ITeamPostEdit";
+import { ITeamPostEdit, ITeamPostEditStudent } from "@interface";
 
 const Container = styled.div`
   width: 100%;
@@ -212,7 +211,6 @@ const TeamEditPage = () => {
     posterImage: "",
   });
 
-  // 상위에서 관리할 학생(멤버) 수정 배열
   const [editedStudents, setEditedStudents] = useState<ITeamPostEditStudent[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<(ITeamPostEditStudent & { index: number }) | null>(null);
   const { openModal, Modal } = useModal();
@@ -222,11 +220,14 @@ const TeamEditPage = () => {
 
   const posterInputRef = useRef<HTMLInputElement>(null);
 
-  // 데이터 가져오기
+  // 팀 정보 불러오기
   const getTeampostEdit = async (team_id: string) => {
-    const res = await postGetTeampostEdit(team_id);
-    setTeampostEdit(res);
-    console.log(res);
+    try {
+      const res = await postGetTeampostEdit(team_id);
+      setTeampostEdit(res);
+    } catch (error) {
+      alert("팀 정보를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
+    }
   };
 
   useEffect(() => {
@@ -279,66 +280,73 @@ const TeamEditPage = () => {
   // 수정된 학생 데이터를 상위 상태에 업데이트
   const updateStudent = (updatedStudent: ITeamPostEditStudent & { index: number }) => {
     setEditedStudents((prev) => prev.map((stu, idx) => (idx === updatedStudent.index ? updatedStudent : stu)));
-
     setSelectedStudent(null);
   };
 
   const handleSave = async () => {
     if (!team_uuid) return;
+    try {
+      // 파일 변환 (이미 파일이면 그대로, 아니면 base64를 File 객체로 변환)
+      const teamProfileFile =
+        editData.teamProfileImage instanceof File
+          ? editData.teamProfileImage
+          : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
+      const demoFile =
+        editData.demoVideo instanceof File ? editData.demoVideo : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
+      const posterFile =
+        editData.posterImage instanceof File ? editData.posterImage : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
 
-    const teamProfileFile =
-      editData.teamProfileImage instanceof File
-        ? editData.teamProfileImage
-        : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
-
-    const demoFile =
-      editData.demoVideo instanceof File ? editData.demoVideo : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
-
-    const posterFile =
-      editData.posterImage instanceof File ? editData.posterImage : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
-
-    const formData = new FormData();
-    formData.append("teamUuid", team_uuid);
-    formData.append("title", editData.title);
-    formData.append("content", editData.content);
-    formData.append("category", editData.category);
-    formData.append("teamProfileImage", teamProfileFile);
-    formData.append("demoVideo", demoFile);
-    formData.append("posterImage", posterFile);
-
-    const res = await putTeampost(formData);
-
-    const formDataSlide = new FormData();
-    formDataSlide.append("teamUuid", team_uuid);
-
-    existingSlideImages.forEach((img, idx) => {
-      const file = base64ToFile(img, `existing_slide_${idx}.jpg`, "image/jpeg");
-      formDataSlide.append("files", file);
-    });
-
-    newSlideImages.forEach((file) => {
-      formDataSlide.append("files", file);
-    });
-
-    const res2 = await putTeampostSlideImage(formDataSlide);
-
-    // 수정된 학생 배열을 JSON 문자열로 변환하여 함께 전송
-    for (const student of editedStudents) {
+      // 팀 포스트 업데이트
       const formData = new FormData();
-      formData.append("encryptedStudentId", student.encryptedStudentProfileId);
-      formData.append("githubUrl", student.githubUrl);
-      formData.append("info", student.info);
       formData.append("teamUuid", team_uuid);
-      const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
-      formData.append("profileImage", profileImage);
-      formData.append("studentBlog", student.studentBlog);
-      formData.append("studentEmail", student.studentEmail);
+      formData.append("title", editData.title);
+      formData.append("content", editData.content);
+      formData.append("category", editData.category);
+      formData.append("teamProfileImage", teamProfileFile);
+      formData.append("demoVideo", demoFile);
+      formData.append("posterImage", posterFile);
+      const teamPostResponse = await putTeampost(formData);
 
-      await putTeamStudent(formData);
-    }
+      // Slide 이미지가 존재할 경우에만 Slide 이미지 업데이트 요청
+      let slideImageResponse = true;
+      if (existingSlideImages.length > 0 || newSlideImages.length > 0) {
+        const formDataSlide = new FormData();
+        formDataSlide.append("teamUuid", team_uuid);
+        existingSlideImages.forEach((img, idx) => {
+          const file = base64ToFile(img, `existing_slide_${idx}.jpg`, "image/jpeg");
+          formDataSlide.append("files", file);
+        });
+        newSlideImages.forEach((file) => {
+          formDataSlide.append("files", file);
+        });
+        slideImageResponse = await putTeampostSlideImage(formDataSlide);
+      }
 
-    if (res && res2) {
-      navigate(-1);
+      // 학생 정보 업데이트 (병렬 처리)
+      await Promise.all(
+        editedStudents.map((student) => {
+          const studentFormData = new FormData();
+          studentFormData.append("encryptedStudentId", student.encryptedStudentProfileId);
+          studentFormData.append("githubUrl", student.githubUrl);
+          studentFormData.append("info", student.info);
+          studentFormData.append("teamUuid", team_uuid);
+          const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
+          studentFormData.append("profileImage", profileImage);
+          studentFormData.append("studentBlog", student.studentBlog);
+          studentFormData.append("studentEmail", student.studentEmail);
+          return putTeamStudent(studentFormData);
+        })
+      );
+
+      // 모든 저장이 성공했다면 이전 페이지로 이동
+      if (teamPostResponse && slideImageResponse) {
+        navigate(-1);
+      } else {
+        throw new Error("Save operation failed");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("저장에 실패했습니다. 다시 시도해 주세요.");
     }
   };
 

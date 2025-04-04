@@ -1,6 +1,6 @@
 import api from ".";
 import { AxiosError } from "axios";
-import { IStudent } from "../interface";
+import { IStudent } from "@interface";
 
 /** 연도별 학생 정보 조회 API */
 export const getStudent = async (year: string): Promise<IStudent[]> => {
@@ -25,15 +25,10 @@ export const postStudent = async (data: { studentName: string; studentNumber: st
   }
 };
 
-/**학생 등록 API (csv) */
-export const postStudents = async (csvStudent: File) => {
+/**학생 등록 API (다수 배열) */
+export const postStudents = async (data: { studentName: string; studentNumber: string }[]) => {
   try {
-    const formData = new FormData();
-    formData.append("file", csvStudent);
-
-    const result = await api.post(`/admin/student/s/save`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const result = await api.post(`/admin/student/save`, data);
     if (result.status === 201) {
       return result.data;
     }

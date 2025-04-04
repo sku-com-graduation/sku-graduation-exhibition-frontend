@@ -1,9 +1,9 @@
-import { getTeamProflies } from "@src/api/team";
+import { getTeamProflies } from "@api/team";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const SliderWrapper = styled.div`
-  overflow-x: hidden; /* 수평 스크롤 방지 */
+  overflow-x: hidden;
   width: 100%;
   margin: 3rem 0;
   box-sizing: border-box;

@@ -1,11 +1,12 @@
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Save as SaveIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
-import { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import { getProfessor, putProfessor, postProfessor } from "@src/api/professor";
-import { IProfessor } from "@src/interface";
-import base64ToFile from "./../../utils/base64ToFile";
+
+import { getProfessor, putProfessor, postProfessor } from "@api/professor";
+import { IProfessor } from "@interface";
+import base64ToFile from "@utils/base64ToFile";
 
 interface ProfessorRow extends IProfessor {
   id: string;
@@ -37,7 +38,6 @@ const ProfessorGrid = () => {
       try {
         const data = await getProfessor();
         setProfessors(data);
-        console.log(JSON.stringify(data, null, 4));
       } catch (error) {
         console.error("교수 데이터 로딩 실패", error);
       } finally {
@@ -93,9 +93,16 @@ const ProfessorGrid = () => {
         formData.append("name", modifiedProf.name);
         formData.append("email", modifiedProf.email);
         formData.append("tenure", String(modifiedProf.tenure));
-        if (typeof modifiedProf.profileImage === "object") {
-          formData.append("profileImage", modifiedProf.profileImage);
+
+        const profileImage = modifiedProf.profileImage;
+
+        if (profileImage instanceof File) {
+          formData.append("profileImage", profileImage);
+        } else if (typeof profileImage === "string") {
+          const file = base64ToFile(profileImage, "profile.jpg"); // 파일명과 타입은 상황에 맞게
+          formData.append("profileImage", file);
         }
+
         await putProfessor(formData);
       }
 
@@ -255,6 +262,9 @@ const ProfessorGrid = () => {
           pagination: {
             paginationModel: { pageSize: 50 },
           },
+          // sorting: {
+          //   sortModel: [{ field: "name", sort: "asc" }],
+          // },
         }}
         checkboxSelection
         disableRowSelectionOnClick
@@ -341,7 +351,6 @@ const Toolbar = styled(Box)({
   gap: 8,
   backgroundColor: "#fff",
   borderRadius: "12px",
-  marginBottom: "0.5rem",
 });
 
 const StyledButton = styled(Button)({

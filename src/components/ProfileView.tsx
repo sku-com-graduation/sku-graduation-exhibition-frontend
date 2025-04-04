@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ITeamStudent } from "../interface";
+import { ITeamStudent } from "@interface";
 import userEmpty from "../assets/image/main_image.png";
 import { FiMail, FiGithub, FiGlobe } from "react-icons/fi";
 
@@ -11,10 +11,7 @@ const ProfileView = ({ student }: ProfileViewProps) => {
   return (
     <ProfileCard>
       <ImageSection>
-        <ProfileImage
-          src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty}
-          alt={`${student.name} Profile`}
-        />
+        <ProfileImage src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty} alt={`${student.name} Profile`} />
       </ImageSection>
 
       <InfoSection>

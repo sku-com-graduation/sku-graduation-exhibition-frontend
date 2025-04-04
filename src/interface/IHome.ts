@@ -1,5 +1,5 @@
-export default interface IHome {
-  encryptedHomeId?: string;
+export interface IHome {
+  encryptedHomeId: string;
   exhibitionYear: string;
   exhibitionDate: string;
   exhibitionHour: string;

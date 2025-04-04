@@ -1,5 +1,7 @@
+import store from "@store/store";
 import api from ".";
-import { IAuth } from "../interface";
+import { IAuth } from "@interface";
+import { clearAuth } from "@store/reducers/auth";
 
 /** login API */
 export const postAuth = async (userName: string, password: string): Promise<IAuth> => {
@@ -8,15 +10,16 @@ export const postAuth = async (userName: string, password: string): Promise<IAut
 
     return result.data;
   } catch (error: unknown) {
-    throw new Error(`${error}`);
+    throw new Error("로그인 인증 오류");
   }
 };
 
 /** logout API */
 export const getLogout = async () => {
   try {
-    sessionStorage.clear();
-  } catch (error) {
-    throw new Error(`${error}`);
+    await api.post(`/public/account/logout`);
+    store.dispatch(clearAuth());
+  } catch (error: unknown) {
+    throw new Error(`로그아웃 오류`);
   }
 };

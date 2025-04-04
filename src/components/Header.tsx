@@ -4,14 +4,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { Login } from "./Login";
-import { useModal } from "../hooks/useModal";
-import { RootState } from "../store/store";
-import { clearAuth } from "../store/reducers/auth";
-import { getLogout } from "../api/auth";
-import { setExhibitionYear } from "../store/reducers/exhibitionYear";
+import { useModal } from "@hooks";
+import { RootState } from "@store/store";
+import { clearAuth } from "@store/reducers/auth";
+import { getLogout } from "@api/auth";
+import { setExhibitionYear } from "@store/reducers/exhibitionYear";
 import { SelectCS } from "./Select";
-import logo from "../assets/image/logo.png";
-import { getYearRange } from "@src/utils/year";
+import logo from "@assets/image/logo.png";
+import { getYearRange } from "@utils/year";
 
 const Container = styled(motion.div)`
   display: flex;
@@ -36,7 +36,7 @@ const Container = styled(motion.div)`
     height: auto;
     padding: 0.5rem 1rem;
     gap: 0.5rem;
-    flex-wrap: nowrap; /* Prevent wrapping */
+    flex-wrap: nowrap;
   }
 `;
 

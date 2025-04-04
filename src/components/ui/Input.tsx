@@ -48,11 +48,7 @@ export const EditableTextArea = styled.textarea`
   }
 `;
 
-interface FileInputProps {
-  hidden?: boolean;
-}
-
-export const FileInput = styled.input<FileInputProps>`
+export const FileInput = styled.input<{ hidden?: boolean }>`
   margin-top: 0.5rem;
   display: none;
 `;

@@ -15,7 +15,7 @@ export const TEAM = {
 
 export const ACCOUNT = {
   team: "팀명",
-  user_email: "계정 아이디",
+  userEmail: "계정 아이디",
   recent: "최근 접속일",
 } as const;
 

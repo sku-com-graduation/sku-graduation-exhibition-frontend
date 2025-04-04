@@ -1,15 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { getProjects } from "../api/team";
-import { IProject } from "../interface";
-import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import empty from "../assets/image/main_image.png";
-import { categories, CategoryType } from "../constant/categorys";
 import { AnimatePresence, motion } from "framer-motion";
+import styled from "styled-components";
+import { getProjects } from "@api/team";
+import { IProject } from "@interface";
+import { categories, CategoryType } from "@constant/categorys";
+import i1 from "@assets/image/i2.png";
+import empty from "@assets/image/main_image.png";
 
-import i1 from "../assets/image/i2.png";
-
-// 추가: 고정된 배경 이미지 요소
 const Background = styled.div`
   position: absolute;
   top: 0;
@@ -59,10 +57,6 @@ const TeamBox = styled.div`
 
   &:hover .overlay {
     opacity: 1;
-  }
-
-  @media (max-width: 768px) {
-    /* padding-bottom: 120%; */
   }
 `;
 

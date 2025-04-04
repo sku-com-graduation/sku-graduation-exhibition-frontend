@@ -1,10 +1,11 @@
-export type { default as IAuth } from "./IAuth";
-export type { default as IAccount } from "./IAccount";
-export type { default as IProfessor } from "./IProfessor";
-export type { default as IProject } from "./IProject";
-export type { default as IStudent } from "./IStudent";
-export type { default as ITeam } from "./ITeam";
+export type { IAuth } from "./IAuth";
+export type { IAccount } from "./IAccount";
+export type { IProfessor } from "./IProfessor";
+export type { IProject } from "./IProject";
+export type { IStudent } from "./IStudent";
+export type { ITeam } from "./ITeam";
 export type { ITeamPost } from "./ITeamPost";
 export type { ITeamStudent } from "./ITeamPost";
 export type { ITeamInfo } from "./ITeamPost";
 export type { ITeamPostEditStudent, ITeamPostEdit } from "./ITeamPostEdit";
+export type { IHome } from "./IHome";

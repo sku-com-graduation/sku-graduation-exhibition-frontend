@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { postAuth } from "../api/auth";
 import { useDispatch } from "react-redux";
 import { setAuth } from "../store/reducers/auth";
+import { validateEmail } from "@utils/validate";
 
 const LoginWrapper = styled.div`
   width: 20rem;
@@ -63,7 +64,6 @@ const SubTextWrapper = styled.div`
 
   div:nth-child(2) {
     color: #1962ff;
-
     transition: color 0.3s;
 
     &:hover {
@@ -89,7 +89,6 @@ const Button = styled.button`
   background-color: #007bff;
   border: none;
   border-radius: 8px;
-
   transition: background-color 0.2s;
 
   &:hover {
@@ -98,6 +97,11 @@ const Button = styled.button`
 
   &:active {
     background-color: #00408a;
+  }
+
+  &:disabled {
+    background-color: #a0c4ff;
+    cursor: not-allowed;
   }
 `;
 
@@ -110,16 +114,24 @@ export const Login = ({ onSuccess }: LoginProps) => {
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [failedLogin, setFailedLogin] = useState<boolean>(false);
+  const [failedLogin, setFailedLogin] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const postLogin = async () => {
+    if (!validateEmail(username)) {
+      setFailedLogin("유효한 이메일 주소를 입력하세요.");
+      return;
+    }
+    setIsSubmitting(true);
+    setFailedLogin("");
     try {
       const user = await postAuth(username, password);
       dispatch(setAuth(user));
       onSuccess();
     } catch (error) {
-      console.log(error);
-      setFailedLogin(true);
+      setFailedLogin("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -133,6 +145,8 @@ export const Login = ({ onSuccess }: LoginProps) => {
           type="email"
           placeholder="example@sungkyul.ac.kr"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+          required
+          autoFocus
         />
       </FieldWrapper>
       <FieldWrapper>
@@ -145,10 +159,13 @@ export const Login = ({ onSuccess }: LoginProps) => {
           onKeyDown={(e) => {
             if (e.key === "Enter") postLogin();
           }}
+          required
         />
       </FieldWrapper>
-      {failedLogin && <FailedMessage>이메일 또는 비밀번호가 일치하지 않습니다.</FailedMessage>}
-      <Button onClick={postLogin}>LOG IN</Button>
+      {failedLogin && <FailedMessage>{failedLogin}</FailedMessage>}
+      <Button onClick={postLogin} disabled={isSubmitting}>
+        {isSubmitting ? "LOG IN..." : "LOG IN"}
+      </Button>
       <SubTextWrapper>
         <div>비밀번호를 잊으셨나요?</div>
         <div>비밀번호 찾기</div>

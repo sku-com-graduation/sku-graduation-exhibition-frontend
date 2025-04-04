@@ -1,4 +1,4 @@
-export default interface ITeam {
+export interface ITeam {
   encryptedTeamId: string;
   encryptedProfessorId: string;
   name: string;

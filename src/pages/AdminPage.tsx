@@ -1,12 +1,7 @@
-// AdminPage.tsx
 import { useState } from "react";
 import styled from "styled-components";
-import StudentGrid from "../components/table/StudentGrid";
-import AccountGrid from "@components/table/AccountGrid";
-import TeamGrid from "@components/table/TeamGrid";
-import ProfessorGrid from "@components/table/ProfessorGrid";
-import { ADMIN_MENUS } from "@src/constant/menuColumns";
-// import HomeGrid from "@components/table/HomeGrid";
+import { AccountGrid, HomeGrid, ProfessorGrid, StudentGrid, TeamGrid } from "@components/grid";
+import { ADMIN_MENUS } from "@constant/menuColumns";
 
 const Container = styled.div`
   display: flex;
@@ -80,7 +75,7 @@ const AdminPage = () => {
         {selectedMenu === "account" && <AccountGrid />}
         {selectedMenu === "team" && <TeamGrid />}
         {selectedMenu === "professor" && <ProfessorGrid />}
-        {/* {selectedMenu === "home" && <HomeGrid />} */}
+        {selectedMenu === "home" && <HomeGrid />}
       </WorkContainer>
     </Container>
   );

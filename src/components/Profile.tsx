@@ -1,9 +1,9 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ITeamPostEditStudent } from "../interface";
+import { ITeamPostEditStudent } from "@interface";
 import userEmpty from "../assets/image/main_image.png";
 import { useSelector } from "react-redux";
-import { RootState } from "@src/store/store";
+import { RootState } from "@store/store";
 import { Input, IconButton, ButtonGroup } from "@components/Input";
 import { FiEdit2, FiSave, FiX, FiMail, FiGithub, FiGlobe } from "react-icons/fi";
 

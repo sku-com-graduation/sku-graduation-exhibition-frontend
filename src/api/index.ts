@@ -1,6 +1,6 @@
-import { clearAuth } from "@src/store/reducers/auth";
 import axios from "axios";
-import store from "../store/store";
+import { clearAuth } from "@store/reducers/auth";
+import store from "@store/store";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT;

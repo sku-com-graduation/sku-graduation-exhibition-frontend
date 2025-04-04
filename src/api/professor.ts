@@ -1,5 +1,5 @@
 import api from ".";
-import { IProfessor } from "../interface";
+import { IProfessor } from "@interface";
 
 /** 교수 정보 조회 */
 export const getProfessor = async (): Promise<IProfessor[]> => {

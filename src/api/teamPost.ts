@@ -1,5 +1,5 @@
 import api from ".";
-import { ITeamPost, ITeamStudent } from "../interface";
+import { ITeamPost, ITeamStudent } from "@interface";
 
 export const postGetTeampost = async (teamId: string): Promise<ITeamPost> => {
   try {

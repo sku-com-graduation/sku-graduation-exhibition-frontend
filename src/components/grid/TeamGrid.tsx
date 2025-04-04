@@ -3,14 +3,14 @@ import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, G
 import { Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getTeams, putTeams } from "@src/api/team";
-import { IProfessor, ITeam } from "@src/interface";
-import { getYearRange } from "@src/utils/year";
-import { getProfessor } from "@src/api/professor";
+import { getTeams, putTeams } from "@api/team";
+import { getProfessor } from "@api/professor";
+import { IProfessor, ITeam } from "@interface";
+import { getYearRange } from "@utils/year";
 
 interface TeamRow extends ITeam {
   id: string;
-  professor: string; // 지도교수의 이름을 표시하기 위한 필드
+  professor: string;
 }
 
 const EditToolbar = () => (
@@ -20,11 +20,11 @@ const EditToolbar = () => (
 );
 
 const TeamGrid = () => {
+  const years = getYearRange();
   const [teams, setTeams] = useState<ITeam[]>([]);
   const [professors, setProfessors] = useState<IProfessor[]>([]);
   const [loading, setLoading] = useState(true);
   const [modifiedRows, setModifiedRows] = useState<Map<string, TeamRow>>(new Map());
-  const years = getYearRange();
   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
 
   useEffect(() => {
@@ -94,12 +94,8 @@ const TeamGrid = () => {
         };
       });
 
-      console.log(JSON.stringify(updatedList, null, 4));
-
       await putTeams(updatedList);
       alert("저장 완료");
-      // setModifiedRows(new Map());
-      // window.location.reload();
     } catch (err) {
       console.error("팀 저장 실패", err);
       alert("저장 중 오류 발생");
@@ -191,6 +187,9 @@ const TeamGrid = () => {
           pagination: {
             paginationModel: { pageSize: 50 },
           },
+          // sorting: {
+          //   sortModel: [{ field: "name", sort: "asc" }],
+          // },
         }}
         checkboxSelection
         disableRowSelectionOnClick
@@ -202,7 +201,6 @@ const TeamGrid = () => {
 
 export default TeamGrid;
 
-// ✅ Toolbar & Styles
 const Toolbar = styled(Box)({
   display: "flex",
   justifyContent: "flex-end",
@@ -210,7 +208,6 @@ const Toolbar = styled(Box)({
   gap: 8,
   backgroundColor: "#fff",
   borderRadius: "12px",
-  marginBottom: "0.5rem",
 });
 
 const StyledButton = styled(Button)({

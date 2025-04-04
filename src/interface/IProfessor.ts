@@ -1,4 +1,4 @@
-export default interface IProfessor {
+export interface IProfessor {
   encryptedProfessorId: string;
   name: string;
   email: string;

@@ -1,4 +1,4 @@
-export default interface IStudent {
+export interface IStudent {
   encryptedStudentId: string;
   encryptedTeamId: string | null;
   name: string;

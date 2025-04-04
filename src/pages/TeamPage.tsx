@@ -1,16 +1,15 @@
-import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { setExhibitionYear } from "../store/reducers/exhibitionYear";
-import { postGetTeampost } from "../api/teamPost";
-import { IProject, ITeamPost, ITeamStudent } from "../interface";
-
-import { useModal } from "../hooks/useModal";
-import empty from "../assets/image/main_image.png";
-import userEmpty from "../assets/image/main_image.png";
-import { getProjects } from "@src/api/team";
+import styled from "styled-components";
+import { RootState } from "@store/store";
+import { setExhibitionYear } from "@store/reducers/exhibitionYear";
+import { postGetTeampost } from "@api/teamPost";
+import { IProject, ITeamPost, ITeamStudent } from "@interface";
+import { useModal } from "@hooks";
+import empty from "@assets/image/main_image.png";
+import userEmpty from "@assets/image/main_image.png";
+import { getProjects } from "@api/team";
 import { motion } from "framer-motion";
 import ProfileView from "@components/ProfileView";
 
@@ -390,14 +389,14 @@ const TeamPage = () => {
               <StudentName>{student.name}</StudentName>
             </StudentItem>
           ))}
-          {/* {teampost?.professorInfo.professorName !== "이름 없음" && (
+          {teampost?.professorInfo.professorName && (
             <ProfessorItem>
               <StudentInfo
                 src={teampost?.professorInfo.professorImage ? `data:image/jpeg;base64,${teampost?.professorInfo.professorImage}` : userEmpty}
               />
               <ProfessorName>{teampost?.professorInfo.professorName}</ProfessorName>
             </ProfessorItem>
-          )} */}
+          )}
         </MemberList>
         <Modal>{selectedStudent && <ProfileView student={selectedStudent} />}</Modal>
 
