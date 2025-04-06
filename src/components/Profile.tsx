@@ -38,7 +38,9 @@ const Profile = ({ selectedStudent, teamUuid, onSave }: ProfileProps) => {
   return (
     <ProfileCard>
       <ImageSection>
-        <ProfileImage src={editedStudent.profileImage ? `data:image/jpeg;base64,${editedStudent.profileImage}` : userEmpty} />
+        <ProfileImage
+          src={editedStudent.profileImage ? `data:image/jpeg;base64,${editedStudent.profileImage}` : userEmpty}
+        />
         {isEditing && <ImageLabel htmlFor="profile-image">이미지 변경</ImageLabel>}
         <input id="profile-image" type="file" accept="image/*" onChange={handleImageChange} hidden />
       </ImageSection>
@@ -154,7 +156,7 @@ const ProfileImage = styled.img`
   height: 9rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #e5e7eb;
+  border: 1px solid #e5e7eb;
 `;
 
 const ImageLabel = styled.label`

@@ -1,8 +1,8 @@
 export type { IAuth } from "./IAuth";
-export type { IAccount } from "./IAccount";
+export type { IAccountResponse, ICreateAccountRequest } from "./IAccount";
 export type { IProfessor } from "./IProfessor";
 export type { IProject } from "./IProject";
-export type { IStudent } from "./IStudent";
+export type { IStudentInfo, IStudentTeamInfo, IStudentResponse, ICreateStudentRequest } from "./IStudent";
 export type { ITeam } from "./ITeam";
 export type { ITeamPost } from "./ITeamPost";
 export type { ITeamStudent } from "./ITeamPost";

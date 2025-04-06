@@ -187,7 +187,6 @@ const CategorySelect = styled.select`
 `;
 
 interface IEditForm {
-  encryptedTeamId: string;
   title: string;
   content: string;
   category: string;
@@ -202,7 +201,6 @@ const TeamEditPage = () => {
   const location = useLocation();
   const [teampostEdit, setTeampostEdit] = useState<ITeamPostEdit | null>(null);
   const [editData, setEditData] = useState<IEditForm>({
-    encryptedTeamId: "",
     title: "",
     content: "",
     category: "",
@@ -240,7 +238,6 @@ const TeamEditPage = () => {
   useEffect(() => {
     if (teampostEdit) {
       setEditData({
-        encryptedTeamId: "test",
         title: teampostEdit.title,
         content: teampostEdit.content,
         category: teampostEdit.category,
@@ -292,9 +289,13 @@ const TeamEditPage = () => {
           ? editData.teamProfileImage
           : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
       const demoFile =
-        editData.demoVideo instanceof File ? editData.demoVideo : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
+        editData.demoVideo instanceof File
+          ? editData.demoVideo
+          : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
       const posterFile =
-        editData.posterImage instanceof File ? editData.posterImage : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
+        editData.posterImage instanceof File
+          ? editData.posterImage
+          : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
 
       // 팀 포스트 업데이트
       const formData = new FormData();
@@ -326,10 +327,10 @@ const TeamEditPage = () => {
       await Promise.all(
         editedStudents.map((student) => {
           const studentFormData = new FormData();
+          studentFormData.append("teamUuid", team_uuid);
           studentFormData.append("encryptedStudentId", student.encryptedStudentProfileId);
           studentFormData.append("githubUrl", student.githubUrl);
           studentFormData.append("info", student.info);
-          studentFormData.append("teamUuid", team_uuid);
           const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
           studentFormData.append("profileImage", profileImage);
           studentFormData.append("studentBlog", student.studentBlog);
@@ -358,7 +359,13 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
+          <EditableTitle
+            type="text"
+            name="title"
+            value={editData.title}
+            onChange={handleInputChange}
+            placeholder="PROJECT TITLE"
+          />
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
             <option value="WEB">WEB</option>
             <option value="MOBILE">MOBILE</option>
@@ -419,7 +426,9 @@ const TeamEditPage = () => {
           </StudentItem>
         ))}
       </StudentList>
-      <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}</Modal>
+      <Modal>
+        {selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}
+      </Modal>
 
       <SectionTitle>Project Video</SectionTitle>
       <DemoVideoEditor base={editData.demoVideo as string} handleFileChange={handleFileChange} />

@@ -1,9 +1,9 @@
 import api from ".";
 import { AxiosError } from "axios";
-import { IStudent } from "@interface";
+import { IStudentResponse } from "@interface";
 
 /** 연도별 학생 정보 조회 API */
-export const getStudent = async (year: string): Promise<IStudent[]> => {
+export const getStudents = async (year: string): Promise<IStudentResponse> => {
   try {
     const result = await api.get(`/admin/student/search?year=${year}`);
     return result.data;
@@ -12,20 +12,7 @@ export const getStudent = async (year: string): Promise<IStudent[]> => {
   }
 };
 
-/**학생 등록 API (개별) */
-export const postStudent = async (data: { studentName: string; studentNumber: string }) => {
-  try {
-    const result = await api.post(`/admin/student/save`, data);
-    if (result.status === 201) {
-      return result.data;
-    }
-    throw new Error(`에러 상태 코드: ${result.status} - ${result.statusText}`);
-  } catch (error) {
-    if (error instanceof AxiosError) throw new Error(`${error}`);
-  }
-};
-
-/**학생 등록 API (다수 배열) */
+/**학생 등록 API*/
 export const postStudents = async (data: { studentName: string; studentNumber: string }[]) => {
   try {
     const result = await api.post(`/admin/student/save`, data);
@@ -39,7 +26,7 @@ export const postStudents = async (data: { studentName: string; studentNumber: s
 };
 
 /** 학생 정보 수정 API */
-export const putStudent = async (studentInfo: IStudent[]) => {
+export const putStudent = async (studentInfo: IStudentResponse[]) => {
   try {
     const result = await api.put(`/admin/student/update`, studentInfo);
     if (result.status === 200) {

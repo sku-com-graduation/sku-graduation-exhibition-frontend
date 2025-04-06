@@ -1,30 +1,42 @@
-import Papa from "papaparse";
+import { ICreateAccountRequest, ICreateStudentRequest } from "@interface";
 
-export const parseCSV = <T extends Record<string, string>>(file: File, fieldNames: (keyof T)[]): Promise<T[]> => {
-  return new Promise((resolve, reject) => {
-    Papa.parse(file, {
-      skipEmptyLines: true,
-      complete: (results) => {
-        const rawData = results.data as unknown as string[][];
+export const parseStudentCSV = async (file: File): Promise<ICreateStudentRequest[]> => {
+  const text = await file.text();
+  const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
 
-        const parsed: T[] = [];
+  return lines.map((line, index) => {
+    const [studentName, studentNumber, ...rest] = line.split(",").map((cell) => cell.trim());
 
-        for (const row of rawData) {
-          if (!Array.isArray(row) || row.length !== fieldNames.length) {
-            return reject(new Error(`형식 오류: ${fieldNames.length}개의 커럼이 필요합니다. 오류 행: ${JSON.stringify(row)}`));
-          }
+    if (!studentName || !studentNumber) {
+      throw new Error(`형식 오류 (행 ${index + 1}): 이름과 학번이 모두 필요합니다. 입력: ${line}`);
+    }
 
-          const record = fieldNames.reduce((acc, key, idx) => {
-            acc[key] = row[idx].trim() as T[keyof T];
-            return acc;
-          }, {} as T);
+    return { studentName, studentNumber };
+  });
+};
 
-          parsed.push(record);
-        }
+export const parseAccountCSV = async (file: File): Promise<ICreateAccountRequest[]> => {
+  const text = await file.text();
+  const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
 
-        resolve(parsed);
-      },
-      error: (error) => reject(error),
-    });
+  return lines.map((line) => {
+    const cells = line.split(",");
+
+    const [teamName, category, professorName, ...rest] = cells;
+    const studentInfos = [];
+
+    for (let i = 0; i < rest.length; i += 3) {
+      const [studentName, studentNumber, studentEmail] = rest.slice(i, i + 3);
+      if (studentName && studentNumber && studentEmail) {
+        studentInfos.push({ studentName, studentNumber, studentEmail });
+      }
+    }
+
+    return {
+      teamName,
+      category,
+      professorName,
+      studentInfos,
+    };
   });
 };

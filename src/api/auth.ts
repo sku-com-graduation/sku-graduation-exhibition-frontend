@@ -1,5 +1,5 @@
-import store from "@store/store";
 import api from ".";
+import store from "@store/store";
 import { IAuth } from "@interface";
 import { clearAuth } from "@store/reducers/auth";
 

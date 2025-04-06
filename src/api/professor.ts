@@ -1,17 +1,7 @@
 import api from ".";
 import { IProfessor } from "@interface";
 
-/** 교수 정보 조회 */
-export const getProfessor = async (): Promise<IProfessor[]> => {
-  try {
-    const result = await api.get(`/admin/professor/search`);
-    return result.data;
-  } catch (error) {
-    throw new Error(`${error}`);
-  }
-};
-
-/** 교수 정보 생성 */
+/** 교수 정보 등록 */
 export const postProfessor = async (data: FormData) => {
   try {
     const result = await api.post(`/admin/professor/regist`, data, {
@@ -28,10 +18,22 @@ export const postProfessor = async (data: FormData) => {
 /** 교수 정보 수정 */
 export const putProfessor = async (data: FormData) => {
   try {
-    const result = await api.put(`/admin/professor/update`, data, { headers: { "Content-Type": "multipart/form-data" } });
+    const result = await api.put(`/admin/professor/update`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     if (result.status === 201) {
       return result.data;
     }
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
+};
+
+/** 교수 정보 조회 */
+export const getProfessor = async (): Promise<IProfessor[]> => {
+  try {
+    const result = await api.get(`/admin/professor/search`);
+    return result.data;
   } catch (error) {
     throw new Error(`${error}`);
   }

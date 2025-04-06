@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Box, Button, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
-import { IAccount } from "@interface";
+import { IAccountResponse, ICreateAccountRequest } from "@interface";
 import { getAccount, postAccounts } from "@api/account";
 import { getYearRange } from "@utils/year";
+import CSVUploader from "@components/CSVUploader";
+import { parseAccountCSV } from "@utils/parse";
 
 const EditToolbar = () => (
   <GridToolbarContainer>
@@ -14,45 +16,38 @@ const EditToolbar = () => (
 );
 
 const AccountGrid = () => {
-  const [accounts, setAccounts] = useState<IAccount[]>([]);
-  const [file, setFile] = useState<File | null>(null);
+  const [accounts, setAccounts] = useState<IAccountResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   const years = getYearRange();
   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const studentData = await getAccount(selectedYear.toString());
-
-        setAccounts(studentData);
+        const accountData = await getAccount(selectedYear.toString());
+        setAccounts(accountData);
       } catch (error) {
         console.error("데이터 로딩 실패", error);
       } finally {
-        setLoading(false); // 로딩 종료
+        setLoading(false);
       }
     };
     fetchData();
   }, [selectedYear]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setFile(e.target.files[0]);
-  };
-
-  const handleUpload = async () => {
-    if (!file) return alert("파일을 선택하세요.");
+  const handleFileParsed = async (parsed: ICreateAccountRequest[]) => {
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append(`file`, file);
-      const result = await postAccounts(formData);
+      await postAccounts(parsed);
       alert("업로드 성공");
+      const updatedData = await getAccount(selectedYear.toString());
+      setAccounts(updatedData);
     } catch (error) {
       alert("업로드 실패, 잠시후 다시 시도해주세요.");
     } finally {
-      const updatedData = await getAccount(selectedYear.toString());
-      setAccounts(updatedData);
       setLoading(false);
     }
   };
@@ -73,7 +68,7 @@ const AccountGrid = () => {
     );
   };
 
-  const columns: GridColDef<IAccount>[] = [
+  const columns: GridColDef<IAccountResponse>[] = [
     { field: "userEmail", headerName: "계정", editable: false, flex: 1 },
     { field: "teamName", headerName: "팀명", editable: false, flex: 1 },
     { field: "recent", headerName: "최근 접속일", editable: false, flex: 1 },
@@ -81,29 +76,18 @@ const AccountGrid = () => {
 
   const rowsWithId =
     accounts &&
-    accounts.map((student) => {
-      return {
-        ...student,
-        id: student.encryptedAccountId,
-      };
-    });
+    accounts.map((account) => ({
+      ...account,
+      id: account.encryptedAccountId,
+    }));
 
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Toolbar>
-        <UploaderBox>
-          <YearSelect />
-          <Typography variant="h6" sx={{ color: "#333", fontSize: "1rem", fontWeight: 500, whiteSpace: "nowrap" }}>
-            등록 업로더
-          </Typography>
-          <StyledInput type="file" accept=".csv" onChange={handleFileChange} />
-          <StyledButton variant="contained" color="primary" onClick={handleUpload}>
-            업로드
-          </StyledButton>
-        </UploaderBox>
-        {/* <StyledButton startIcon={<AddIcon />} variant="outlined">
+        <YearSelect />
+        <StyledButton startIcon={<AddIcon />} variant="outlined" onClick={() => setDialogOpen(true)}>
           추가
-        </StyledButton> */}
+        </StyledButton>
         <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error">
           삭제
         </StyledButton>
@@ -111,6 +95,7 @@ const AccountGrid = () => {
           저장
         </StyledButton>
       </Toolbar>
+
       <DataGrid
         rows={rowsWithId}
         columns={columns}
@@ -119,13 +104,19 @@ const AccountGrid = () => {
           pagination: {
             paginationModel: { pageSize: 100 },
           },
-          // sorting: {
-          //   sortModel: [{ field: "userEmail", sort: "asc" }],
-          // },
         }}
         checkboxSelection
         disableRowSelectionOnClick
         slots={{ toolbar: EditToolbar }}
+      />
+
+      <CSVUploader<ICreateAccountRequest>
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title="계정 등록"
+        confirmLabel="등록"
+        parseCsv={parseAccountCSV}
+        onFileParsed={handleFileParsed}
       />
     </Box>
   );
@@ -145,20 +136,6 @@ const Toolbar = styled(Box)({
   overflow: "hidden",
   flexWrap: "wrap",
 });
-
-const UploaderBox = styled(Box)({
-  display: "flex",
-  alignItems: "center",
-  gap: 16,
-});
-
-const StyledInput = styled.input.attrs({ type: "file", accept: ".csv" })`
-  font-size: 0.85rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  padding: 0.3rem 0.5rem;
-  width: 180px;
-`;
 
 const StyledButton = styled(Button)({
   fontSize: "0.85rem",

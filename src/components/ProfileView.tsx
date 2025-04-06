@@ -11,7 +11,10 @@ const ProfileView = ({ student }: ProfileViewProps) => {
   return (
     <ProfileCard>
       <ImageSection>
-        <ProfileImage src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty} alt={`${student.name} Profile`} />
+        <ProfileImage
+          src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty}
+          alt={`${student.name} Profile`}
+        />
       </ImageSection>
 
       <InfoSection>
@@ -76,7 +79,7 @@ const ProfileImage = styled.img`
   height: 9rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #e5e7eb;
+  border: 1px solid #e5e7eb;
 `;
 
 const InfoSection = styled.div`

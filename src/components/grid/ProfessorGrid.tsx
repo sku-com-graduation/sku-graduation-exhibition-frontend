@@ -1,6 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Save as SaveIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
 
@@ -57,7 +68,9 @@ const ProfessorGrid = () => {
   };
 
   const handleRowImageChange = (professorId: string, file: File) => {
-    setProfessors((prev) => prev.map((prof) => (prof.encryptedProfessorId === professorId ? { ...prof, profileImage: file } : prof)));
+    setProfessors((prev) =>
+      prev.map((prof) => (prof.encryptedProfessorId === professorId ? { ...prof, profileImage: file } : prof))
+    );
     setModifiedRows((prev) => {
       const updated = new Map(prev);
       const existing = professors.find((p) => p.encryptedProfessorId === professorId);
@@ -180,12 +193,9 @@ const ProfessorGrid = () => {
   };
 
   const columns: GridColDef<ProfessorRow>[] = [
-    { field: "name", headerName: "이름", editable: true, flex: 1 },
-    { field: "email", headerName: "이메일", editable: true, flex: 1 },
-    { field: "tenure", headerName: "재직", editable: true, type: "boolean", flex: 1 },
     {
       field: "profileImage",
-      headerName: "프로필 이미지",
+      headerName: "프로필",
       editable: false,
       flex: 1,
       renderCell: (params) => {
@@ -193,7 +203,11 @@ const ProfessorGrid = () => {
         const professorId = params.row.encryptedProfessorId;
 
         const src =
-          typeof value === "string" ? URL.createObjectURL(base64ToFile(value, "profile.jpg", "image/jpeg")) : value ? URL.createObjectURL(value) : "";
+          typeof value === "string"
+            ? URL.createObjectURL(base64ToFile(value, "profile.jpg", "image/jpeg"))
+            : value
+            ? URL.createObjectURL(value)
+            : "";
 
         return (
           <Box
@@ -227,6 +241,9 @@ const ProfessorGrid = () => {
         );
       },
     },
+    { field: "name", headerName: "이름", editable: true, flex: 1 },
+    { field: "email", headerName: "이메일", editable: true, flex: 1 },
+    { field: "tenure", headerName: "재직", editable: true, type: "boolean", flex: 1 },
   ];
 
   const rowsWithId: ProfessorRow[] = professors.map((prof) => {
@@ -319,8 +336,20 @@ const ProfessorGrid = () => {
             </Box>
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
-              <TextField name="name" label="이름" value={newProfessor.name} onChange={handleNewProfessorChange} fullWidth />
-              <TextField name="email" label="이메일" value={newProfessor.email} onChange={handleNewProfessorChange} fullWidth />
+              <TextField
+                name="name"
+                label="이름"
+                value={newProfessor.name}
+                onChange={handleNewProfessorChange}
+                fullWidth
+              />
+              <TextField
+                name="email"
+                label="이메일"
+                value={newProfessor.email}
+                onChange={handleNewProfessorChange}
+                fullWidth
+              />
             </Box>
           </Box>
 
@@ -329,7 +358,13 @@ const ProfessorGrid = () => {
             label="재직 여부"
             sx={{ mt: 2 }}
           />
-          <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
           <Button onClick={handleDialogClose}>취소</Button>
