@@ -1,11 +1,12 @@
 export type { IAuth } from "./IAuth";
-export type { IAccountResponse, ICreateAccountRequest } from "./IAccount";
+export type { TAdminMenu } from "./IAdmin";
+export type { IAccountResponse, IAccountRequest } from "./IAccount";
 export type { IProfessor } from "./IProfessor";
 export type { IProject } from "./IProject";
-export type { IStudentInfo, IStudentTeamInfo, IStudentResponse, ICreateStudentRequest } from "./IStudent";
-export type { ITeam } from "./ITeam";
+export type { IStudentResponseInfo, IStudentResponseTeamInfo, IStudentResponse, IStudentRequest } from "./IStudent";
+export type { ITeamData, ITeamProfessorData, ITeamResponse } from "./ITeam";
 export type { ITeamPost } from "./ITeamPost";
 export type { ITeamStudent } from "./ITeamPost";
 export type { ITeamInfo } from "./ITeamPost";
 export type { ITeamPostEditStudent, ITeamPostEdit } from "./ITeamPostEdit";
-export type { IHome } from "./IHome";
+export type { IHomeResponse, IHomeRequest } from "./IHome";

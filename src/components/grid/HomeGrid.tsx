@@ -5,13 +5,14 @@ import { Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getHomeInfoAll, putHomeInfo, postHomeInfo } from "@api/home";
-import { IHome } from "@interface";
+import { IHomeResponse } from "@interface";
 
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/ko";
 import dayjs, { Dayjs } from "dayjs";
+import { useToast } from "@hooks";
 dayjs.locale("ko");
 
 const EditToolbar = () => (
@@ -20,7 +21,7 @@ const EditToolbar = () => (
   </GridToolbarContainer>
 );
 
-interface HomeRow extends IHome {
+interface HomeRow extends IHomeResponse {
   id: string;
   isNew?: boolean;
 }
@@ -57,11 +58,12 @@ const renderTimeEditCell = (params: GridRenderEditCellParams<HomeRow>) => {
 };
 
 const HomeGrid = () => {
-  const [homeInfo, setHomeInfo] = useState<IHome[]>([]);
+  const [homeInfo, setHomeInfo] = useState<IHomeResponse[]>([]);
   const [modifiedRows, setModifiedRows] = useState<Map<string, HomeRow>>(new Map());
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newYear, setNewYear] = useState<number>(new Date().getFullYear());
+  const { notifySuccess, notifyInfo, notifyError } = useToast();
 
   const fetchData = async () => {
     setLoading(true);
@@ -94,14 +96,14 @@ const HomeGrid = () => {
   };
 
   const handleSave = async () => {
-    if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
+    if (modifiedRows.size === 0) return notifyInfo("수정된 내용이 없습니다.");
 
     try {
-      const newRows: IHome[] = [];
-      const existingRows: IHome[] = [];
+      const newRows: IHomeResponse[] = [];
+      const existingRows: IHomeResponse[] = [];
 
       for (const row of modifiedRows.values()) {
-        const data: IHome = {
+        const data: IHomeResponse = {
           encryptedHomeId: row.encryptedHomeId,
           exhibitionYear: row.exhibitionYear,
           exhibitionDate: row.exhibitionDate,
@@ -120,12 +122,12 @@ const HomeGrid = () => {
         await putHomeInfo(data);
       }
 
-      alert("저장 완료");
+      notifySuccess("저장 완료");
       setModifiedRows(new Map());
       fetchData();
     } catch (err) {
       console.error("홈 저장 실패", err);
-      alert("저장 중 오류 발생");
+      notifyError("저장 중 오류 발생. 잠시후 재시도 하세요.");
     }
   };
 
@@ -212,7 +214,7 @@ const HomeGrid = () => {
               const yearStr = String(newYear);
               const allYears = [...homeInfo, ...modifiedRows.values()].map((r) => r.exhibitionYear);
               if (allYears.includes(yearStr)) {
-                alert(`${yearStr}년은 이미 존재합니다.`);
+                notifyInfo(`${yearStr}년은 이미 존재합니다.`);
                 return;
               }
 

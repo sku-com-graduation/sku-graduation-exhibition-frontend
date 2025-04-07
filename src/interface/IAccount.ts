@@ -5,13 +5,15 @@ export interface IAccountResponse {
   recent: string;
 }
 
-export interface ICreateAccountRequest {
+export interface IAccountRequestStudentInfo {
+  studentName: string;
+  studentNumber: string;
+  studentEmail: string;
+}
+
+export interface IAccountRequest {
   teamName: string;
   category: string;
   professorName: string;
-  studentInfos: {
-    studentName: string;
-    studentNumber: string;
-    studentEmail: string;
-  }[];
+  studentInfos: IAccountRequestStudentInfo[];
 }

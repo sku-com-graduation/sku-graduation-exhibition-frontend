@@ -10,7 +10,7 @@ const defaultOptions: ToastOptions = {
   draggable: true,
 };
 
-const useToast = () => {
+export const useToast = () => {
   const notifySuccess = (message: string, options?: ToastOptions) => {
     toast.success(message, { ...defaultOptions, ...options });
   };
@@ -29,5 +29,3 @@ const useToast = () => {
     notifyInfo,
   };
 };
-
-export default useToast;

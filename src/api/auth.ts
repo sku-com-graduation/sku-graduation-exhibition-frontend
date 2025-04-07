@@ -17,8 +17,8 @@ export const postAuth = async (userName: string, password: string): Promise<IAut
 /** logout API */
 export const getLogout = async () => {
   try {
-    await api.post(`/public/account/logout`);
     store.dispatch(clearAuth());
+    await api.post(`/public/account/logout`);
   } catch (error: unknown) {
     throw new Error(`로그아웃 오류`);
   }

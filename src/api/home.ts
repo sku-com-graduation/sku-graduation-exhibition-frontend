@@ -1,8 +1,8 @@
 import api from ".";
-import { IHome } from "@interface";
+import { IHomeResponse } from "@interface";
 
 /**홈페이지 정보 수정 API */
-export const putHomeInfo = async (data: IHome) => {
+export const putHomeInfo = async (data: IHomeResponse) => {
   try {
     const result = await api.put(`/admin/home/update/info`, data);
     return result.data;
@@ -12,7 +12,7 @@ export const putHomeInfo = async (data: IHome) => {
 };
 
 /**전체 홈페이지 정보 조회 API */
-export const getHomeInfoAll = async (): Promise<IHome[] | []> => {
+export const getHomeInfoAll = async (): Promise<IHomeResponse[] | []> => {
   try {
     const result = await api.get(`/admin/home/search/infos`);
     return result.data;
@@ -22,7 +22,7 @@ export const getHomeInfoAll = async (): Promise<IHome[] | []> => {
 };
 
 /**홈페이지 정보 조회 API */
-export const getHomeInfo = async (year: string): Promise<IHome> => {
+export const getHomeInfo = async (year: string): Promise<IHomeResponse> => {
   try {
     const result = await api.get(`/public/home/search/info?year=${year}`);
     return result.data;
@@ -32,7 +32,7 @@ export const getHomeInfo = async (year: string): Promise<IHome> => {
 };
 
 /**홈페이지 정보 생성 API */
-export const postHomeInfo = async (data: IHome[]): Promise<IHome[] | []> => {
+export const postHomeInfo = async (data: IHomeResponse[]): Promise<IHomeResponse[] | []> => {
   try {
     const result = await api.post(`/admin/home/create/infos`, data);
     return result.data;

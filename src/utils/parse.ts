@@ -1,6 +1,6 @@
-import { ICreateAccountRequest, ICreateStudentRequest } from "@interface";
+import { IAccountRequest, IStudentRequest } from "@interface";
 
-export const parseStudentCSV = async (file: File): Promise<ICreateStudentRequest[]> => {
+export const parseStudentCSV = async (file: File): Promise<IStudentRequest[]> => {
   const text = await file.text();
   const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
 
@@ -15,7 +15,7 @@ export const parseStudentCSV = async (file: File): Promise<ICreateStudentRequest
   });
 };
 
-export const parseAccountCSV = async (file: File): Promise<ICreateAccountRequest[]> => {
+export const parseAccountCSV = async (file: File): Promise<IAccountRequest[]> => {
   const text = await file.text();
   const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
 

@@ -3,11 +3,12 @@ import styled from "styled-components";
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
-import { IAccountResponse, ICreateAccountRequest } from "@interface";
-import { getAccount, postAccounts } from "@api/account";
+import { IAccountResponse, IAccountRequest } from "@interface";
+import { deleteAccount, getAccount, postAccounts } from "@api/account";
 import { getYearRange } from "@utils/year";
 import CSVUploader from "@components/CSVUploader";
 import { parseAccountCSV } from "@utils/parse";
+import { useToast } from "@hooks";
 
 const EditToolbar = () => (
   <GridToolbarContainer>
@@ -18,10 +19,13 @@ const EditToolbar = () => (
 const AccountGrid = () => {
   const [accounts, setAccounts] = useState<IAccountResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectionModel, setSelectionModel] = useState<string[]>([]);
 
   const years = getYearRange();
   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { notifySuccess, notifyInfo, notifyError } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,15 +42,30 @@ const AccountGrid = () => {
     fetchData();
   }, [selectedYear]);
 
-  const handleFileParsed = async (parsed: ICreateAccountRequest[]) => {
+  const handleDeleteSelected = async () => {
+    if (selectionModel.length === 0) {
+      notifyInfo("삭제할 항목을 선택하세요.");
+      return;
+    }
+
+    const confirmed = window.confirm(`${selectionModel.length}개 계정을 삭제하시겠습니까?`);
+    if (!confirmed) return;
+
+    await deleteAccount(selectionModel);
+
+    setAccounts((prev) => prev.filter((account) => !selectionModel.includes(account.encryptedAccountId)));
+    setSelectionModel([]);
+  };
+
+  const handleFileParsed = async (parsed: IAccountRequest[]) => {
     setLoading(true);
     try {
       await postAccounts(parsed);
-      alert("업로드 성공");
+      notifySuccess("업로드 성공");
       const updatedData = await getAccount(selectedYear.toString());
       setAccounts(updatedData);
     } catch (error) {
-      alert("업로드 실패, 잠시후 다시 시도해주세요.");
+      notifyError("업로드 실패, 잠시후 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -88,7 +107,7 @@ const AccountGrid = () => {
         <StyledButton startIcon={<AddIcon />} variant="outlined" onClick={() => setDialogOpen(true)}>
           추가
         </StyledButton>
-        <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error">
+        <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error" onClick={handleDeleteSelected}>
           삭제
         </StyledButton>
         <StyledButton startIcon={<SaveIcon />} variant="outlined">
@@ -100,6 +119,8 @@ const AccountGrid = () => {
         rows={rowsWithId}
         columns={columns}
         loading={loading}
+        rowSelectionModel={selectionModel}
+        onRowSelectionModelChange={(newSelection) => setSelectionModel(newSelection as string[])}
         initialState={{
           pagination: {
             paginationModel: { pageSize: 100 },
@@ -110,7 +131,7 @@ const AccountGrid = () => {
         slots={{ toolbar: EditToolbar }}
       />
 
-      <CSVUploader<ICreateAccountRequest>
+      <CSVUploader<IAccountRequest>
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         title="계정 등록"

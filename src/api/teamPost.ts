@@ -11,6 +11,9 @@ export const postGetTeampost = async (teamId: string): Promise<ITeamPost> => {
 };
 
 export const putTeampost = async (data: FormData) => {
+  for (const [key, value] of data.entries()) {
+    console.log(`${key}:`, value);
+  }
   try {
     const result = await api.put(`/user/post/update/teamPost`, data, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -24,14 +27,14 @@ export const putTeampost = async (data: FormData) => {
 };
 
 export const putTeamStudent = async (data: FormData) => {
-  try {
-    const result = await api.put(`/user/post/update/studentProfile`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return result.data;
-  } catch (error) {
-    throw new Error(`문제 발생: ${error}`);
-  }
+  // try {
+  const result = await api.put(`/user/post/update/studentProfile`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return result.data;
+  // } catch (error) {
+  //   throw new Error(`문제 발생: ${error}`);
+  // }
 };
 
 export const putTeampostSlideImage = async (data: FormData) => {

@@ -1,14 +1,14 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
-import { Save as SaveIcon } from "@mui/icons-material";
+import { Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getTeams, putTeams } from "@api/team";
-import { getProfessor } from "@api/professor";
-import { IProfessor, ITeam } from "@interface";
+import { deleteTeams, getTeams, putTeams } from "@api/team";
+import { ITeamData, ITeamProfessorData } from "@interface";
 import { getYearRange } from "@utils/year";
+import { useToast } from "@hooks";
 
-interface TeamRow extends ITeam {
+interface TeamRow extends ITeamData {
   id: string;
   professor: string;
 }
@@ -21,38 +21,30 @@ const EditToolbar = () => (
 
 const TeamGrid = () => {
   const years = getYearRange();
-  const [teams, setTeams] = useState<ITeam[]>([]);
-  const [professors, setProfessors] = useState<IProfessor[]>([]);
+  const [teams, setTeams] = useState<ITeamData[]>([]);
+  const [professors, setProfessors] = useState<ITeamProfessorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [modifiedRows, setModifiedRows] = useState<Map<string, TeamRow>>(new Map());
   const [selectedYear, setSelectedYear] = useState<number>(years[0]);
+  const { notifySuccess, notifyInfo, notifyError } = useToast();
+  const [selectionModel, setSelectionModel] = useState<string[]>([]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const data = await getTeams(selectedYear.toString());
+      setTeams(data.teams);
+      setProfessors(data.professors);
+    } catch (error) {
+      console.error("팀 데이터 로딩 실패", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const teamData = await getTeams(selectedYear.toString());
-        setTeams(teamData);
-      } catch (error) {
-        console.error("팀 데이터 로딩 실패", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, [selectedYear]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const profData = await getProfessor();
-        setProfessors(profData);
-      } catch (error) {
-        console.error("교수 데이터 로딩 실패", error);
-      }
-    };
-    fetchData();
-  }, []);
 
   const YearSelect = () => {
     const handleChange = (event: SelectChangeEvent<number>) => {
@@ -79,12 +71,26 @@ const TeamGrid = () => {
     return newRow;
   };
 
-  const handleSave = async () => {
-    if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
+  const handleDeleteSelected = async () => {
+    if (selectionModel.length === 0) {
+      notifyInfo("삭제할 항목을 선택하세요.");
+      return;
+    }
 
+    const confirmed = window.confirm(`${selectionModel.length}개 팀을 삭제하시겠습니까?`);
+    if (!confirmed) return;
+
+    await deleteTeams(selectionModel);
+
+    setTeams((prev) => prev.filter((team) => !selectionModel.includes(team.encryptedTeamId)));
+    setSelectionModel([]);
+  };
+
+  const handleSave = async () => {
+    if (modifiedRows.size === 0) return notifyInfo("수정된 내용이 없습니다.");
     try {
-      const updatedList: ITeam[] = Array.from(modifiedRows.values()).map((row) => {
-        const prof = professors.find((p) => p.name === row.professor);
+      const updatedList: ITeamData[] = Array.from(modifiedRows.values()).map((row) => {
+        const prof = professors.find((p) => p.professorName === row.professor);
         return {
           encryptedTeamId: row.id,
           encryptedProfessorId: prof ? prof.encryptedProfessorId : row.encryptedProfessorId,
@@ -95,10 +101,10 @@ const TeamGrid = () => {
       });
 
       await putTeams(updatedList);
-      alert("저장 완료");
+      notifySuccess("저장 완료");
     } catch (err) {
       console.error("팀 저장 실패", err);
-      alert("저장 중 오류 발생");
+      notifyError("저장 중 오류 발생");
     }
   };
 
@@ -119,7 +125,6 @@ const TeamGrid = () => {
     );
   };
 
-  // 교수 리스트를 드롭다운으로 수정할 수 있도록 하는 편집 셀
   const ProfessorSelectEditCell = (props: GridRenderEditCellParams<TeamRow>) => {
     const { id, value, field, api } = props;
 
@@ -129,11 +134,12 @@ const TeamGrid = () => {
 
     return (
       <Select value={value ?? ""} onChange={handleChange} fullWidth>
-        {professors.map((prof) => (
-          <MenuItem key={prof.encryptedProfessorId} value={prof.name}>
-            {prof.name}
-          </MenuItem>
-        ))}
+        {professors &&
+          professors.map((prof) => (
+            <MenuItem key={prof.encryptedProfessorId} value={prof.professorName}>
+              {prof.professorName}
+            </MenuItem>
+          ))}
       </Select>
     );
   };
@@ -162,11 +168,11 @@ const TeamGrid = () => {
     teams.map((team) => {
       const modifiedTeam = modifiedRows.get(team.encryptedTeamId);
       if (modifiedTeam) return modifiedTeam;
-      const prof = professors.find((p) => p.encryptedProfessorId === team.encryptedProfessorId);
+      const prof = professors && professors.find((p) => p.encryptedProfessorId === team.encryptedProfessorId);
       return {
         ...team,
         id: team.encryptedTeamId,
-        professor: prof ? prof.name : "",
+        professor: prof ? prof.professorName : "",
       };
     });
 
@@ -174,6 +180,9 @@ const TeamGrid = () => {
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Toolbar>
         <YearSelect />
+        <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error" onClick={handleDeleteSelected}>
+          삭제
+        </StyledButton>
         <StyledButton startIcon={<SaveIcon />} variant="outlined" onClick={handleSave}>
           저장
         </StyledButton>
@@ -182,6 +191,8 @@ const TeamGrid = () => {
         rows={rowsWithId}
         columns={columns}
         loading={loading}
+        rowSelectionModel={selectionModel}
+        onRowSelectionModelChange={(newSelection) => setSelectionModel(newSelection as string[])}
         processRowUpdate={handleRowUpdate}
         initialState={{
           pagination: {

@@ -1,3 +1,4 @@
+import { useToast } from "@hooks";
 import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -20,7 +21,7 @@ type CSVUploaderProps<T> = {
   parseCsv: (file: File) => Promise<T[]>;
   title?: string;
   confirmLabel?: string;
-  manualFields?: { field: keyof T; label: string }[]; // optional
+  manualFields?: { field: keyof T; label: string }[];
 };
 
 function CSVUploader<T>({
@@ -37,6 +38,7 @@ function CSVUploader<T>({
   const [preview, setPreview] = useState<T[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [manualRow, setManualRow] = useState<Partial<T>>({});
+  const { notifySuccess, notifyInfo, notifyError } = useToast();
 
   const handleFile = async (file: File) => {
     try {
@@ -44,7 +46,7 @@ function CSVUploader<T>({
       setFile(file);
       setPreview((prev) => [...prev, ...parsed]);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "CSV 파싱 실패");
+      notifyError(err instanceof Error ? err.message : "CSV 파싱 실패");
     }
   };
 
@@ -55,7 +57,7 @@ function CSVUploader<T>({
     if (dropped && dropped.type === "text/csv") {
       handleFile(dropped);
     } else {
-      alert("CSV 파일만 업로드 가능합니다.");
+      notifyInfo("CSV 파일만 업로드 가능합니다.");
     }
   }, []);
 
@@ -65,18 +67,19 @@ function CSVUploader<T>({
 
   const autoFieldNames = useMemo(() => {
     if (manualFields.length > 0) return manualFields;
+    return [];
 
-    const fields = Object.keys(preview[0] ?? manualRow) as (keyof T)[];
-    return fields.map((field) => ({
-      field,
-      label: String(field),
-    }));
+    // const fields = Object.keys(preview[0] ?? manualRow) as (keyof T)[];
+    // return fields.map((field) => ({
+    //   field,
+    //   label: String(field),
+    // }));
   }, [manualFields, preview, manualRow]);
 
   const handleAddManualRow = () => {
     const missingField = autoFieldNames.find(({ field }) => !manualRow[field]);
     if (missingField) {
-      alert(`${missingField.label} 값을 입력해주세요.`);
+      notifyInfo(`${missingField.label} 값을 입력해주세요.`);
       return;
     }
     setPreview((prev) => [...prev, manualRow as T]);
@@ -131,7 +134,7 @@ function CSVUploader<T>({
               />
             ))}
             <Button variant="outlined" onClick={handleAddManualRow} sx={{ mt: 1 }}>
-              행 추가
+              추가
             </Button>
           </Box>
         )}
@@ -176,9 +179,7 @@ function CSVUploader<T>({
                           {Array.isArray(value)
                             ? value
                                 .map((v) =>
-                                  typeof v === "object" && v !== null
-                                    ? `${v.studentName} (${v.studentNumber}, ${v.studentEmail})`
-                                    : JSON.stringify(v)
+                                  typeof v === "object" && v !== null ? `${v.studentName} (${v.studentNumber}, ${v.studentEmail})` : JSON.stringify(v)
                                 )
                                 .join("\n") // 줄바꿈 추가
                             : typeof value === "object" && value !== null

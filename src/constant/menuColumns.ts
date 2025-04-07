@@ -1,3 +1,5 @@
+import { TAdminMenu } from "@interface";
+
 export const STUDENT = {
   encryptedTeamId: "팀명",
   name: "이름",
@@ -27,7 +29,7 @@ export const PROFESSOR = {
 } as const;
 
 export const ADMIN_MENUS: {
-  id: "student" | "team" | "account" | "professor" | "home";
+  id: TAdminMenu;
   title: string;
 }[] = [
   { id: "student", title: "학생 관리" },

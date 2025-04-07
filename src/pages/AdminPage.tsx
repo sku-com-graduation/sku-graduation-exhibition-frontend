@@ -2,6 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { AccountGrid, HomeGrid, ProfessorGrid, StudentGrid, TeamGrid } from "@components/grid";
 import { ADMIN_MENUS } from "@constant/menuColumns";
+import { TAdminMenu } from "@interface";
 
 const Container = styled.div`
   display: flex;
@@ -56,7 +57,7 @@ const WorkContainer = styled.div`
 `;
 
 const AdminPage = () => {
-  const [selectedMenu, setSelectedMenu] = useState<"student" | "team" | "account" | "professor" | "home">(ADMIN_MENUS[0].id);
+  const [selectedMenu, setSelectedMenu] = useState<TAdminMenu>(ADMIN_MENUS[0].id);
 
   return (
     <Container>

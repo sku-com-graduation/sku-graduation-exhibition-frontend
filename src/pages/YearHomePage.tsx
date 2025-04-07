@@ -7,7 +7,7 @@ import i1 from "@assets/image/i3.png";
 import v5 from "@assets/video/v1.mp4";
 import back from "@assets/image/back_image.png";
 import { getHomeInfo } from "@api/home";
-import { IHome } from "@interface";
+import { IHomeResponse } from "@interface";
 import { MODERN_INTRO_TEXT, MODERN_INTRO_TITLE } from "@constant/homeText";
 
 const Wrapper = styled.div`
@@ -187,7 +187,7 @@ const YearHomePage = () => {
   const navigate = useNavigate();
   const { year } = useParams();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [homeInfo, setHomeInfo] = useState<IHome>();
+  const [homeInfo, setHomeInfo] = useState<IHomeResponse>();
 
   const scrollTextVariants = {
     hidden: { y: 50, opacity: 0 },

@@ -1,4 +1,4 @@
-export interface IStudentInfo {
+export interface IStudentResponseInfo {
   encryptedStudentId: string;
   encryptedTeamId: string | null;
   name: string;
@@ -7,17 +7,17 @@ export interface IStudentInfo {
   exhibitionYear: string;
 }
 
-export interface IStudentTeamInfo {
+export interface IStudentResponseTeamInfo {
   encryptedTeamId: string;
   teamName: string;
 }
 
 export interface IStudentResponse {
-  students: IStudentInfo[];
-  teams: IStudentTeamInfo[];
+  students: IStudentResponseInfo[];
+  teams: IStudentResponseTeamInfo[];
 }
 
-export interface ICreateStudentRequest {
+export interface IStudentRequest {
   studentName: string;
   studentNumber: string;
 }

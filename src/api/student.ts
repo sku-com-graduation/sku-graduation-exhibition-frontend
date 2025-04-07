@@ -1,6 +1,6 @@
 import api from ".";
 import { AxiosError } from "axios";
-import { IStudentResponse } from "@interface";
+import { IStudentResponseInfo, IStudentResponse } from "@interface";
 
 /** 연도별 학생 정보 조회 API */
 export const getStudents = async (year: string): Promise<IStudentResponse> => {
@@ -26,7 +26,7 @@ export const postStudents = async (data: { studentName: string; studentNumber: s
 };
 
 /** 학생 정보 수정 API */
-export const putStudent = async (studentInfo: IStudentResponse[]) => {
+export const putStudent = async (studentInfo: IStudentResponseInfo[]) => {
   try {
     const result = await api.put(`/admin/student/update`, studentInfo);
     if (result.status === 200) {

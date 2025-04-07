@@ -1,23 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Save as SaveIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
 
 import { getProfessor, putProfessor, postProfessor } from "@api/professor";
 import { IProfessor } from "@interface";
 import base64ToFile from "@utils/base64ToFile";
+import { useToast } from "@hooks";
 
 interface ProfessorRow extends IProfessor {
   id: string;
@@ -44,6 +34,8 @@ const ProfessorGrid = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputMapRef = useRef<Map<string, HTMLInputElement>>(new Map());
 
+  const { notifySuccess, notifyInfo, notifyError } = useToast();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,9 +60,7 @@ const ProfessorGrid = () => {
   };
 
   const handleRowImageChange = (professorId: string, file: File) => {
-    setProfessors((prev) =>
-      prev.map((prof) => (prof.encryptedProfessorId === professorId ? { ...prof, profileImage: file } : prof))
-    );
+    setProfessors((prev) => prev.map((prof) => (prof.encryptedProfessorId === professorId ? { ...prof, profileImage: file } : prof)));
     setModifiedRows((prev) => {
       const updated = new Map(prev);
       const existing = professors.find((p) => p.encryptedProfessorId === professorId);
@@ -97,7 +87,7 @@ const ProfessorGrid = () => {
   };
 
   const handleSave = async () => {
-    if (modifiedRows.size === 0) return alert("수정된 내용이 없습니다.");
+    if (modifiedRows.size === 0) return notifyInfo("수정된 내용이 없습니다.");
 
     try {
       for (const modifiedProf of modifiedRows.values()) {
@@ -126,11 +116,11 @@ const ProfessorGrid = () => {
         })
       );
 
-      alert("저장 완료");
+      notifySuccess("저장 완료");
       setModifiedRows(new Map());
     } catch (err) {
       console.error("교수 저장 실패", err);
-      alert("저장 중 오류 발생");
+      notifyError("저장 중 오류 발생. 잠시후 재시도 해주세요.");
     }
   };
 
@@ -156,7 +146,7 @@ const ProfessorGrid = () => {
 
   const handleAddProfessor = async () => {
     if (!newProfessor.name || !newProfessor.email || !newProfessor.profileImage) {
-      alert("모든 항목을 입력해주세요. (프로필 사진 포함)");
+      notifyInfo("모든 항목을 입력해주세요. (프로필 사진 포함)");
       return;
     }
 
@@ -178,7 +168,7 @@ const ProfessorGrid = () => {
 
       setProfessors((prev) => [...prev, newProfessorData]);
 
-      alert("교수 등록 완료");
+      notifySuccess("교수 등록 완료");
       setOpenDialog(false);
       setNewProfessor({
         name: "",
@@ -188,7 +178,7 @@ const ProfessorGrid = () => {
       });
     } catch (err) {
       console.error("교수 등록 실패", err);
-      alert("등록 중 오류 발생");
+      notifyError("등록 중 오류 발생. 잠시후 재시도 해주세요.");
     }
   };
 
@@ -203,11 +193,7 @@ const ProfessorGrid = () => {
         const professorId = params.row.encryptedProfessorId;
 
         const src =
-          typeof value === "string"
-            ? URL.createObjectURL(base64ToFile(value, "profile.jpg", "image/jpeg"))
-            : value
-            ? URL.createObjectURL(value)
-            : "";
+          typeof value === "string" ? URL.createObjectURL(base64ToFile(value, "profile.jpg", "image/jpeg")) : value ? URL.createObjectURL(value) : "";
 
         return (
           <Box
@@ -336,20 +322,8 @@ const ProfessorGrid = () => {
             </Box>
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
-              <TextField
-                name="name"
-                label="이름"
-                value={newProfessor.name}
-                onChange={handleNewProfessorChange}
-                fullWidth
-              />
-              <TextField
-                name="email"
-                label="이메일"
-                value={newProfessor.email}
-                onChange={handleNewProfessorChange}
-                fullWidth
-              />
+              <TextField name="name" label="이름" value={newProfessor.name} onChange={handleNewProfessorChange} fullWidth />
+              <TextField name="email" label="이메일" value={newProfessor.email} onChange={handleNewProfessorChange} fullWidth />
             </Box>
           </Box>
 
@@ -358,13 +332,7 @@ const ProfessorGrid = () => {
             label="재직 여부"
             sx={{ mt: 2 }}
           />
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
+          <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
           <Button onClick={handleDialogClose}>취소</Button>

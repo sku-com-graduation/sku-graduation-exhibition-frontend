@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { ITeamPostEditStudent } from "@interface";
 import userEmpty from "../assets/image/main_image.png";
@@ -38,9 +38,7 @@ const Profile = ({ selectedStudent, teamUuid, onSave }: ProfileProps) => {
   return (
     <ProfileCard>
       <ImageSection>
-        <ProfileImage
-          src={editedStudent.profileImage ? `data:image/jpeg;base64,${editedStudent.profileImage}` : userEmpty}
-        />
+        <ProfileImage src={editedStudent.profileImage ? `data:image/jpeg;base64,${editedStudent.profileImage}` : userEmpty} />
         {isEditing && <ImageLabel htmlFor="profile-image">이미지 변경</ImageLabel>}
         <input id="profile-image" type="file" accept="image/*" onChange={handleImageChange} hidden />
       </ImageSection>

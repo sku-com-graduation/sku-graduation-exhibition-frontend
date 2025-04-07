@@ -1,7 +1,7 @@
 import api from ".";
-import { IProject, ITeam } from "@interface";
+import { IProject, ITeamData, ITeamResponse } from "@interface";
 
-export const getTeams = async (year: string): Promise<ITeam[]> => {
+export const getTeams = async (year: string): Promise<ITeamResponse> => {
   try {
     const result = await api.get(`/admin/team/search/teamInfo?year=${year}`);
     return result.data;
@@ -10,7 +10,7 @@ export const getTeams = async (year: string): Promise<ITeam[]> => {
   }
 };
 
-export const putTeams = async (teams: ITeam[]) => {
+export const putTeams = async (teams: ITeamData[]) => {
   try {
     const result = await api.put(`/admin/team/update`, teams);
     return result.data;
