@@ -146,9 +146,7 @@ const SlideImageEditor = ({ existingImages, newImages, setExistingImages, setNew
               <SortableItem key={item.id} id={item.id}>
                 <ImageWrapper>
                   <SlideImage
-                    src={
-                      item.type === "existing" ? `data:image/jpeg;base64,${item.img}` : URL.createObjectURL(item.file)
-                    }
+                    src={item.type === "existing" ? item.img : URL.createObjectURL(item.file)}
                     alt={item.id}
                   />
                   <DeleteButton

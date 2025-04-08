@@ -11,7 +11,7 @@ import base64ToFile from "@utils/base64ToFile";
 import { useModal, useToast } from "@hooks";
 import Profile from "@components/Profile";
 
-import userEmpty from "../assets/image/main_image.png";
+import userEmpty from "../assets/image/user.png";
 import back_image from "../assets/image/back_image.png";
 import { ITeamPostEdit, ITeamPostEditStudent } from "@interface";
 
@@ -339,20 +339,48 @@ const TeamEditPage = () => {
         return isStudentModified(original, edited);
       });
 
+      const blobUrlToFile = async (blobUrl: string, fileName: string, mimeType: string): Promise<File> => {
+        const res = await fetch(blobUrl);
+        const blob = await res.blob();
+        return new File([blob], fileName, { type: mimeType });
+      };
+
       await Promise.all(
-        modifiedStudents.map((student) => {
+        modifiedStudents.map(async (student) => {
           const studentFormData = new FormData();
           studentFormData.append("teamUuid", team_uuid);
           studentFormData.append("encryptedStudentId", student.encryptedStudentProfileId);
           studentFormData.append("githubUrl", student.githubUrl);
           studentFormData.append("info", student.info);
-          const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
-          studentFormData.append("profileImage", profileImage);
           studentFormData.append("studentBlog", student.studentBlog);
           studentFormData.append("studentEmail", student.studentEmail);
+
+          if (student.profileImage.startsWith("blob:")) {
+            const file = await blobUrlToFile(student.profileImage, "profile.jpg", "image/jpeg");
+            studentFormData.append("profileImage", file);
+          } else {
+            const file = base64ToFile(student.profileImage, "profile.jpg", "image/jpeg");
+            studentFormData.append("profileImage", file);
+          }
+
           return putTeamStudent(studentFormData);
         })
       );
+
+      // await Promise.all(
+      //   modifiedStudents.map((student) => {
+      //     const studentFormData = new FormData();
+      //     studentFormData.append("teamUuid", team_uuid);
+      //     studentFormData.append("encryptedStudentId", student.encryptedStudentProfileId);
+      //     studentFormData.append("githubUrl", student.githubUrl);
+      //     studentFormData.append("info", student.info);
+      //     const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
+      //     studentFormData.append("profileImage", profileImage);
+      //     studentFormData.append("studentBlog", student.studentBlog);
+      //     studentFormData.append("studentEmail", student.studentEmail);
+      //     return putTeamStudent(studentFormData);
+      //   })
+      // );
 
       if (teamPostResponse && slideImageResponse) {
         navigate(-1);
@@ -393,7 +421,7 @@ const TeamEditPage = () => {
               src={
                 editData.teamProfileImage
                   ? typeof editData.teamProfileImage === "string"
-                    ? `data:image/jpeg;base64,${editData.teamProfileImage}`
+                    ? editData.teamProfileImage
                     : URL.createObjectURL(editData.teamProfileImage)
                   : empty
               }
@@ -435,7 +463,8 @@ const TeamEditPage = () => {
       <StudentList>
         {editedStudents.map((student, index) => (
           <StudentItem key={index} onClick={() => handleStudentClick(student, index)}>
-            <StudentInfo src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty} />
+            <StudentInfo src={student.profileImage ? student.profileImage : userEmpty} />
+
             <StudentName>{student.name}</StudentName>
           </StudentItem>
         ))}
@@ -454,7 +483,7 @@ const TeamEditPage = () => {
             src={
               editData.posterImage
                 ? typeof editData.posterImage === "string"
-                  ? `data:image/jpeg;base64,${editData.posterImage}`
+                  ? editData.posterImage
                   : URL.createObjectURL(editData.posterImage)
                 : back_image
             }
@@ -463,7 +492,14 @@ const TeamEditPage = () => {
           <Overlay className="overlay">Poster</Overlay>
         </ImageWrapper>
 
-        <FileInput ref={posterInputRef} type="file" name="posterImage" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+        <FileInput
+          ref={posterInputRef}
+          type="file"
+          name="posterImage"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
       </PosterIntro>
 
       <SaveButton onClick={handleSave}>SAVE</SaveButton>

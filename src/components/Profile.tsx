@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { ITeamPostEditStudent } from "@interface";
-import userEmpty from "../assets/image/main_image.png";
+import userEmpty from "../assets/image/user.png";
 import { useSelector } from "react-redux";
 import { RootState } from "@store/store";
 import { Input, IconButton, ButtonGroup } from "@components/Input";
@@ -21,14 +21,25 @@ const Profile = ({ selectedStudent, teamUuid, onSave }: ProfileProps) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = (reader.result as string).split(",")[1];
-        setEditedStudent({ ...editedStudent, profileImage: base64String });
-      };
-      reader.readAsDataURL(file);
+      const imageUrl = URL.createObjectURL(file);
+      setEditedStudent({
+        ...editedStudent,
+        profileImage: imageUrl,
+      });
     }
   };
+
+  // const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       const base64String = (reader.result as string).split(",")[1];
+  //       setEditedStudent({ ...editedStudent, profileImage: base64String });
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   const handleSaveClick = () => {
     onSave({ ...editedStudent, index: selectedStudent.index });
@@ -38,22 +49,15 @@ const Profile = ({ selectedStudent, teamUuid, onSave }: ProfileProps) => {
   return (
     <ProfileCard>
       <ImageSection>
-        <ProfileImage src={editedStudent.profileImage ? `data:image/jpeg;base64,${editedStudent.profileImage}` : userEmpty} />
+        <ProfileImage src={editedStudent.profileImage || userEmpty} />
+
         {isEditing && <ImageLabel htmlFor="profile-image">이미지 변경</ImageLabel>}
         <input id="profile-image" type="file" accept="image/*" onChange={handleImageChange} hidden />
       </ImageSection>
 
       <InfoSection>
         <HeaderContainer>
-          {isEditing ? (
-            <Input
-              value={editedStudent.name}
-              onChange={(e) => setEditedStudent({ ...editedStudent, name: e.target.value })}
-              placeholder="이름 입력"
-            />
-          ) : (
-            <Name>{editedStudent.name}</Name>
-          )}
+          {<Name>{editedStudent.name}</Name>}
           <RoleBadge>{editedStudent.role}</RoleBadge>
           {(auth.uuid === teamUuid || auth.role === "ADMIN") && (
             <ButtonGroup>
@@ -155,6 +159,7 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #e5e7eb;
+  image-rendering: auto;
 `;
 
 const ImageLabel = styled.label`

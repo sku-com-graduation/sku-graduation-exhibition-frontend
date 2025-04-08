@@ -84,14 +84,14 @@ const SlideImage: React.FC<{ year: string }> = ({ year }) => {
       <SliderWrapper>
         <SlideTrack duration={duration}>
           {images.map((src, idx) => (
-            <SliderImage key={`row1-${idx}`} src={`data:image/jpeg;base64,${src}`} />
+            <SliderImage key={`row1-${idx}`} src={src} />
           ))}
         </SlideTrack>
       </SliderWrapper>
       <SliderWrapper>
         <SlideTrack reverse duration={duration}>
           {images.map((src, idx) => (
-            <SliderImage key={`row2-${idx}`} src={`data:image/jpeg;base64,${src}`} />
+            <SliderImage key={`row2-${idx}`} src={src} />
           ))}
         </SlideTrack>
       </SliderWrapper>

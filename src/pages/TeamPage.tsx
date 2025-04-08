@@ -14,7 +14,7 @@ import { IProject, ITeamPost, ITeamStudent } from "@interface";
 import { IprofessorInfo } from "src/interface/ITeamPost"; // 교수 정보 타입
 
 import empty from "@assets/image/main_image.png";
-import userEmpty from "@assets/image/main_image.png";
+import userEmpty from "@assets/image/user.png";
 
 import ProfileView from "@components/ProfileView";
 import ProfessorProfileView from "@components/ProfessorProfileView";
@@ -142,6 +142,21 @@ const VideoIntro = styled.div`
   box-sizing: border-box;
 `;
 
+const EmptyVideoPlaceholder = styled.div`
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #f0f0f0;
+  border: 0.2rem dashed #ccc;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+`;
+
 // 동영상 태그
 const TeamVideo = styled.video`
   width: 100%;
@@ -251,6 +266,7 @@ const StudentInfo = styled.img`
   border: 0.1rem solid #d8d8d8;
   object-fit: cover;
   transition: filter 0.3s ease-in-out;
+  image-rendering: auto;
 
   &:hover {
     filter: brightness(50%);
@@ -300,7 +316,19 @@ const SlideImageItem = styled.img`
 /* 슬라이드 캐러셀 컴포넌트 */
 const SlideCarousel = ({ images }: { images: string[] }) => {
   // 무한 루프를 위해 이미지 배열을 여러 번 복제
-  const duplicatedImages = [...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images];
+  const duplicatedImages = [
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+  ];
   // rem 단위 -> 대략 16px/1rem 가정
   const totalWidth = images.length * 16; // (이미지 하나당 가로폭 15rem + 여백 약 1rem)
 
@@ -315,7 +343,7 @@ const SlideCarousel = ({ images }: { images: string[] }) => {
         }}
       >
         {duplicatedImages.map((img, index) => (
-          <SlideImageItem key={index} src={`data:image/jpeg;base64,${img}`} />
+          <SlideImageItem key={index} src={img} />
         ))}
       </SlideTrack>
     </SlideWrapper>
@@ -391,7 +419,6 @@ const TeamPage = () => {
   const fetchTeampost = async (teamId: string) => {
     try {
       const res = await postGetTeampost(teamId);
-      console.log(JSON.stringify(res, null, 4));
       setTeampost(res);
     } catch (error) {
       console.error("Error fetching team post:", error);
@@ -405,7 +432,10 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
+    const newIndex =
+      direction === "prev"
+        ? (currentIndex - 1 + projects.length) % projects.length
+        : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -425,7 +455,9 @@ const TeamPage = () => {
   return (
     <>
       {/* 권한자만 EDIT 보이게 */}
-      {(auth.uuid === team_uuid || auth.role === "ADMIN") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+      {(auth.uuid === team_uuid || auth.role === "ADMIN") && (
+        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
+      )}
 
       {/* 이전/다음 팀 이동 버튼 */}
       <PrevButton
@@ -452,26 +484,20 @@ const TeamPage = () => {
         {/* 팀 소개 섹션 */}
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.title === "null" ? "PROJECT TITLE" : teampost?.teamInfo.title}</TeamTitle>
-          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? `data:image/jpeg;base64,${teampost.teamInfo.teamProfileImage}` : empty} />
-          <TeamContent>{teampost?.teamInfo.content === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.content}</TeamContent>
+          <TeamProfile src={teampost?.teamInfo.teamProfileImage ? teampost.teamInfo.teamProfileImage : empty} />
+          <TeamContent>
+            {teampost?.teamInfo.content === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.content}
+          </TeamContent>
         </TeamIntro>
 
         {/* 슬라이드 이미지 */}
-        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && <SlideCarousel images={teampost.teamInfo.slideImages} />}
+        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && (
+          <SlideCarousel images={teampost.teamInfo.slideImages} />
+        )}
 
         {/* 멤버 섹션 */}
         <SectionTitle>Members</SectionTitle>
         <MemberList>
-          {/* 학생 목록 */}
-          {teampost?.students.map((student, index) => (
-            <StudentItem key={index} onClick={() => handleStudentClick(student)}>
-              <StudentInfo src={student.profileImage ? `data:image/jpeg;base64,${student.profileImage}` : userEmpty} />
-              <StudentName>{student.name}</StudentName>
-              {/* 팀장 뱃지 */}
-              {student.role === "LEADER" && <StudentBadge>팀장</StudentBadge>}
-            </StudentItem>
-          ))}
-
           {/* 지도교수 */}
           {teampost?.professorInfo.professorName && (
             <ProfessorItem
@@ -481,13 +507,23 @@ const TeamPage = () => {
               }}
             >
               <StudentInfo
-                src={teampost.professorInfo.professorImage ? `data:image/jpeg;base64,${teampost.professorInfo.professorImage}` : userEmpty}
+                src={teampost.professorInfo.professorImage ? teampost.professorInfo.professorImage : userEmpty}
               />
               <ProfessorName>{teampost.professorInfo.professorName}</ProfessorName>
               {/* 지도교수 뱃지 */}
               <ProfessorBadge>지도교수</ProfessorBadge>
             </ProfessorItem>
           )}
+
+          {/* 학생 목록 */}
+          {teampost?.students.map((student, index) => (
+            <StudentItem key={index} onClick={() => handleStudentClick(student)}>
+              <StudentInfo src={student.profileImage ? student.profileImage : userEmpty} />
+              <StudentName>{student.name}</StudentName>
+              {/* 팀장 뱃지 */}
+              {student.role === "LEADER" && <StudentBadge>팀장</StudentBadge>}
+            </StudentItem>
+          ))}
         </MemberList>
 
         {/* 모달 (학생 or 교수) */}
@@ -499,18 +535,22 @@ const TeamPage = () => {
         {/* 프로젝트 영상 섹션 */}
         <SectionTitle>Project Video</SectionTitle>
         <VideoIntro>
-          {teampost?.teamInfo.demoVideo && (
+          {teampost?.teamInfo.demoVideo ? (
             <TeamVideo controls>
-              <source src={`data:video/mp4;base64,${teampost.teamInfo.demoVideo}`} type="video/mp4" />
+              <source src={teampost.teamInfo.demoVideo} type="video/mp4" />
               Your browser does not support the video tag.
             </TeamVideo>
+          ) : (
+            <EmptyVideoPlaceholder>
+              <p>프로젝트 영상이 업로드되지 않았습니다.</p>
+            </EmptyVideoPlaceholder>
           )}
         </VideoIntro>
 
         {/* 포스터 섹션 */}
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg src={teampost?.teamInfo.posterImage ? `data:image/jpeg;base64,${teampost.teamInfo.posterImage}` : empty} />
+          <PosterImg src={teampost?.teamInfo.posterImage ? teampost.teamInfo.posterImage : empty} />
         </PosterIntro>
       </Container>
     </>

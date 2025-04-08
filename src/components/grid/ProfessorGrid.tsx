@@ -1,6 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Save as SaveIcon, PersonAdd as PersonAddIcon } from "@mui/icons-material";
 
@@ -28,7 +39,7 @@ const ProfessorGrid = () => {
     name: "",
     email: "",
     tenure: false,
-    profileImage: null as File | null,
+    profileImage: null as File | null | string,
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -60,7 +71,9 @@ const ProfessorGrid = () => {
   };
 
   const handleRowImageChange = (professorId: string, file: File) => {
-    setProfessors((prev) => prev.map((prof) => (prof.encryptedProfessorId === professorId ? { ...prof, profileImage: file } : prof)));
+    setProfessors((prev) =>
+      prev.map((prof) => (prof.encryptedProfessorId === professorId ? { ...prof, profileImage: file } : prof))
+    );
     setModifiedRows((prev) => {
       const updated = new Map(prev);
       const existing = professors.find((p) => p.encryptedProfessorId === professorId);
@@ -192,8 +205,7 @@ const ProfessorGrid = () => {
         const value = params.value;
         const professorId = params.row.encryptedProfessorId;
 
-        const src =
-          typeof value === "string" ? URL.createObjectURL(base64ToFile(value, "profile.jpg", "image/jpeg")) : value ? URL.createObjectURL(value) : "";
+        const src = typeof value === "string" ? value : value ? URL.createObjectURL(value) : "";
 
         return (
           <Box
@@ -306,7 +318,11 @@ const ProfessorGrid = () => {
             >
               {newProfessor.profileImage ? (
                 <img
-                  src={URL.createObjectURL(newProfessor.profileImage)}
+                  src={
+                    typeof newProfessor.profileImage === "string"
+                      ? newProfessor.profileImage
+                      : URL.createObjectURL(newProfessor.profileImage)
+                  }
                   alt="미리보기"
                   style={{
                     width: "100%",
@@ -322,8 +338,20 @@ const ProfessorGrid = () => {
             </Box>
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
-              <TextField name="name" label="이름" value={newProfessor.name} onChange={handleNewProfessorChange} fullWidth />
-              <TextField name="email" label="이메일" value={newProfessor.email} onChange={handleNewProfessorChange} fullWidth />
+              <TextField
+                name="name"
+                label="이름"
+                value={newProfessor.name}
+                onChange={handleNewProfessorChange}
+                fullWidth
+              />
+              <TextField
+                name="email"
+                label="이메일"
+                value={newProfessor.email}
+                onChange={handleNewProfessorChange}
+                fullWidth
+              />
             </Box>
           </Box>
 
@@ -332,7 +360,13 @@ const ProfessorGrid = () => {
             label="재직 여부"
             sx={{ mt: 2 }}
           />
-          <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
           <Button onClick={handleDialogClose}>취소</Button>

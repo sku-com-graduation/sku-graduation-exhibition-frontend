@@ -68,6 +68,7 @@ const Logo = styled.img`
   width: 5rem;
   cursor: pointer;
   transition: opacity 0.3s;
+  image-rendering: auto;
 
   &:hover {
     opacity: 0.8;

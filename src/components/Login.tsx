@@ -166,10 +166,10 @@ export const Login = ({ onSuccess }: LoginProps) => {
       <Button onClick={postLogin} disabled={isSubmitting}>
         {isSubmitting ? "LOG IN..." : "LOG IN"}
       </Button>
-      <SubTextWrapper>
+      {/* <SubTextWrapper>
         <div>비밀번호를 잊으셨나요?</div>
         <div>비밀번호 찾기</div>
-      </SubTextWrapper>
+      </SubTextWrapper> */}
     </LoginWrapper>
   );
 };

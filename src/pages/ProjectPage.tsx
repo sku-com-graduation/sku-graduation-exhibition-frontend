@@ -199,7 +199,9 @@ const ProjectPage = () => {
     setCategory(category);
   }, []);
 
-  const filteredProjects = Array.isArray(projects) ? projects.filter((pro) => category === "ALL" || pro.category === category) : [];
+  const filteredProjects = Array.isArray(projects)
+    ? projects.filter((pro) => category === "ALL" || pro.category === category)
+    : [];
 
   return (
     <Wrapper>
@@ -225,7 +227,7 @@ const ProjectPage = () => {
                 transition={{ duration: 0.3 }}
               >
                 <TeamBox onClick={() => navigate(`${location.pathname}/${pro.uuid}`)}>
-                  <TeamImage src={pro.teamProfileImage ? `data:image/jpeg;base64,${pro.teamProfileImage}` : empty} />
+                  <TeamImage src={pro.teamProfileImage ? pro.teamProfileImage : empty} />
                   <Overlay className="overlay">
                     <OverlayText>{pro.title}</OverlayText>
                   </Overlay>

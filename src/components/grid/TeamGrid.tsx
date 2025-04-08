@@ -1,5 +1,11 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderEditCellParams,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+} from "@mui/x-data-grid";
 import { Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -101,6 +107,8 @@ const TeamGrid = () => {
       });
 
       await putTeams(updatedList);
+      fetchData();
+      setModifiedRows(new Map());
       notifySuccess("저장 완료");
     } catch (err) {
       console.error("팀 저장 실패", err);
