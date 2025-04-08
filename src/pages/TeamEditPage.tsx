@@ -224,7 +224,6 @@ const TeamEditPage = () => {
   const getTeampostEdit = async (team_id: string) => {
     try {
       const res = await postGetTeampostEdit(team_id);
-      console.log(res);
       setTeampostEdit(res);
     } catch (error) {
       notifyError("팀 정보를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
@@ -302,9 +301,13 @@ const TeamEditPage = () => {
           ? editData.teamProfileImage
           : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
       const demoFile =
-        editData.demoVideo instanceof File ? editData.demoVideo : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
+        editData.demoVideo instanceof File
+          ? editData.demoVideo
+          : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
       const posterFile =
-        editData.posterImage instanceof File ? editData.posterImage : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
+        editData.posterImage instanceof File
+          ? editData.posterImage
+          : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
 
       const formData = new FormData();
       formData.append("teamUuid", team_uuid);
@@ -370,7 +373,13 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
+          <EditableTitle
+            type="text"
+            name="title"
+            value={editData.title}
+            onChange={handleInputChange}
+            placeholder="PROJECT TITLE"
+          />
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
             <option value="WEB">WEB</option>
             <option value="MOBILE">MOBILE</option>
@@ -431,7 +440,9 @@ const TeamEditPage = () => {
           </StudentItem>
         ))}
       </StudentList>
-      <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}</Modal>
+      <Modal>
+        {selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}
+      </Modal>
 
       <SectionTitle>Project Video</SectionTitle>
       <DemoVideoEditor base={editData.demoVideo as string} handleFileChange={handleFileChange} />
