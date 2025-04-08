@@ -1,5 +1,5 @@
 import api from ".";
-import { ITeamPost, ITeamStudent } from "@interface";
+import { ITeamPost } from "@interface";
 
 export const postGetTeampost = async (teamId: string): Promise<ITeamPost> => {
   try {
@@ -11,9 +11,6 @@ export const postGetTeampost = async (teamId: string): Promise<ITeamPost> => {
 };
 
 export const putTeampost = async (data: FormData) => {
-  for (const [key, value] of data.entries()) {
-    console.log(`${key}:`, value);
-  }
   try {
     const result = await api.put(`/user/post/update/teamPost`, data, {
       headers: { "Content-Type": "multipart/form-data" },
