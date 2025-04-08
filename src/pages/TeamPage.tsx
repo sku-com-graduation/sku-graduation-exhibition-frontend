@@ -194,18 +194,18 @@ const EditButton = styled.button`
   }
 `;
 
-// 양옆 이동 버튼 (prev / next)
 const SideButton = styled(motion.button)`
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
   padding: 0.8rem 1rem;
   background: linear-gradient(135deg, #6e8efb, #a777e3);
   color: white;
-  font-weight: 700;
-  font-size: 1.2rem;
   border: none;
-  border-radius: 50%;
 
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -217,12 +217,10 @@ const SideButton = styled(motion.button)`
   }
 `;
 
-// 이전 버튼
 const PrevButton = styled(SideButton)`
   left: 1rem;
 `;
 
-// 다음 버튼
 const NextButton = styled(SideButton)`
   right: 1rem;
 `;
@@ -393,6 +391,7 @@ const TeamPage = () => {
   const fetchTeampost = async (teamId: string) => {
     try {
       const res = await postGetTeampost(teamId);
+      console.log(JSON.stringify(res, null, 4));
       setTeampost(res);
     } catch (error) {
       console.error("Error fetching team post:", error);
@@ -432,8 +431,8 @@ const TeamPage = () => {
       <PrevButton
         variants={buttonVariants}
         initial="hidden"
-        animate="visible"
-        transition={{ duration: 1, ease: "easeOut" }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
         onClick={() => navigateProject("prev")}
       >
         ←
@@ -441,8 +440,8 @@ const TeamPage = () => {
       <NextButton
         variants={buttonVariants}
         initial="hidden"
-        animate="visible"
-        transition={{ duration: 1, ease: "easeOut" }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
         onClick={() => navigateProject("next")}
       >
         →

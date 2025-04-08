@@ -25,6 +25,7 @@ const Background = styled.div`
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
+  /* min-height: 100vh; */
   display: grid;
   grid-template-rows: auto;
   box-sizing: border-box;
@@ -33,6 +34,7 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   width: 100%;
+  min-height: 100vh;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   gap: 5rem;
@@ -49,7 +51,6 @@ const Container = styled.div`
 const TeamBox = styled.div`
   box-sizing: border-box;
   width: 100%;
-  height: 0;
   padding-bottom: 100%;
   position: relative;
   flex-direction: column;
@@ -116,7 +117,8 @@ const CategoryContainer = styled.div`
 
 const ProjectButton = styled(motion.button)`
   width: 100%;
-  padding: 1rem 2rem;
+  height: 3rem;
+  padding: 0.5rem 2rem;
   font-size: 1.2rem;
   color: #ffffff;
   background: linear-gradient(135deg, #7fbfff, #a389f4);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { motion, AnimatePresence, useTransform, useViewportScroll } from "framer-motion";
+import { motion, useTransform, useViewportScroll } from "framer-motion";
 import SlideImage from "@components/SlideImage";
 import i1 from "@assets/image/i3.png";
 import v5 from "@assets/video/v1.mp4";
@@ -35,7 +35,6 @@ const VideoCircle = styled(motion.video)`
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
 `;
 
 const Title = styled(motion.h1)`
@@ -85,7 +84,7 @@ const Button = styled(motion.button)`
 
 const ScrollTextContainer = styled(motion.div)`
   width: auto;
-  margin: 2rem 5rem;
+  margin: 2rem 2rem;
   box-sizing: border-box;
   overflow-x: hidden;
 `;
@@ -267,47 +266,6 @@ const YearHomePage = () => {
       </ScrollTextContainer>
 
       <ModernIntroSection />
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsExpanded(false)}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              backgroundColor: "rgba(0, 0, 0, 0.8)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-              cursor: "pointer",
-            }}
-          >
-            <motion.video
-              src={v5}
-              autoPlay
-              loop
-              muted
-              playsInline
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              style={{
-                maxWidth: "90vw",
-                maxHeight: "90vh",
-                borderRadius: "1rem",
-                boxShadow: "0 0 40px rgba(255,255,255,0.2)",
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </Wrapper>
   );
 };

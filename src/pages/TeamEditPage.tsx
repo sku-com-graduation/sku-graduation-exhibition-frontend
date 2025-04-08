@@ -6,12 +6,13 @@ import { postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent
 import empty from "../assets/image/main_image.png";
 import SlideImageEditor from "@components/SlideImageEditor";
 import DemoVideoEditor from "@components/DemoVideoEditor";
-import { AddArea, EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
+import { EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
 import base64ToFile from "@utils/base64ToFile";
 import { useModal, useToast } from "@hooks";
 import Profile from "@components/Profile";
 
 import userEmpty from "../assets/image/main_image.png";
+import back_image from "../assets/image/back_image.png";
 import { ITeamPostEdit, ITeamPostEditStudent } from "@interface";
 
 const Container = styled.div`
@@ -83,20 +84,17 @@ const CharCount = styled.div`
 
 const PosterIntro = styled.div`
   width: 100%;
+  max-width: 80rem;
+
   display: grid;
   place-items: center;
 `;
 
 const PosterImg = styled.img`
-  width: 50%;
+  width: 100%;
   height: auto;
   object-fit: cover;
   max-width: 100%;
-
-  @media (max-width: 768px) {
-    width: 15rem;
-    height: 15rem;
-  }
 `;
 
 const SaveButton = styled.button`
@@ -252,7 +250,7 @@ const TeamEditPage = () => {
       });
       setExistingSlideImages(teampostEdit.slideImages || []);
       setEditedStudents(teampostEdit.students);
-      setOriginalStudents(teampostEdit.students); // ⬅️ 추가
+      setOriginalStudents(teampostEdit.students);
     }
   }, [teampostEdit]);
 
@@ -440,18 +438,21 @@ const TeamEditPage = () => {
 
       <SectionTitle>Poster</SectionTitle>
       <PosterIntro>
-        <PosterImg
-          src={
-            editData.posterImage
-              ? typeof editData.posterImage === "string"
-                ? `data:image/jpeg;base64,${editData.posterImage}`
-                : URL.createObjectURL(editData.posterImage)
-              : empty
-          }
-          alt="Poster"
-        />
-        <AddArea onClick={() => posterInputRef.current?.click()}>Add Poster</AddArea>
-        <FileInput ref={posterInputRef} type="file" name="posterImage" accept="image/*" onChange={handleFileChange} />
+        <ImageWrapper onClick={() => posterInputRef.current?.click()}>
+          <PosterImg
+            src={
+              editData.posterImage
+                ? typeof editData.posterImage === "string"
+                  ? `data:image/jpeg;base64,${editData.posterImage}`
+                  : URL.createObjectURL(editData.posterImage)
+                : back_image
+            }
+            alt="Poster"
+          />
+          <Overlay className="overlay">Poster</Overlay>
+        </ImageWrapper>
+
+        <FileInput ref={posterInputRef} type="file" name="posterImage" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
       </PosterIntro>
 
       <SaveButton onClick={handleSave}>SAVE</SaveButton>
