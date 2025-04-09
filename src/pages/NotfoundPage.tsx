@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import i3 from "../assets/image/back_image.png";
+import i3 from "@assets/image/back_image.png";
 import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`

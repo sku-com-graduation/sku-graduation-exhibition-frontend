@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { ITeamPostEditStudent } from "@interface";
-import userEmpty from "../assets/image/user.png";
+import userEmpty from "@assets/image/user.png";
 import { useSelector } from "react-redux";
 import { RootState } from "@store/store";
 import { Input, IconButton, ButtonGroup } from "@components/Input";

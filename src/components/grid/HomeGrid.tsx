@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getHomeInfoAll, putHomeInfo, postHomeInfo } from "@api/home";
 import { IHomeResponse } from "@interface";
+import style from "@style";
 
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 
@@ -251,7 +252,7 @@ const Toolbar = styled(Box)({
   justifyContent: "flex-end",
   padding: "0.8rem",
   gap: 8,
-  backgroundColor: "#fff",
+  backgroundColor: style.color.background,
   borderRadius: "12px",
   marginBottom: "0.5rem",
 });

@@ -33,7 +33,7 @@
       "@hooks": ["src/hooks"],
       "@interface": ["src/interface"],
       "@pages": ["src/pages"],
-      "@styles": ["src/styles"],
+      "@style": ["src/style"],
       "@store/*": ["src/store/*"],
       "@utils/*": ["src/utils/*"]
     }

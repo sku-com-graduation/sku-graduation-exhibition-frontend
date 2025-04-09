@@ -31,7 +31,7 @@ const ModalContent = styled.div`
   background-color: #fff;
   border-radius: 1rem;
   position: relative;
-  animation: ${fadeIn} 0.3s ease-in-out;
+  animation: ${fadeIn} 0.2s ease-in-out;
 `;
 
 type ModalProps = {

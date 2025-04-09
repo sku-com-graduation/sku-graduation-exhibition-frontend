@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { motion, useAnimation, useViewportScroll } from "framer-motion";
+import { motion, useAnimation, useScroll } from "framer-motion";
 import { Login } from "./Login";
-import { useModal } from "@hooks";
+import { useModal, useToast } from "@hooks";
 import { RootState } from "@store/store";
 import { clearAuth } from "@store/reducers/auth";
 import { getLogout } from "@api/auth";
@@ -102,13 +102,14 @@ const Header = () => {
   const navigate = useNavigate();
   const selectedAuth = useSelector((state: RootState) => state.auth);
   const { openModal, closeModal, Modal } = useModal();
+  const { notifySuccess, notifyError, notifyInfo } = useToast();
 
   const controls = useAnimation();
-  const { scrollY } = useViewportScroll();
+  const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const unsubscribe = scrollY.onChange((currentY) => {
+    const unsubscribe = scrollY.on("change", (currentY) => {
       if (currentY > lastScrollY.current) {
         controls.start({ y: "-100%" });
       } else {
@@ -129,6 +130,7 @@ const Header = () => {
     try {
       await getLogout();
       dispatch(clearAuth());
+      notifySuccess(`로그아웃`);
     } catch (error) {
       console.error(error);
     }
@@ -137,6 +139,8 @@ const Header = () => {
   const goToMyPage = () => {
     if (selectedAuth.role === "ADMIN") {
       navigate(`/${year}/admin`);
+    } else {
+      navigate(`/${year}/project/${selectedAuth.uuid}`);
     }
   };
 

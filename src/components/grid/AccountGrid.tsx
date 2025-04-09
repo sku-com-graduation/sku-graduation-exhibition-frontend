@@ -6,9 +6,9 @@ import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/ico
 import { IAccountResponse, IAccountRequest } from "@interface";
 import { deleteAccount, getAccount, postAccounts } from "@api/account";
 import { getYearRange } from "@utils/year";
-import CSVUploader from "@components/CSVUploader";
-import { parseAccountCSV } from "@utils/parse";
 import { useToast } from "@hooks";
+import style from "@style";
+import AccountCSVUploader from "@components/csv/AccountCSVUploader";
 
 const EditToolbar = () => (
   <GridToolbarContainer>
@@ -52,6 +52,8 @@ const AccountGrid = () => {
     if (!confirmed) return;
 
     await deleteAccount(selectionModel);
+
+    notifySuccess(`계정 삭제 완료`);
 
     setAccounts((prev) => prev.filter((account) => !selectionModel.includes(account.encryptedAccountId)));
     setSelectionModel([]);
@@ -130,15 +132,9 @@ const AccountGrid = () => {
         disableRowSelectionOnClick
         slots={{ toolbar: EditToolbar }}
       />
+      <AccountCSVUploader open={dialogOpen} onClose={() => setDialogOpen(false)} onFileParsed={handleFileParsed} />
 
-      <CSVUploader<IAccountRequest>
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        title="계정 등록"
-        confirmLabel="등록"
-        parseCsv={parseAccountCSV}
-        onFileParsed={handleFileParsed}
-      />
+      {/* <AccountCSVUploader open={dialogOpen} onClose={() => setDialogOpen(false)} onFileParsed={handleFileParsed} /> */}
     </Box>
   );
 };
@@ -152,7 +148,7 @@ const Toolbar = styled(Box)({
   boxSizing: "border-box",
   padding: "0.8rem",
   borderRadius: "12px",
-  backgroundColor: "#fff",
+  backgroundColor: style.color.background,
   width: "100%",
   overflow: "hidden",
   flexWrap: "wrap",

@@ -7,8 +7,9 @@ import { deleteStudent, getStudents, postStudents, putStudent } from "@api/stude
 import { IStudentRequest, IStudentResponseInfo, IStudentResponseTeamInfo } from "@interface";
 import { getYearRange } from "@utils/year";
 import { parseStudentCSV } from "@utils/parse";
-import CSVUploader from "@components/CSVUploader";
 import { useToast } from "@hooks";
+import style from "@style";
+import SimpleCSVUploader from "@components/csv/SimpleCSVUploader";
 
 interface StudentRow extends IStudentResponseInfo {
   id: string;
@@ -77,6 +78,8 @@ const StudentGrid = () => {
       selectionModel.forEach((id) => updated.delete(id));
       return updated;
     });
+    notifySuccess(`학생 삭제 완료`);
+
     setSelectionModel([]);
   };
 
@@ -155,7 +158,8 @@ const StudentGrid = () => {
   const TeamSelectEditCell = (props: GridRenderEditCellParams<StudentRow>) => {
     const { id, value, field, api } = props;
     const handleChange = (event: SelectChangeEvent<string>) => {
-      api.setEditCellValue({ id, field, value: event.target.value }, event);
+      const newValue = event.target.value === "" ? null : event.target.value;
+      api.setEditCellValue({ id, field, value: newValue }, event);
     };
 
     return (
@@ -201,8 +205,8 @@ const StudentGrid = () => {
   };
 
   const columns: GridColDef<StudentRow>[] = [
-    { field: "studentNumber", headerName: "학번", editable: true, flex: 1 },
-    { field: "name", headerName: "이름", editable: true, flex: 1 },
+    { field: "studentNumber", headerName: "학번", editable: false, flex: 1 },
+    { field: "name", headerName: "이름", editable: false, flex: 1 },
     {
       field: "role",
       headerName: "역할",
@@ -224,7 +228,7 @@ const StudentGrid = () => {
     {
       field: "exhibitionYear",
       headerName: "전시연도",
-      editable: true,
+      editable: false,
       flex: 1,
       renderEditCell: (params) => <YearCellEdit {...params} />,
     },
@@ -247,7 +251,7 @@ const StudentGrid = () => {
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Toolbar>
         <YearSelect />
-        <StyledButton startIcon={<AddIcon />} variant="outlined" onClick={() => setDialogOpen(true)}>
+        <StyledButton startIcon={<AddIcon />} variant="outlined" color="primary" onClick={() => setDialogOpen(true)}>
           추가
         </StyledButton>
         <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error" onClick={handleDeleteSelected}>
@@ -273,18 +277,17 @@ const StudentGrid = () => {
         slots={{ toolbar: EditToolbar }}
       />
 
-      {/* CSV 업로드 모달 */}
-      <CSVUploader<IStudentRequest>
+      <SimpleCSVUploader<IStudentRequest>
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        title="학생 등록"
+        title="학생 CSV 등록"
         confirmLabel="등록"
         parseCsv={parseStudentCSV}
+        onFileParsed={handleStudentPost}
         manualFields={[
           { field: "studentName", label: "이름" },
           { field: "studentNumber", label: "학번" },
         ]}
-        onFileParsed={handleStudentPost}
       />
     </Box>
   );
@@ -299,7 +302,7 @@ const Toolbar = styled(Box)({
   boxSizing: "border-box",
   padding: "0.8rem",
   borderRadius: "12px",
-  backgroundColor: "#fff",
+  backgroundColor: style.color.background,
   width: "100%",
   overflow: "hidden",
   flexWrap: "wrap",

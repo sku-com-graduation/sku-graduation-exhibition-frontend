@@ -41,13 +41,13 @@ export const getProfessor = async (): Promise<IProfessor[]> => {
 
 /**교수 삭제 */
 export const deleteProfessor = async (professorId: string[]) => {
-  try {
-    const result = await api.delete(`/admin/professor/delete`, { data: professorId });
-    if (result.status === 200) {
-      return result.data;
-    }
-    throw new Error(`에러 상태 코드: ${result.status} - ${result.statusText}`);
-  } catch (error) {
-    throw new Error(`${error}`);
+  // try {
+  const result = await api.delete(`/admin/professor/delete`, { data: professorId });
+  if (result.status === 200) {
+    return result.data;
   }
+  throw new Error(`에러 상태 코드: ${result.status} - ${result.statusText}`);
+  // } catch (error) {
+  //   throw new Error(`${error}`);
+  // }
 };

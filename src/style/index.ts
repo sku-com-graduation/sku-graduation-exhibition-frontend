@@ -1,6 +1,6 @@
 const style = {
   color: {
-    background: "#f5f5f5",
+    background: "#ffffff",
     font: "#2c3e50",
     accent: "#e74c3c",
     primary: "#f39c12",

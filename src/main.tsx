@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import "./styles/global.css";
+import "./style/global.css";
 
 // reducer
 import { Provider } from "react-redux";

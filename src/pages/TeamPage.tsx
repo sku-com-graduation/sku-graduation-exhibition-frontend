@@ -316,19 +316,7 @@ const SlideImageItem = styled.img`
 /* 슬라이드 캐러셀 컴포넌트 */
 const SlideCarousel = ({ images }: { images: string[] }) => {
   // 무한 루프를 위해 이미지 배열을 여러 번 복제
-  const duplicatedImages = [
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-    ...images,
-  ];
+  const duplicatedImages = [...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images];
   // rem 단위 -> 대략 16px/1rem 가정
   const totalWidth = images.length * 16; // (이미지 하나당 가로폭 15rem + 여백 약 1rem)
 
@@ -432,10 +420,7 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex =
-      direction === "prev"
-        ? (currentIndex - 1 + projects.length) % projects.length
-        : (currentIndex + 1) % projects.length;
+    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -455,9 +440,7 @@ const TeamPage = () => {
   return (
     <>
       {/* 권한자만 EDIT 보이게 */}
-      {(auth.uuid === team_uuid || auth.role === "ADMIN") && (
-        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
-      )}
+      {(auth.uuid === team_uuid || auth.role === "ADMIN") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
 
       {/* 이전/다음 팀 이동 버튼 */}
       <PrevButton
@@ -485,15 +468,11 @@ const TeamPage = () => {
         <TeamIntro>
           <TeamTitle>{teampost?.teamInfo.title === "null" ? "PROJECT TITLE" : teampost?.teamInfo.title}</TeamTitle>
           <TeamProfile src={teampost?.teamInfo.teamProfileImage ? teampost.teamInfo.teamProfileImage : empty} />
-          <TeamContent>
-            {teampost?.teamInfo.content === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.content}
-          </TeamContent>
+          <TeamContent>{teampost?.teamInfo.content === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.content}</TeamContent>
         </TeamIntro>
 
         {/* 슬라이드 이미지 */}
-        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && (
-          <SlideCarousel images={teampost.teamInfo.slideImages} />
-        )}
+        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && <SlideCarousel images={teampost.teamInfo.slideImages} />}
 
         {/* 멤버 섹션 */}
         <SectionTitle>Members</SectionTitle>
@@ -506,9 +485,7 @@ const TeamPage = () => {
                 openModal();
               }}
             >
-              <StudentInfo
-                src={teampost.professorInfo.professorImage ? teampost.professorInfo.professorImage : userEmpty}
-              />
+              <StudentInfo src={teampost.professorInfo.professorImage ? teampost.professorInfo.professorImage : userEmpty} />
               <ProfessorName>{teampost.professorInfo.professorName}</ProfessorName>
               {/* 지도교수 뱃지 */}
               <ProfessorBadge>지도교수</ProfessorBadge>
@@ -516,14 +493,20 @@ const TeamPage = () => {
           )}
 
           {/* 학생 목록 */}
-          {teampost?.students.map((student, index) => (
-            <StudentItem key={index} onClick={() => handleStudentClick(student)}>
-              <StudentInfo src={student.profileImage ? student.profileImage : userEmpty} />
-              <StudentName>{student.name}</StudentName>
-              {/* 팀장 뱃지 */}
-              {student.role === "LEADER" && <StudentBadge>팀장</StudentBadge>}
-            </StudentItem>
-          ))}
+          {teampost?.students
+            .slice()
+            .sort((a, b) => {
+              if (a.role === "LEADER" && b.role !== "LEADER") return -1;
+              if (a.role !== "LEADER" && b.role === "LEADER") return 1;
+              return a.name.localeCompare(b.name);
+            })
+            .map((student, index) => (
+              <StudentItem key={index} onClick={() => handleStudentClick(student)}>
+                <StudentInfo src={student.profileImage ? student.profileImage : userEmpty} />
+                <StudentName>{student.name}</StudentName>
+                {student.role === "LEADER" && <StudentBadge>팀장</StudentBadge>}
+              </StudentItem>
+            ))}
         </MemberList>
 
         {/* 모달 (학생 or 교수) */}

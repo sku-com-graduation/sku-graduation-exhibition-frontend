@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { postAuth } from "../api/auth";
+import { postAuth } from "@api/auth";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../store/reducers/auth";
+import { setAuth } from "@store/reducers/auth";
 import { validateEmail } from "@utils/validate";
+import { useToast } from "@hooks";
 
 const LoginWrapper = styled.div`
   width: 20rem;
@@ -117,6 +118,8 @@ export const Login = ({ onSuccess }: LoginProps) => {
   const [failedLogin, setFailedLogin] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const { notifySuccess, notifyError, notifyInfo } = useToast();
+
   const postLogin = async () => {
     if (!validateEmail(username)) {
       setFailedLogin("유효한 이메일 주소를 입력하세요.");
@@ -128,6 +131,7 @@ export const Login = ({ onSuccess }: LoginProps) => {
       const user = await postAuth(username, password);
       dispatch(setAuth(user));
       onSuccess();
+      notifySuccess(`로그인 성공`);
     } catch (error) {
       setFailedLogin("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.");
     } finally {
@@ -166,10 +170,6 @@ export const Login = ({ onSuccess }: LoginProps) => {
       <Button onClick={postLogin} disabled={isSubmitting}>
         {isSubmitting ? "LOG IN..." : "LOG IN"}
       </Button>
-      {/* <SubTextWrapper>
-        <div>비밀번호를 잊으셨나요?</div>
-        <div>비밀번호 찾기</div>
-      </SubTextWrapper> */}
     </LoginWrapper>
   );
 };

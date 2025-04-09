@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { motion, useTransform, useViewportScroll } from "framer-motion";
+import { motion, useTransform, useScroll } from "framer-motion";
 import SlideImage from "@components/SlideImage";
 import i1 from "@assets/image/i3.png";
 import v5 from "@assets/video/v1.mp4";
@@ -9,11 +9,12 @@ import back from "@assets/image/back_image.png";
 import { getHomeInfo } from "@api/home";
 import { IHomeResponse } from "@interface";
 import { MODERN_INTRO_TEXT, MODERN_INTRO_TITLE } from "@constant/homeText";
+import style from "@style";
 
 const Wrapper = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: #ffffff;
+  background: ${style.color.background};
   padding: 5rem 0 0 0;
   box-sizing: border-box;
   overflow: hidden;
@@ -185,7 +186,6 @@ const ModernIntroSection = () => {
 const YearHomePage = () => {
   const navigate = useNavigate();
   const { year } = useParams();
-  const [isExpanded, setIsExpanded] = useState(false);
   const [homeInfo, setHomeInfo] = useState<IHomeResponse>();
 
   const scrollTextVariants = {
@@ -193,7 +193,7 @@ const YearHomePage = () => {
     visible: { y: 0, opacity: 1 },
   };
 
-  const { scrollY } = useViewportScroll();
+  const { scrollY } = useScroll();
   const scale = useTransform(scrollY, [0, 300], [1, 1.1]);
   const opacityValue = useTransform(scrollY, [0, 300], [1, 0.85]);
 
@@ -234,7 +234,6 @@ const YearHomePage = () => {
               ease: "easeInOut",
               repeat: Infinity,
             }}
-            onClick={() => setIsExpanded(true)}
           />
         </motion.div>
 

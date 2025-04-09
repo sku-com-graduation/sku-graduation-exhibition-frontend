@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { ITeamStudent } from "@interface";
-import userEmpty from "../assets/image/user.png";
+import userEmpty from "@assets/image/user.png";
 import { FiMail, FiGithub, FiGlobe } from "react-icons/fi";
 
 interface ProfileViewProps {
@@ -52,6 +52,8 @@ const ProfileView = ({ student }: ProfileViewProps) => {
 
 export default ProfileView;
 
+/* Styled Components */
+
 const ProfileCard = styled.div`
   width: 100%;
   max-width: 600px;
@@ -62,6 +64,12 @@ const ProfileCard = styled.div`
   display: flex;
   gap: 1.5rem;
   font-family: "Pretendard", sans-serif;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
 `;
 
 const ImageSection = styled.div`
@@ -77,6 +85,11 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #e5e7eb;
+
+  @media (max-width: 768px) {
+    width: 7rem;
+    height: 7rem;
+  }
 `;
 
 const InfoSection = styled.div`
@@ -84,12 +97,22 @@ const InfoSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
 `;
 
 const HeaderContainer = styled.div`
   display: flex;
   gap: 0.7rem;
   align-items: center;
+  @media (max-width: 768px) {
+    gap: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -101,6 +124,11 @@ const ContentContainer = styled.div`
 const Name = styled.h2`
   font-size: 1.6rem;
   color: #111827;
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+    margin: 0.5rem;
+  }
 `;
 
 const RoleBadge = styled.span`
@@ -109,6 +137,11 @@ const RoleBadge = styled.span`
   padding: 0.3rem 0.8rem;
   font-size: 0.85rem;
   color: #374151;
+
+  @media (max-width: 768px) {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+  }
 `;
 
 const DetailText = styled.p`
@@ -122,6 +155,10 @@ const IconText = styled.div`
   gap: 0.5rem;
   color: #4b5563;
   font-size: 0.95rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
 `;
 
 const Link = styled.a`

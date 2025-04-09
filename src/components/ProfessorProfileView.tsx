@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import userEmpty from "../assets/image/user.png";
+import userEmpty from "@assets/image/user.png";
 import { FiMail } from "react-icons/fi";
 import { IprofessorInfo } from "src/interface/ITeamPost";
 
@@ -11,10 +11,7 @@ const ProfessorProfileView = ({ professor }: ProfessorProfileViewProps) => {
   return (
     <Card>
       <ImageSection>
-        <Image
-          src={professor.professorImage ? professor.professorImage : userEmpty}
-          alt={`${professor.professorName} Profile`}
-        />
+        <Image src={professor.professorImage ? professor.professorImage : userEmpty} alt={`${professor.professorName} Profile`} />
       </ImageSection>
       <InfoSection>
         <Name>{professor.professorName}</Name>

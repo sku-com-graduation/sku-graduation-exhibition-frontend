@@ -9,7 +9,10 @@ const SliderWrapper = styled.div`
   box-sizing: border-box;
 `;
 
-const SlideTrack = styled.div<{ reverse?: boolean; duration: number }>`
+// ✅ styled-components v5 방식: reverse를 DOM에 전달하지 않도록 처리
+const SlideTrack = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "reverse" && prop !== "duration",
+})<{ reverse?: boolean; duration: number }>`
   display: flex;
   width: max-content;
   animation: ${({ reverse, duration }) => `${reverse ? "slideReverse" : "slide"} ${duration}s linear infinite`};

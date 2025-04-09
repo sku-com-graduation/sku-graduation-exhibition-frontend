@@ -2,18 +2,22 @@ import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-import { postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent } from "../api/teamPost";
-import empty from "../assets/image/main_image.png";
+import { postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent } from "@api/teamPost";
 import SlideImageEditor from "@components/SlideImageEditor";
 import DemoVideoEditor from "@components/DemoVideoEditor";
 import { EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
-import base64ToFile from "@utils/base64ToFile";
+import { urlToFile } from "@utils/File";
 import { useModal, useToast } from "@hooks";
 import Profile from "@components/Profile";
 
-import userEmpty from "../assets/image/user.png";
-import back_image from "../assets/image/back_image.png";
+import empty from "@assets/image/main_image.png";
+import userEmpty from "@assets/image/user.png";
+import back_image from "@assets/image/back_image.png";
 import { ITeamPostEdit, ITeamPostEditStudent } from "@interface";
+
+/* ────────────────
+   Styled Components
+   ──────────────── */
 
 const Container = styled.div`
   width: 100%;
@@ -85,7 +89,6 @@ const CharCount = styled.div`
 const PosterIntro = styled.div`
   width: 100%;
   max-width: 80rem;
-
   display: grid;
   place-items: center;
 `;
@@ -184,6 +187,10 @@ const CategorySelect = styled.select`
   }
 `;
 
+/* ────────────────
+   메인 컴포넌트
+   ──────────────── */
+
 interface IEditForm {
   title: string;
   content: string;
@@ -197,6 +204,7 @@ const TeamEditPage = () => {
   const { team_uuid } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [teampostEdit, setTeampostEdit] = useState<ITeamPostEdit | null>(null);
   const [editData, setEditData] = useState<IEditForm>({
     title: "",
@@ -293,57 +301,75 @@ const TeamEditPage = () => {
     );
   };
 
+  // 저장 버튼 클릭 시 처리 (파일/URL 처리 및 null 처리 포함)
   const handleSave = async () => {
     if (!team_uuid) return;
     try {
+      // teamProfileImage
       const teamProfileFile =
-        editData.teamProfileImage instanceof File
-          ? editData.teamProfileImage
-          : base64ToFile(editData.teamProfileImage as string, "profile.jpg", "image/jpeg");
+        editData.teamProfileImage && editData.teamProfileImage !== ""
+          ? editData.teamProfileImage instanceof File
+            ? editData.teamProfileImage
+            : await urlToFile(editData.teamProfileImage as string, "profile.jpg")
+          : null;
+
+      // demoVideo
       const demoFile =
-        editData.demoVideo instanceof File
-          ? editData.demoVideo
-          : base64ToFile(editData.demoVideo as string, "demoVideo.mp4", "video/mp4");
+        editData.demoVideo && editData.demoVideo !== ""
+          ? editData.demoVideo instanceof File
+            ? editData.demoVideo
+            : await urlToFile(editData.demoVideo as string, "demoVideo.mp4")
+          : null;
+
+      // posterImage
       const posterFile =
-        editData.posterImage instanceof File
-          ? editData.posterImage
-          : base64ToFile(editData.posterImage as string, "poster.jpg", "image/jpeg");
+        editData.posterImage && editData.posterImage !== ""
+          ? editData.posterImage instanceof File
+            ? editData.posterImage
+            : await urlToFile(editData.posterImage as string, "poster.jpg")
+          : null;
 
       const formData = new FormData();
       formData.append("teamUuid", team_uuid);
-      formData.append("title", editData.title);
-      formData.append("content", editData.content);
-      formData.append("category", editData.category);
-      formData.append("teamProfileImage", teamProfileFile);
-      formData.append("demoVideo", demoFile);
-      formData.append("posterImage", posterFile);
+      formData.append("title", editData.title || "");
+      formData.append("content", editData.content || "");
+      formData.append("category", editData.category || "");
+
+      if (teamProfileFile) {
+        formData.append("teamProfileImage", teamProfileFile);
+      }
+      if (demoFile) {
+        formData.append("demoVideo", demoFile);
+      }
+      if (posterFile) {
+        formData.append("posterImage", posterFile);
+      }
+
       const teamPostResponse = await putTeampost(formData);
 
       let slideImageResponse = true;
       if (existingSlideImages.length > 0 || newSlideImages.length > 0) {
         const formDataSlide = new FormData();
         formDataSlide.append("teamUuid", team_uuid);
-        existingSlideImages.forEach((img, idx) => {
-          const file = base64ToFile(img, `existing_slide_${idx}.jpg`, "image/jpeg");
+
+        for (let idx = 0; idx < existingSlideImages.length; idx++) {
+          const img = existingSlideImages[idx];
+          const file = await urlToFile(img, `existing_slide_${idx}.jpg`);
           formDataSlide.append("files", file);
-        });
+        }
+
         newSlideImages.forEach((file) => {
           formDataSlide.append("files", file);
         });
+
         slideImageResponse = await putTeampostSlideImage(formDataSlide);
       }
 
-      // ✅ 수정된 학생만 필터링
+      // 수정된 학생만 필터링
       const modifiedStudents = editedStudents.filter((edited, index) => {
         const original = originalStudents[index];
         return isStudentModified(original, edited);
       });
-
-      const blobUrlToFile = async (blobUrl: string, fileName: string, mimeType: string): Promise<File> => {
-        const res = await fetch(blobUrl);
-        const blob = await res.blob();
-        return new File([blob], fileName, { type: mimeType });
-      };
 
       await Promise.all(
         modifiedStudents.map(async (student) => {
@@ -356,31 +382,16 @@ const TeamEditPage = () => {
           studentFormData.append("studentEmail", student.studentEmail);
 
           if (student.profileImage.startsWith("blob:")) {
-            const file = await blobUrlToFile(student.profileImage, "profile.jpg", "image/jpeg");
+            const file = await urlToFile(student.profileImage, "profile.jpg");
             studentFormData.append("profileImage", file);
           } else {
-            const file = base64ToFile(student.profileImage, "profile.jpg", "image/jpeg");
+            const file = await urlToFile(student.profileImage, "profile.jpg");
             studentFormData.append("profileImage", file);
           }
 
           return putTeamStudent(studentFormData);
         })
       );
-
-      // await Promise.all(
-      //   modifiedStudents.map((student) => {
-      //     const studentFormData = new FormData();
-      //     studentFormData.append("teamUuid", team_uuid);
-      //     studentFormData.append("encryptedStudentId", student.encryptedStudentProfileId);
-      //     studentFormData.append("githubUrl", student.githubUrl);
-      //     studentFormData.append("info", student.info);
-      //     const profileImage = base64ToFile(student.profileImage, `team.jpg`, "image/jpeg");
-      //     studentFormData.append("profileImage", profileImage);
-      //     studentFormData.append("studentBlog", student.studentBlog);
-      //     studentFormData.append("studentEmail", student.studentEmail);
-      //     return putTeamStudent(studentFormData);
-      //   })
-      // );
 
       if (teamPostResponse && slideImageResponse) {
         navigate(-1);
@@ -400,14 +411,9 @@ const TeamEditPage = () => {
   return (
     <Container>
       <TeamIntro>
+        {/* 제목 및 카테고리 */}
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <EditableTitle
-            type="text"
-            name="title"
-            value={editData.title}
-            onChange={handleInputChange}
-            placeholder="PROJECT TITLE"
-          />
+          <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
             <option value="WEB">WEB</option>
             <option value="MOBILE">MOBILE</option>
@@ -415,6 +421,7 @@ const TeamEditPage = () => {
           </CategorySelect>
         </div>
 
+        {/* 팀 프로필 이미지 */}
         <div style={{ gridRow: "span 2" }}>
           <ImageWrapper onClick={() => document.getElementById("teamProfileInput")?.click()}>
             <TeamProfile
@@ -429,7 +436,6 @@ const TeamEditPage = () => {
             />
             <Overlay className="overlay">Team Profile</Overlay>
           </ImageWrapper>
-
           <FileInput
             id="teamProfileInput"
             type="file"
@@ -440,6 +446,7 @@ const TeamEditPage = () => {
           />
         </div>
 
+        {/* 팀 내용 */}
         <EditableTextArea
           name="content"
           value={editData.content}
@@ -464,14 +471,11 @@ const TeamEditPage = () => {
         {editedStudents.map((student, index) => (
           <StudentItem key={index} onClick={() => handleStudentClick(student, index)}>
             <StudentInfo src={student.profileImage ? student.profileImage : userEmpty} />
-
             <StudentName>{student.name}</StudentName>
           </StudentItem>
         ))}
       </StudentList>
-      <Modal>
-        {selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}
-      </Modal>
+      <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}</Modal>
 
       <SectionTitle>Project Video</SectionTitle>
       <DemoVideoEditor base={editData.demoVideo as string} handleFileChange={handleFileChange} />
@@ -491,15 +495,7 @@ const TeamEditPage = () => {
           />
           <Overlay className="overlay">Poster</Overlay>
         </ImageWrapper>
-
-        <FileInput
-          ref={posterInputRef}
-          type="file"
-          name="posterImage"
-          accept="image/*"
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
+        <FileInput ref={posterInputRef} type="file" name="posterImage" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
       </PosterIntro>
 
       <SaveButton onClick={handleSave}>SAVE</SaveButton>

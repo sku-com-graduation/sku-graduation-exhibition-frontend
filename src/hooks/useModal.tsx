@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import Modal from "../components/Modal";
+import Modal from "@components/Modal";
 
 type UseModalResult = {
   Modal: React.FC<{ children: React.ReactNode }>;

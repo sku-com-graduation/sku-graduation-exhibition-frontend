@@ -1,11 +1,5 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderEditCellParams,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -13,6 +7,7 @@ import { deleteTeams, getTeams, putTeams } from "@api/team";
 import { ITeamData, ITeamProfessorData } from "@interface";
 import { getYearRange } from "@utils/year";
 import { useToast } from "@hooks";
+import style from "@style";
 
 interface TeamRow extends ITeamData {
   id: string;
@@ -89,6 +84,7 @@ const TeamGrid = () => {
     await deleteTeams(selectionModel);
 
     setTeams((prev) => prev.filter((team) => !selectionModel.includes(team.encryptedTeamId)));
+    notifySuccess(`팀 삭제 완료`);
     setSelectionModel([]);
   };
 
@@ -225,7 +221,7 @@ const Toolbar = styled(Box)({
   justifyContent: "flex-end",
   padding: "0.8rem",
   gap: 8,
-  backgroundColor: "#fff",
+  backgroundColor: style.color.background,
   borderRadius: "12px",
 });
 
