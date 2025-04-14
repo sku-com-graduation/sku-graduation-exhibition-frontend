@@ -34,6 +34,7 @@ const AccountGrid = () => {
         const accountData = await getAccount(selectedYear.toString());
         setAccounts(accountData);
       } catch (error) {
+        notifyError("데이터 로딩 실패");
         console.error("데이터 로딩 실패", error);
       } finally {
         setLoading(false);
@@ -51,12 +52,18 @@ const AccountGrid = () => {
     const confirmed = window.confirm(`${selectionModel.length}개 계정을 삭제하시겠습니까?`);
     if (!confirmed) return;
 
-    await deleteAccount(selectionModel);
-
-    notifySuccess(`계정 삭제 완료`);
-
-    setAccounts((prev) => prev.filter((account) => !selectionModel.includes(account.encryptedAccountId)));
-    setSelectionModel([]);
+    setLoading(true);
+    try {
+      await deleteAccount(selectionModel);
+      notifySuccess(`계정 삭제 완료`);
+      setAccounts((prev) => prev.filter((account) => !selectionModel.includes(account.encryptedAccountId)));
+      setSelectionModel([]);
+    } catch (error) {
+      console.error("계정 삭제 실패", error);
+      notifyError("계정 삭제 실패");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFileParsed = async (parsed: IAccountRequest[]) => {
@@ -64,9 +71,11 @@ const AccountGrid = () => {
     try {
       await postAccounts(parsed);
       notifySuccess("업로드 성공");
+
       const updatedData = await getAccount(selectedYear.toString());
       setAccounts(updatedData);
     } catch (error) {
+      console.error("업로드 실패", error);
       notifyError("업로드 실패, 잠시후 다시 시도해주세요.");
     } finally {
       setLoading(false);
@@ -112,9 +121,6 @@ const AccountGrid = () => {
         <StyledButton startIcon={<DeleteIcon />} variant="outlined" color="error" onClick={handleDeleteSelected}>
           삭제
         </StyledButton>
-        <StyledButton startIcon={<SaveIcon />} variant="outlined">
-          저장
-        </StyledButton>
       </Toolbar>
 
       <DataGrid
@@ -133,8 +139,6 @@ const AccountGrid = () => {
         slots={{ toolbar: EditToolbar }}
       />
       <AccountCSVUploader open={dialogOpen} onClose={() => setDialogOpen(false)} onFileParsed={handleFileParsed} />
-
-      {/* <AccountCSVUploader open={dialogOpen} onClose={() => setDialogOpen(false)} onFileParsed={handleFileParsed} /> */}
     </Box>
   );
 };

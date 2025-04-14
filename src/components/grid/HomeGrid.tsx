@@ -1,5 +1,11 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderEditCellParams,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+} from "@mui/x-data-grid";
 import { Save as SaveIcon } from "@mui/icons-material";
 
 import { useEffect, useState } from "react";
@@ -73,10 +79,10 @@ const HomeGrid = () => {
       if (Array.isArray(homeData)) {
         setHomeInfo(homeData);
       } else {
-        console.warn("Unexpected home data:", homeData);
         setHomeInfo([]);
       }
     } catch (error) {
+      notifyError("홈 데이터 로딩 실패");
       console.error("홈 데이터 로딩 실패", error);
     } finally {
       setLoading(false);

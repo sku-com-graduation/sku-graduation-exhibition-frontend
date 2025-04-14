@@ -173,7 +173,7 @@ const SlideImageEditor = ({ existingImages, newImages, setExistingImages, setNew
         </SortableContext>
       </DndContext>
 
-      <HiddenFileInput ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleNewImages} />
+      <HiddenFileInput ref={fileInputRef} type="file" accept=".jpg,.png" multiple onChange={handleNewImages} />
     </>
   );
 };

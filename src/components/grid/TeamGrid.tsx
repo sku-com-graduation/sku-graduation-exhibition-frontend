@@ -1,5 +1,11 @@
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderEditCellParams, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderEditCellParams,
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+} from "@mui/x-data-grid";
 import { Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -37,6 +43,7 @@ const TeamGrid = () => {
       setTeams(data.teams);
       setProfessors(data.professors);
     } catch (error) {
+      notifyError("팀 데이터 로딩 실패");
       console.error("팀 데이터 로딩 실패", error);
     } finally {
       setLoading(false);
@@ -81,15 +88,27 @@ const TeamGrid = () => {
     const confirmed = window.confirm(`${selectionModel.length}개 팀을 삭제하시겠습니까?`);
     if (!confirmed) return;
 
-    await deleteTeams(selectionModel);
-
-    setTeams((prev) => prev.filter((team) => !selectionModel.includes(team.encryptedTeamId)));
-    notifySuccess(`팀 삭제 완료`);
-    setSelectionModel([]);
+    setLoading(true);
+    try {
+      await deleteTeams(selectionModel);
+      setTeams((prev) => prev.filter((team) => !selectionModel.includes(team.encryptedTeamId)));
+      setSelectionModel([]);
+      notifySuccess("팀 삭제 완료");
+    } catch (err) {
+      console.error("팀 삭제 실패", err);
+      notifyError("팀 삭제 실패");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = async () => {
-    if (modifiedRows.size === 0) return notifyInfo("수정된 내용이 없습니다.");
+    if (modifiedRows.size === 0) {
+      notifyInfo("수정된 내용이 없습니다.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const updatedList: ITeamData[] = Array.from(modifiedRows.values()).map((row) => {
         const prof = professors.find((p) => p.professorName === row.professor);
@@ -103,12 +122,14 @@ const TeamGrid = () => {
       });
 
       await putTeams(updatedList);
-      fetchData();
+      await fetchData();
       setModifiedRows(new Map());
       notifySuccess("저장 완료");
     } catch (err) {
       console.error("팀 저장 실패", err);
       notifyError("저장 중 오류 발생");
+    } finally {
+      setLoading(false);
     }
   };
 

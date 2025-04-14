@@ -1,5 +1,4 @@
-// SimpleCSVUploader.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import CSVUploaderBase from "./CSVUploaderBase";
 import { useToast } from "@hooks";
@@ -29,11 +28,8 @@ function DefaultPreviewTable<T>({ preview }: { preview: T[] }) {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr style={{ backgroundColor: "#f9f9f9" }}>
-            {Object.keys(preview[0] ?? {}).map((key) => (
-              <th key={key} style={{ textAlign: "left", padding: "6px", borderBottom: "1px solid #eee" }}>
-                {key}
-              </th>
-            ))}
+            <th style={{ textAlign: "left", padding: "6px", borderBottom: "1px solid #eee" }}>이름</th>
+            <th style={{ textAlign: "left", padding: "6px", borderBottom: "1px solid #eee" }}>학번</th>
           </tr>
         </thead>
         <tbody>
@@ -63,7 +59,7 @@ function DefaultPreviewTable<T>({ preview }: { preview: T[] }) {
   );
 }
 
-function SimpleCSVUploader<T>({
+function StudentCSVUploader<T>({
   open,
   onClose,
   parseCsv,
@@ -119,6 +115,7 @@ function SimpleCSVUploader<T>({
   const onConfirm = () => {
     onFileParsed(preview);
     onClose();
+    setPreview([]);
   };
 
   return (
@@ -136,4 +133,4 @@ function SimpleCSVUploader<T>({
   );
 }
 
-export default SimpleCSVUploader;
+export default StudentCSVUploader;

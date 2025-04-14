@@ -17,3 +17,10 @@ export interface IAccountRequest {
   professorName: string;
   studentInfos: IAccountRequestStudentInfo[];
 }
+
+export interface IAccountSetInfo {
+  professors: {
+    professorName: string;
+  }[];
+  students: IAccountRequestStudentInfo[];
+}

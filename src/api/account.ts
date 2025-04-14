@@ -1,5 +1,5 @@
 import api from ".";
-import { IAccountResponse, IAccountRequest } from "@interface";
+import { IAccountResponse, IAccountRequest, IAccountSetInfo } from "@interface";
 
 /** 계정 및 팀 정보 등록 API*/
 export const postAccounts = async (data: IAccountRequest[]) => {
@@ -40,5 +40,15 @@ export const resetAccount = async (accountId: string[]) => {
     }
   } catch (error) {
     throw new Error(`계정 초기화 실패`);
+  }
+};
+
+/** 연도별 계정 정보 조회 API*/
+export const getAccountSetInfo = async (): Promise<IAccountSetInfo> => {
+  try {
+    const result = await api.get(`/admin/account/regist/info`);
+    return result.data;
+  } catch (error) {
+    throw new Error(`계정 정보 조회 실패`);
   }
 };

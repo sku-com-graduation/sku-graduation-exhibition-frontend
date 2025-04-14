@@ -17,16 +17,16 @@ export const postProfessor = async (data: FormData) => {
 
 /** 교수 정보 수정 */
 export const putProfessor = async (data: FormData) => {
-  try {
-    const result = await api.put(`/admin/professor/update`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    if (result.status === 201) {
-      return result.data;
-    }
-  } catch (error) {
-    throw new Error(`${error}`);
+  // try {
+  const result = await api.put(`/admin/professor/update`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  if (result.status === 201) {
+    return result.data;
   }
+  // } catch (error) {
+  //   throw new Error(`${error}`);
+  // }
 };
 
 /** 교수 정보 조회 */

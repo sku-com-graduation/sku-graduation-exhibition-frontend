@@ -97,7 +97,13 @@ const DemoVideoEditor = ({ base, handleFileChange }: DemoVideoEditorProps) => {
       ) : (
         <AddMediaButton onClick={openFileInput}>+</AddMediaButton>
       )}
-      <HiddenFileInput name="demoVideo" ref={fileInputRef} type="file" accept="video/*" onChange={onFileChange} />
+      <HiddenFileInput
+        name="demoVideo"
+        ref={fileInputRef}
+        type="file"
+        accept=".mkv,.mp4,.avi"
+        onChange={onFileChange}
+      />
     </Wrapper>
   );
 };

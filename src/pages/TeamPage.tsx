@@ -191,21 +191,28 @@ const PosterImg = styled.img`
 // 수정 버튼 (EDIT)
 const EditButton = styled.button`
   position: fixed;
-  top: 5rem;
+  bottom: 2rem;
   right: 2rem;
-  padding: 0.5rem 1rem;
-  background-color: #4a90e2;
-  color: white;
-  font-weight: 600;
-  border-radius: 0.5rem;
+  z-index: 1000;
+
+  padding: 0.75rem 2rem;
+  background-color: #0070f3;
+  color: #fff;
   border: none;
-  z-index: 5000;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 
   &:hover {
-    background-color: #357ab8;
-    transform: translateY(-0.2rem);
+    /* background-color: #357ab8; */
+  }
+
+  @media (max-width: 768px) {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -316,7 +323,19 @@ const SlideImageItem = styled.img`
 /* 슬라이드 캐러셀 컴포넌트 */
 const SlideCarousel = ({ images }: { images: string[] }) => {
   // 무한 루프를 위해 이미지 배열을 여러 번 복제
-  const duplicatedImages = [...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images, ...images];
+  const duplicatedImages = [
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+    ...images,
+  ];
   // rem 단위 -> 대략 16px/1rem 가정
   const totalWidth = images.length * 16; // (이미지 하나당 가로폭 15rem + 여백 약 1rem)
 
@@ -420,7 +439,10 @@ const TeamPage = () => {
     const currentIndex = projects.findIndex((project) => project.uuid === team_uuid);
     if (currentIndex === -1) return;
 
-    const newIndex = direction === "prev" ? (currentIndex - 1 + projects.length) % projects.length : (currentIndex + 1) % projects.length;
+    const newIndex =
+      direction === "prev"
+        ? (currentIndex - 1 + projects.length) % projects.length
+        : (currentIndex + 1) % projects.length;
     const newTeamId = projects[newIndex].uuid;
     navigate(`/${year}/project/${newTeamId}`);
   };
@@ -440,7 +462,9 @@ const TeamPage = () => {
   return (
     <>
       {/* 권한자만 EDIT 보이게 */}
-      {(auth.uuid === team_uuid || auth.role === "ADMIN") && <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>}
+      {(auth.uuid === team_uuid || auth.role === "ADMIN") && (
+        <EditButton onClick={() => navigate(`${location.pathname}/edit`)}>EDIT</EditButton>
+      )}
 
       {/* 이전/다음 팀 이동 버튼 */}
       <PrevButton
@@ -466,13 +490,15 @@ const TeamPage = () => {
       <Container>
         {/* 팀 소개 섹션 */}
         <TeamIntro>
-          <TeamTitle>{teampost?.teamInfo.title === "null" ? "PROJECT TITLE" : teampost?.teamInfo.title}</TeamTitle>
+          <TeamTitle>{teampost?.teamInfo.title ? teampost?.teamInfo.title : "PROJECT TITLE"}</TeamTitle>
           <TeamProfile src={teampost?.teamInfo.teamProfileImage ? teampost.teamInfo.teamProfileImage : empty} />
-          <TeamContent>{teampost?.teamInfo.content === "null" ? "PROJECT DESCRIPTION" : teampost?.teamInfo.content}</TeamContent>
+          <TeamContent>{teampost?.teamInfo.content ? teampost?.teamInfo.content : "PROJECT DESCRIPTION"}</TeamContent>
         </TeamIntro>
 
         {/* 슬라이드 이미지 */}
-        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && <SlideCarousel images={teampost.teamInfo.slideImages} />}
+        {teampost?.teamInfo.slideImages && teampost.teamInfo.slideImages.length > 0 && (
+          <SlideCarousel images={teampost.teamInfo.slideImages} />
+        )}
 
         {/* 멤버 섹션 */}
         <SectionTitle>Members</SectionTitle>
@@ -485,7 +511,9 @@ const TeamPage = () => {
                 openModal();
               }}
             >
-              <StudentInfo src={teampost.professorInfo.professorImage ? teampost.professorInfo.professorImage : userEmpty} />
+              <StudentInfo
+                src={teampost.professorInfo.professorImage ? teampost.professorInfo.professorImage : userEmpty}
+              />
               <ProfessorName>{teampost.professorInfo.professorName}</ProfessorName>
               {/* 지도교수 뱃지 */}
               <ProfessorBadge>지도교수</ProfessorBadge>
@@ -533,7 +561,13 @@ const TeamPage = () => {
         {/* 포스터 섹션 */}
         <SectionTitle>Poster</SectionTitle>
         <PosterIntro>
-          <PosterImg src={teampost?.teamInfo.posterImage ? teampost.teamInfo.posterImage : empty} />
+          {teampost?.teamInfo.posterImage ? (
+            <PosterImg src={teampost?.teamInfo.posterImage} />
+          ) : (
+            <EmptyVideoPlaceholder>
+              <p>포스터가 업로드되지 않았습니다.</p>
+            </EmptyVideoPlaceholder>
+          )}
         </PosterIntro>
       </Container>
     </>

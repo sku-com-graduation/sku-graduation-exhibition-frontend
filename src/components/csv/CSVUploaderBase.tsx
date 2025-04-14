@@ -1,4 +1,3 @@
-// CSVUploaderBase.tsx
 import React, { useRef, useState } from "react";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
