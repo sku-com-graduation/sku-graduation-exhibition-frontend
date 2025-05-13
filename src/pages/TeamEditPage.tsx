@@ -243,10 +243,6 @@ const TeamEditPage = () => {
   const [selectedStudent, setSelectedStudent] = useState<ITeamPostEditStudent | null>(null);
   const { openModal, closeModal, Modal } = useModal();
 
-  useEffect(() => {
-    console.log(editedStudents);
-  }, [editedStudents]);
-
   const [existingSlideImages, setExistingSlideImages] = useState<string[]>([]);
   const [newSlideImages, setNewSlideImages] = useState<File[]>([]);
   const posterInputRef = useRef<HTMLInputElement>(null);
@@ -510,13 +506,13 @@ const TeamEditPage = () => {
         />
         <CharCount>{(editData.content || "").length} / 500</CharCount>
       </TeamIntro>
-      <SectionTitle>Slide Images</SectionTitle>
-      <SlideImageEditor
+      {/* <SectionTitle>Slide Images</SectionTitle> */}
+      {/* <SlideImageEditor
         existingImages={existingSlideImages}
         newImages={newSlideImages}
         setExistingImages={setExistingSlideImages}
         setNewImages={setNewSlideImages}
-      />
+      /> */}
       <SectionTitle>Members</SectionTitle>
       <StudentList>
         {editedStudents
