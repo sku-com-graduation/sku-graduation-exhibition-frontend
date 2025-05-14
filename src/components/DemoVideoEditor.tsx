@@ -13,8 +13,9 @@ const Wrapper = styled.div`
 const SlideMedia = styled.video`
   width: 100%;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 1rem;
+  background-color: black;
 `;
 
 const HiddenFileInput = styled.input`
@@ -64,7 +65,7 @@ const DemoVideoEditor = ({ base, handleFileChange }: DemoVideoEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
-  const { notifySuccess, notifyError, notifyInfo } = useToast();
+  const { notifyInfo } = useToast();
 
   const openFileInput = () => {
     fileInputRef.current?.click();
