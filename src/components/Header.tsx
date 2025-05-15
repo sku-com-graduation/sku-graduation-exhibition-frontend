@@ -131,6 +131,10 @@ const Header = () => {
       await getLogout();
       dispatch(clearAuth());
       notifySuccess(`로그아웃`);
+      const currentPath = location.pathname;
+      if (currentPath.includes("/edit") || currentPath.includes("/admin")) {
+        navigate(`/${year}`);
+      }
     } catch (error) {
       console.error(error);
     }
