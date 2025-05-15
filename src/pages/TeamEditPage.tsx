@@ -109,6 +109,13 @@ const TeamEditPage = () => {
   }, [team_uuid]);
 
   useEffect(() => {
+    console.log("????????????? " + JSON.stringify(teampostEdit, null, 4));
+  }, [teampostEdit]);
+  useEffect(() => {
+    console.log("!!!!!!!!!: " + JSON.stringify(editData, null, 4));
+  }, [editData]);
+
+  useEffect(() => {
     if (teampostEdit) {
       setEditData({
         title: teampostEdit.title,
@@ -135,6 +142,7 @@ const TeamEditPage = () => {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log("파일 파꾸기");
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setEditData((prev) => ({ ...prev, [e.target.name]: file }));
@@ -151,7 +159,9 @@ const TeamEditPage = () => {
   // 수정된 학생 데이터를 상위 상태에 업데이트
   const updateStudent = (updatedStudent: ITeamPostEditStudent) => {
     setEditedStudents((prev) =>
-      prev.map((stu) => (stu.encryptedStudentProfileId === updatedStudent.encryptedStudentProfileId ? updatedStudent : stu))
+      prev.map((stu) =>
+        stu.encryptedStudentProfileId === updatedStudent.encryptedStudentProfileId ? updatedStudent : stu
+      )
     );
     setSelectedStudent(null);
     closeModal();
@@ -172,33 +182,51 @@ const TeamEditPage = () => {
     loadingStart();
 
     try {
-      // 1. 파일 준비 (File 또는 URL → File)
-      const teamProfileFile =
-        editData.teamProfileImage instanceof File
-          ? editData.teamProfileImage
-          : editData.teamProfileImage
-          ? await urlToFile(editData.teamProfileImage, "profile.jpg")
-          : null;
+      // 1. 수정된 파일만 File 객체로 분리
+      const teamProfileFile = editData.teamProfileImage instanceof File ? editData.teamProfileImage : null;
+      const demoFile = editData.demoVideo instanceof File ? editData.demoVideo : null;
+      const posterFile = editData.posterImage instanceof File ? editData.posterImage : null;
 
-      const demoFile =
-        editData.demoVideo instanceof File ? editData.demoVideo : editData.demoVideo ? await urlToFile(editData.demoVideo, "demoVideo.mp4") : null;
+      console.log("teamProfileFile =", teamProfileFile ? `${teamProfileFile.name} (${teamProfileFile.type})` : "null");
+      console.log("demoFile =", demoFile ? `${demoFile.name} (${demoFile.type})` : "null");
+      console.log("posterFile =", posterFile ? `${posterFile.name} (${posterFile.type})` : "null");
 
-      const posterFile =
-        editData.posterImage instanceof File
-          ? editData.posterImage
-          : editData.posterImage
-          ? await urlToFile(editData.posterImage, "poster.jpg")
-          : null;
+      // 2. presigned 요청용 정보 생성
+      const mimeToExt = (mime: string): string => {
+        const map: Record<string, string> = {
+          "video/x-matroska": "mkv",
+          "video/mp4": "mp4",
+          "video/x-msvideo": "avi",
+          "image/jpeg": "jpg",
+          "image/png": "png",
+        };
+        return map[mime] || "unsupported";
+      };
 
-      // 2. presigned URL 요청
       const fileInfos = [];
-      if (teamProfileFile) fileInfos.push({ fileType: "TEAM_PROFILE" as const, extension: "jpg" });
-      if (demoFile) fileInfos.push({ fileType: "DEMO" as const, extension: "mp4" });
-      if (posterFile) fileInfos.push({ fileType: "POSTER" as const, extension: "jpg" });
+      if (teamProfileFile)
+        fileInfos.push({
+          fileType: "TEAM_PROFILE" as const,
+          contentType: teamProfileFile.type,
+          extension: mimeToExt(teamProfileFile.type),
+        });
+      if (demoFile)
+        fileInfos.push({ fileType: "DEMO" as const, contentType: demoFile.type, extension: mimeToExt(demoFile.type) });
+      if (posterFile)
+        fileInfos.push({
+          fileType: "POSTER" as const,
+          contentType: posterFile.type,
+          extension: mimeToExt(posterFile.type),
+        });
+      console.log("fileInfos = " + JSON.stringify(fileInfos, null, 4));
 
+      // 3. presigned URL 요청
       const presignedUrls = fileInfos.length ? await getPresignedUrlTeamPost({ teamUuid: team_uuid, fileInfos }) : [];
+      const uploadedMap = new Map(presignedUrls.map((u) => [u.fileType, u.cloudFrontUrl]));
+      console.log("📦 presignedUrls =", JSON.stringify(presignedUrls, null, 4));
+      console.log("📦 uploadedMap =", Object.fromEntries(uploadedMap));
 
-      // 3. S3 직접 업로드
+      // 4. 실제 S3 업로드
       await Promise.all(
         presignedUrls.map(async (item) => {
           let file: File | null = null;
@@ -207,29 +235,65 @@ const TeamEditPage = () => {
           if (item.fileType === "POSTER") file = posterFile;
 
           if (file) {
+            console.log("file.type = " + file.type);
             await axios.put(item.s3Url, file, {
-              headers: { "Content-Type": file.type },
+              headers: { "Content-Type": file.type, "x-amz-meta-content-type": file.type },
             });
           }
         })
       );
 
-      // 4. FormData 구성 (파일은 cloudFrontUrl로 대체)
+      // 5. formData 구성
       const formData = new FormData();
       formData.append("teamUuid", team_uuid);
       formData.append("title", editData.title || "");
       formData.append("content", editData.content || "");
       formData.append("category", editData.category || "");
 
-      presignedUrls.forEach(({ fileType, cloudFrontUrl }) => {
-        if (fileType === "TEAM_PROFILE") formData.append("teamProfileImageUrl", cloudFrontUrl);
-        if (fileType === "DEMO") formData.append("demoVideoUrl", cloudFrontUrl);
-        if (fileType === "POSTER") formData.append("posterImageUrl", cloudFrontUrl);
-      });
+      // teamProfileImage
+      if (uploadedMap.has("TEAM_PROFILE")) {
+        // 새로 올린 이미지
+        console.log("111111111111111111" + uploadedMap.get("TEAM_PROFILE"));
+        formData.append("teamProfileImage", uploadedMap.get("TEAM_PROFILE")!);
+      } else if (typeof editData.teamProfileImage === "string") {
+        // 기존 이미지 유지
+        console.log("222222222");
 
+        formData.append("teamProfileImage", editData.teamProfileImage);
+      } else {
+        // 이미지 없음
+        console.log("2333333333333333333333333333");
+
+        formData.append("teamProfileImage", "");
+      }
+
+      formData.append("teamProfileImageOperation", "UPLOAD");
+
+      // demoVideo
+      formData.append(
+        "demoVideo",
+        uploadedMap.get("DEMO") ?? (typeof editData.demoVideo === "string" ? editData.demoVideo : "")
+      );
+      formData.append("demoVideoOperation", "UPLOAD");
+
+      // posterImage
+      formData.append(
+        "posterImage",
+        uploadedMap.get("POSTER") ?? (typeof editData.posterImage === "string" ? editData.posterImage : "")
+      );
+      formData.append("posterImageOperation", "UPLOAD");
+
+      // 테스트용
+      formData.append("teamProfileImagePath", `/teamPost/${team_uuid}/teamProfile`);
+      formData.append("demoVideoPath", `/teamPost/${team_uuid}/demo`);
+      formData.append("posterImagePath", `/teamPost/${team_uuid}/poster`);
+
+      formData.forEach((v, k) => console.log(`[formData] ${k}:`, v));
+
+      // 6. 서버 요청
       const teamPostResponse = await putTeampost(formData);
 
-      // 5. 수정된 학생 정보 저장 (이미지 포함)
+      // 7. 수정된 학생 정보도 처리
       const modifiedStudents = editedStudents.filter((edited, index) => {
         const original = originalStudents[index];
         return isStudentModified(original, edited);
@@ -245,130 +309,42 @@ const TeamEditPage = () => {
           studentFormData.append("studentBlog", student.studentBlog);
           studentFormData.append("studentEmail", student.studentEmail);
 
-          // blob 이미지 처리 → S3 업로드
           if (student.profileImage.startsWith("blob:")) {
             const file = await urlToFile(student.profileImage, "profile.jpg");
-
-            // presigned URL 요청
             const { s3Url, cloudFrontUrl } = await getPresignedUrlStudent({
               encryptedStudentId: student.encryptedStudentProfileId,
               fileType: "STUDENT_PROFILE",
+              contentType: file.type,
               extension: file.type,
             });
-            console.log(s3Url, cloudFrontUrl);
 
             await axios.put(s3Url, file, {
-              headers: { "Content-Type": file.type },
+              headers: { "Content-Type": file.type, "x-amz-meta-content-type": file.type },
             });
 
-            studentFormData.append("profileImageUrl", cloudFrontUrl);
+            studentFormData.append("profileImage", cloudFrontUrl);
+            studentFormData.append("profileImageOperation", "UPLOAD");
           }
 
           return putTeamStudent(studentFormData);
         })
       );
 
-      // 6. 완료 처리
+      // 8. 완료 처리
       if (teamPostResponse) {
         setIsDirty(false);
         notifySuccess("저장되었습니다.");
         navigate(-1);
       } else {
-        throw new Error("저장 실패");
+        throw new Error("팀 게시글 저장 실패");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      console.error("[오류 발생]", error);
       notifyError("저장에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       loadingStop();
     }
   };
-
-  // const handleSave = async () => {
-  //   if (!team_uuid) return;
-  //   loadingStart();
-  //   try {
-  //     // teamProfileImage 처리
-  //     const teamProfileFile =
-  //       editData.teamProfileImage && editData.teamProfileImage !== ""
-  //         ? editData.teamProfileImage instanceof File
-  //           ? editData.teamProfileImage
-  //           : await urlToFile(editData.teamProfileImage as string, "profile.jpg")
-  //         : null;
-
-  //     // demoVideo 처리
-  //     const demoFile =
-  //       editData.demoVideo && editData.demoVideo !== ""
-  //         ? editData.demoVideo instanceof File
-  //           ? editData.demoVideo
-  //           : await urlToFile(editData.demoVideo as string, "demoVideo.mp4")
-  //         : null;
-
-  //     // posterImage 처리
-  //     const posterFile =
-  //       editData.posterImage && editData.posterImage !== ""
-  //         ? editData.posterImage instanceof File
-  //           ? editData.posterImage
-  //           : await urlToFile(editData.posterImage as string, "poster.jpg")
-  //         : null;
-
-  //     const formData = new FormData();
-  //     formData.append("teamUuid", team_uuid);
-  //     formData.append("title", editData.title || "");
-  //     formData.append("content", editData.content || "");
-  //     formData.append("category", editData.category || "");
-
-  //     if (teamProfileFile) {
-  //       formData.append("teamProfileImage", teamProfileFile);
-  //     }
-  //     if (demoFile) {
-  //       formData.append("demoVideo", demoFile);
-  //     }
-  //     if (posterFile) {
-  //       formData.append("posterImage", posterFile);
-  //     }
-
-  //     const teamPostResponse = await putTeampost(formData);
-
-  //     // 수정된 학생 데이터만 필터링 후 업데이트
-  //     const modifiedStudents = editedStudents.filter((edited, index) => {
-  //       const original = originalStudents[index];
-  //       return isStudentModified(original, edited);
-  //     });
-
-  //     await Promise.all(
-  //       modifiedStudents.map(async (student) => {
-  //         const studentFormData = new FormData();
-  //         studentFormData.append("teamUuid", team_uuid);
-  //         studentFormData.append("encryptedStudentId", student.encryptedStudentProfileId);
-  //         studentFormData.append("githubUrl", student.githubUrl);
-  //         studentFormData.append("info", student.info);
-  //         studentFormData.append("studentBlog", student.studentBlog);
-  //         studentFormData.append("studentEmail", student.studentEmail);
-
-  //         // profileImage가 blob URL인 경우 파일로 변환
-  //         if (student.profileImage.startsWith("blob:")) {
-  //           const file = await urlToFile(student.profileImage, "profile.jpg");
-  //           studentFormData.append("profileImage", file);
-  //         }
-
-  //         return putTeamStudent(studentFormData);
-  //       })
-  //     );
-
-  //     if (teamPostResponse) {
-  //       setIsDirty(false);
-  //       notifySuccess("저장되었습니다.");
-  //       navigate(-1);
-  //     } else {
-  //       throw new Error("저장 실패");
-  //     }
-  //   } catch (error) {
-  //     notifyError("저장에 실패했습니다. 다시 시도해 주세요.");
-  //   } finally {
-  //     loadingStop();
-  //   }
-  // };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -379,7 +355,13 @@ const TeamEditPage = () => {
       <TeamIntro>
         {/* 제목 및 카테고리 */}
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
+          <EditableTitle
+            type="text"
+            name="title"
+            value={editData.title}
+            onChange={handleInputChange}
+            placeholder="PROJECT TITLE"
+          />
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
             <option value="WEB">WEB</option>
             <option value="MOBILE">MOBILE</option>
@@ -440,7 +422,9 @@ const TeamEditPage = () => {
             </StudentItem>
           ))}
       </StudentList>
-      <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}</Modal>
+      <Modal>
+        {selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}
+      </Modal>
       <div>
         <SectionTitle>Project Video</SectionTitle>
         <FileFormatNotice>* mkv, mp4, avi 형식만 업로드 가능합니다.</FileFormatNotice>
@@ -464,7 +448,14 @@ const TeamEditPage = () => {
           />
           <Overlay className="overlay">Poster</Overlay>
         </ImageWrapper>
-        <FileInput ref={posterInputRef} type="file" name="posterImage" accept=".jpg,.png" onChange={handleFileChange} style={{ display: "none" }} />
+        <FileInput
+          ref={posterInputRef}
+          type="file"
+          name="posterImage"
+          accept=".jpg,.png"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
       </PosterIntro>
       <SaveButton onClick={handleSave}>SAVE</SaveButton> {isLoading && <Spinner />}
     </Container>
@@ -756,6 +747,10 @@ export default TeamEditPage;
 //       getTeampostEdit(team_uuid);
 //     }
 //   }, [team_uuid]);
+
+//   useEffect(() => {
+//     console.log("editData = " + JSON.stringify(editData, null, 4));
+//   }, [editData]);
 
 //   useEffect(() => {
 //     if (teampostEdit) {

@@ -183,6 +183,8 @@ const TeamPage: React.FC = () => {
     { id: "poster", label: "Poster" },
   ];
 
+  const version = Date.now();
+
   return (
     <>
       {(auth.uuid === team_uuid || auth.role === "ADMIN") && (
@@ -237,7 +239,7 @@ const TeamPage: React.FC = () => {
         <VideoIntro>
           {teampost?.teamInfo.demoVideo ? (
             <TeamVideo controls>
-              <source src={teampost.teamInfo.demoVideo} type="video/mp4" />
+              <source src={`${teampost.teamInfo.demoVideo}?v=${version}`} type="video/mp4" />
             </TeamVideo>
           ) : (
             <EmptyVideoPlaceholder>프로젝트 영상이 업로드되지 않았습니다.</EmptyVideoPlaceholder>
@@ -247,7 +249,7 @@ const TeamPage: React.FC = () => {
         <SectionTitle id="poster">Poster</SectionTitle>
         <PosterIntro>
           {teampost?.teamInfo.posterImage ? (
-            <PosterImg src={teampost.teamInfo.posterImage} />
+            <PosterImg src={`${teampost.teamInfo.posterImage}?v=${version}`} />
           ) : (
             <EmptyVideoPlaceholder>포스터가 업로드되지 않았습니다.</EmptyVideoPlaceholder>
           )}

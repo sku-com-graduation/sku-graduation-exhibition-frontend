@@ -7,6 +7,7 @@ export interface IPresignedUrlTeamPostRequest {
   teamUuid: string;
   fileInfos: {
     fileType: FileTypeTeamPost;
+    contentType: string;
     extension: string;
   }[];
 }
@@ -14,16 +15,19 @@ export interface IPresignedUrlTeamPostRequest {
 export interface IPresignedUrlStudentRequest {
   encryptedStudentId: string;
   fileType: FileTypeStudent;
+  contentType: string;
   extension: string;
 }
 
 export interface IPresignedUrlProfessorRequest {
   fileType: FileTypeProfessor;
+  contentType: string;
   extension: string;
 }
 
 export interface IPresignedUrlResponse {
   fileType: FileUploadResponseType;
   cloudFrontUrl: string;
+  contentType: string;
   s3Url: string;
 }
