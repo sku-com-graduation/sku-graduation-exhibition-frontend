@@ -11,3 +11,14 @@ export const urlToFile = async (url: string, filename: string): Promise<File> =>
   const blob = await response.blob();
   return new File([blob], filename, { type: blob.type });
 };
+
+export const extractFilenameFromUrl = (url: string, fallback: string = "profile.jpg") => {
+  try {
+    const parts = url.split("/");
+    const filename = parts[parts.length - 1];
+    if (!filename.includes(".")) return fallback;
+    return filename;
+  } catch {
+    return fallback;
+  }
+};
