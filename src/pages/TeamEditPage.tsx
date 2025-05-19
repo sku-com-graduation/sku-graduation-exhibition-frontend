@@ -41,6 +41,7 @@ import { getPresignedUrlStudent, getPresignedUrlTeamPost, postMultipartComplete 
 import axios, { AxiosResponse } from "axios";
 import { DeleteSqButton } from "@components/ui/Button";
 import { IPresignedUrlTeamPostRequest } from "src/interface/IPresignedUrl";
+import { categories } from "@constant/categorys";
 
 /* ────────────────
    메인 컴포넌트
@@ -50,9 +51,9 @@ interface IEditForm {
   title: string;
   content: string;
   category: string;
-  teamProfileImage: File | string;
-  demoVideo: File | string;
-  posterImage: File | string;
+  teamProfileImage: File | string | null;
+  demoVideo: File | string | null;
+  posterImage: File | string | null;
 }
 
 const TeamEditPage = () => {
@@ -454,7 +455,7 @@ const TeamEditPage = () => {
     <Container>
       <TeamIntro>
         {/* 제목 및 카테고리 */}
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", width: "100%" }}>
           <EditableTitle
             type="text"
             name="title"
@@ -462,10 +463,13 @@ const TeamEditPage = () => {
             onChange={handleInputChange}
             placeholder="PROJECT TITLE"
           />
+
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
-            <option value="WEB">WEB</option>
-            <option value="MOBILE">MOBILE</option>
-            <option value="GAME">GAME</option>
+            {categories.slice(1).map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
           </CategorySelect>
         </div>
 
@@ -504,7 +508,7 @@ const TeamEditPage = () => {
                 setIsDirty(true);
               }}
             >
-              프로필 삭제
+              팀 프로필 삭제
             </DeleteSqButton>
           )}
         </div>
@@ -548,7 +552,7 @@ const TeamEditPage = () => {
         base={editData.demoVideo as string}
         handleFileChange={handleFileChange}
         onDelete={() => {
-          setEditData((prev) => ({ ...prev, demoVideo: "" }));
+          setEditData((prev) => ({ ...prev, demoVideo: null }));
           setIsDirty(true);
         }}
       />

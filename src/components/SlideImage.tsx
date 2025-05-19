@@ -9,7 +9,6 @@ const SliderWrapper = styled.div`
   box-sizing: border-box;
 `;
 
-// ✅ styled-components v5 방식: reverse를 DOM에 전달하지 않도록 처리
 const SlideTrack = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "reverse" && prop !== "duration",
 })<{ reverse?: boolean; duration: number }>`
@@ -67,18 +66,24 @@ const SlideImage: React.FC<{ year: string }> = ({ year }) => {
   const [images, setImages] = useState<string[]>([]);
   const [duration, setDuration] = useState<number>(60);
 
-  useEffect(() => {
-    async function loadImages() {
-      const res = await fetchTeamProfile(year);
-      if (res) {
-        const repeated = Array(10).fill(res).flat();
+  async function loadImages() {
+    const res = await fetchTeamProfile(year);
+    if (res) {
+      const filtered = res.filter((src) => src.trim() !== ""); // 빈 문자열 제거
+      if (filtered.length >= 5) {
+        const repeated = Array(50).fill(filtered).flat();
         setImages(repeated);
 
         const baseSpeed = 2;
         const calculatedDuration = repeated.length * baseSpeed;
         setDuration(calculatedDuration);
+      } else {
+        setImages([]); // 5개 미만일 경우 출력 방지
       }
     }
+  }
+
+  useEffect(() => {
     loadImages();
   }, [year]);
 

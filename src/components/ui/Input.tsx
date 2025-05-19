@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 export const EditableTitle = styled.input`
   flex: 1;
+  min-width: 0;
   font-size: 2rem;
   font-weight: 700;
   color: #333;
@@ -11,6 +12,7 @@ export const EditableTitle = styled.input`
   width: 100%;
   background: transparent;
   margin-bottom: 1rem;
+
   @media (max-width: 768px) {
     font-size: 2.2rem;
     text-align: center;

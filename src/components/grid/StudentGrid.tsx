@@ -88,6 +88,7 @@ const StudentGrid = () => {
       notifySuccess("학생 삭제 완료");
     } catch (error) {
       notifyError("학생 삭제 실패");
+      console.log(error);
     } finally {
       setLoading(false);
     }

@@ -105,13 +105,17 @@ const CategoryContainer = styled.div`
   box-sizing: border-box;
   padding: 0rem 10rem 5rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   text-align: center;
 
   @media (max-width: 768px) {
     padding: 0 2rem;
     grid-template-columns: repeat(2, 1fr);
+
+    & > :first-child {
+      grid-column: span 2;
+    }
   }
 `;
 
