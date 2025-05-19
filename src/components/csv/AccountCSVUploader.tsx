@@ -24,6 +24,7 @@ import { IAccountRequest, IAccountRequestStudentInfo, IAccountSetInfo } from "@i
 import { parseAccountCSV } from "@utils/parse";
 import { useToast } from "@hooks";
 import { getAccountSetInfo } from "@api/account";
+import { categories } from "@constant/categorys";
 
 function AccountPreviewTable({ preview }: { preview: IAccountRequest[] }) {
   return (
@@ -212,10 +213,17 @@ function AccountCSVUploader({
         />
         <FormControl fullWidth size="small">
           <InputLabel>카테고리</InputLabel>
-          <Select value={manualAccount.category || ""} onChange={handleCategoryChange} label="카테고리">
+          {/* <Select value={manualAccount.category || ""} onChange={handleCategoryChange} label="카테고리">
             <MenuItem value="GAME">GAME</MenuItem>
             <MenuItem value="MOBILE">MOBILE</MenuItem>
             <MenuItem value="WEB">WEB</MenuItem>
+            <MenuItem value="WEB">test</MenuItem>
+          </Select> */}
+
+          <Select value={manualAccount.category || ""} onChange={handleCategoryChange} label="카테고리">
+            {categories.slice(1).map((cat) => (
+              <MenuItem value={cat}>{cat}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Stack>

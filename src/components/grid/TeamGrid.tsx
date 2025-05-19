@@ -14,6 +14,7 @@ import { ITeamData, ITeamProfessorData } from "@interface";
 import { getYearRange } from "@utils/year";
 import { useToast } from "@hooks";
 import style from "@style";
+import { categories } from "@constant/categorys";
 
 interface TeamRow extends ITeamData {
   id: string;
@@ -140,10 +141,16 @@ const TeamGrid = () => {
 
     return (
       <Select value={value ?? ""} onChange={handleChange} fullWidth>
-        <MenuItem value="MOBILE">MOBILE</MenuItem>
-        <MenuItem value="WEB">WEB</MenuItem>
-        <MenuItem value="GAME">GAME</MenuItem>
+        {categories.slice(1).map((cat) => (
+          <MenuItem value={cat}>{cat}</MenuItem>
+        ))}
       </Select>
+
+      // <Select value={value ?? ""} onChange={handleChange} fullWidth>
+      //   <MenuItem value="MOBILE">MOBILE</MenuItem>
+      //   <MenuItem value="WEB">WEB</MenuItem>
+      //   <MenuItem value="GAME">GAME</MenuItem>
+      // </Select>
     );
   };
 
