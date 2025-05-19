@@ -128,7 +128,6 @@ const StudentGrid = () => {
       setModifiedRows(new Map());
       await fetchData();
     } catch (err) {
-      console.error("저장 실패", err);
       notifyError("저장 중 오류 발생");
     } finally {
       setLoading(false);

@@ -44,7 +44,6 @@ const TeamGrid = () => {
       setProfessors(data.professors);
     } catch (error) {
       notifyError("팀 데이터 로딩 실패");
-      console.error("팀 데이터 로딩 실패", error);
     } finally {
       setLoading(false);
     }
@@ -95,7 +94,6 @@ const TeamGrid = () => {
       setSelectionModel([]);
       notifySuccess("팀 삭제 완료");
     } catch (err) {
-      console.error("팀 삭제 실패", err);
       notifyError("팀 삭제 실패");
     } finally {
       setLoading(false);
@@ -126,7 +124,6 @@ const TeamGrid = () => {
       setModifiedRows(new Map());
       notifySuccess("저장 완료");
     } catch (err) {
-      console.error("팀 저장 실패", err);
       notifyError("저장 중 오류 발생");
     } finally {
       setLoading(false);

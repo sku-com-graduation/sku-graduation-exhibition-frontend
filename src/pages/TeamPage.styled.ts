@@ -134,9 +134,10 @@ export const TeamVideo = styled.video`
 `;
 
 export const PosterIntro = styled.div`
-  width: 50%;
+  width: 60%;
   display: grid;
   place-items: center;
+  margin-bottom: 10rem;
 
   @media (max-width: 768px) {
     width: 100%;

@@ -22,3 +22,14 @@ export const extractFilenameFromUrl = (url: string, fallback: string = "profile.
     return fallback;
   }
 };
+
+export const mimeToExt = (mime: string): string => {
+  const map: Record<string, string> = {
+    "video/x-matroska": "mkv",
+    "video/mp4": "mp4",
+    "video/x-msvideo": "avi",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+  };
+  return map[mime] || "unsupported";
+};

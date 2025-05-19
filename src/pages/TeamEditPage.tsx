@@ -1,17 +1,18 @@
+// 250518 업로드 퍼센트
+
 import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { postGetTeampostEdit, putTeampost, putTeampostSlideImage, putTeamStudent } from "@api/teamPost";
 import DemoVideoEditor from "@components/DemoVideoEditor";
 import { EditableTextArea, EditableTitle, FileInput } from "@components/ui/Input";
-import { extractFilenameFromUrl, urlToFile } from "@utils/File";
+import { extractFilenameFromUrl, mimeToExt, urlToFile } from "@utils/File";
 import { useModal, usePrompt, useToast } from "@hooks";
 import Profile from "@components/Profile";
 
-import empty from "@assets/image/main_image.png";
 import userEmpty from "@assets/image/user.png";
-import back_image from "@assets/image/back_image.png";
 import { ITeamPostEdit, ITeamPostEditStudent } from "@interface";
+
 import { useSpinner } from "src/hooks/useSpinner";
 import Spinner from "@components/Spinner";
 
@@ -32,9 +33,14 @@ import {
   StudentInfo,
   StudentName,
   CategorySelect,
+  AddMediaButton,
+  SquareMediaButton,
+  PosterMediaButton,
 } from "./TeamEditPage.styled";
-import { getPresignedUrlStudent, getPresignedUrlTeamPost } from "@api/presignedUrl";
-import axios from "axios";
+import { getPresignedUrlStudent, getPresignedUrlTeamPost, postMultipartComplete } from "@api/presignedUrl";
+import axios, { AxiosResponse } from "axios";
+import { DeleteSqButton } from "@components/ui/Button";
+import { IPresignedUrlTeamPostRequest } from "src/interface/IPresignedUrl";
 
 /* ────────────────
    메인 컴포넌트
@@ -53,6 +59,9 @@ const TeamEditPage = () => {
   const { team_uuid, year } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const totalBytesRef = useRef(0);
+  const uploadedBytesRef = useRef(0);
 
   const [teampostEdit, setTeampostEdit] = useState<ITeamPostEdit | null>(null);
   const [editData, setEditData] = useState<IEditForm>({
@@ -74,7 +83,7 @@ const TeamEditPage = () => {
   const posterInputRef = useRef<HTMLInputElement>(null);
 
   const { notifySuccess, notifyInfo, notifyError } = useToast();
-  const { isLoading, setIsLoading, loadingStart, loadingStop } = useSpinner();
+  const { isLoading, setIsLoading, loadingStart, loadingStop, progress, setProgress } = useSpinner();
 
   const [isDirty, setIsDirty] = useState<boolean>(false);
 
@@ -109,10 +118,10 @@ const TeamEditPage = () => {
   }, [team_uuid]);
 
   useEffect(() => {
-    console.log("????????????? " + JSON.stringify(teampostEdit, null, 4));
+    // console.log("????????????? " + JSON.stringify(teampostEdit, null, 4));
   }, [teampostEdit]);
   useEffect(() => {
-    console.log("!!!!!!!!!: " + JSON.stringify(editData, null, 4));
+    // console.log("!!!!!!!!!: " + JSON.stringify(editData, null, 4));
   }, [editData]);
 
   useEffect(() => {
@@ -142,24 +151,24 @@ const TeamEditPage = () => {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("파일 파꾸기");
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setEditData((prev) => ({ ...prev, [e.target.name]: file }));
       setIsDirty(true);
     }
+    e.target.value = "";
   };
 
-  // 학생 클릭 시 해당 학생 및 인덱스를 함께 선택하여 모달 오픈
   const handleStudentClick = (student: ITeamPostEditStudent) => {
     setSelectedStudent(student);
     openModal();
   };
 
-  // 수정된 학생 데이터를 상위 상태에 업데이트
   const updateStudent = (updatedStudent: ITeamPostEditStudent) => {
     setEditedStudents((prev) =>
-      prev.map((stu) => (stu.encryptedStudentProfileId === updatedStudent.encryptedStudentProfileId ? updatedStudent : stu))
+      prev.map((stu) =>
+        stu.encryptedStudentProfileId === updatedStudent.encryptedStudentProfileId ? updatedStudent : stu
+      )
     );
     setSelectedStudent(null);
     closeModal();
@@ -176,8 +185,27 @@ const TeamEditPage = () => {
   /////////////////////////////////////////////////////////////////////// 저장 버튼 클릭 시 처리 (파일/URL 처리 포함)
 
   const handleSave = async () => {
+    const uploadWithProgress = async (url: string, file: Blob): Promise<AxiosResponse> => {
+      let prevLoaded = 0;
+      const res = await axios.put(url, file, {
+        headers: { "Content-Type": file.type },
+        onUploadProgress: (event) => {
+          const diff = event.loaded - prevLoaded;
+          prevLoaded = event.loaded;
+          uploadedBytesRef.current += diff;
+          const percent = Math.round((uploadedBytesRef.current / totalBytesRef.current) * 100);
+          setProgress(percent);
+        },
+      });
+      return res;
+    };
+
     if (!team_uuid) return;
     loadingStart();
+
+    setProgress(0);
+    uploadedBytesRef.current = 0;
+    totalBytesRef.current = 0;
 
     try {
       // 1. 수정된 파일만 File 객체로 분리
@@ -185,55 +213,128 @@ const TeamEditPage = () => {
       const demoFile = editData.demoVideo instanceof File ? editData.demoVideo : null;
       const posterFile = editData.posterImage instanceof File ? editData.posterImage : null;
 
-      console.log("teamProfileFile =", teamProfileFile ? `${teamProfileFile.name} (${teamProfileFile.type})` : "null");
-      console.log("demoFile =", demoFile ? `${demoFile.name} (${demoFile.type})` : "null");
-      console.log("posterFile =", posterFile ? `${posterFile.name} (${posterFile.type})` : "null");
+      if (teamProfileFile) totalBytesRef.current += teamProfileFile.size;
+      if (posterFile) totalBytesRef.current += posterFile.size;
+      if (demoFile) totalBytesRef.current += demoFile.size;
 
-      // 2. presigned 요청용 정보 생성
-      const mimeToExt = (mime: string): string => {
-        const map: Record<string, string> = {
-          "video/x-matroska": "mkv",
-          "video/mp4": "mp4",
-          "video/x-msvideo": "avi",
-          "image/jpeg": "jpg",
-          "image/png": "png",
-        };
-        return map[mime] || "unsupported";
-      };
+      // console.log("teamProfileFile =", teamProfileFile ? `${teamProfileFile.name} (${teamProfileFile.type})` : "null");
+      // console.log("demoFile =", demoFile ? `${demoFile.name} (${demoFile.type})` : "null");
+      // console.log("posterFile =", posterFile ? `${posterFile.name} (${posterFile.type})` : "null");
 
-      const fileInfos = [];
-      if (teamProfileFile)
-        fileInfos.push({
+      const imageInfos = [];
+      if (teamProfileFile) {
+        imageInfos.push({
           fileType: "TEAM_PROFILE" as const,
           contentType: teamProfileFile.type,
           extension: mimeToExt(teamProfileFile.type),
         });
-      if (demoFile) fileInfos.push({ fileType: "DEMO" as const, contentType: demoFile.type, extension: mimeToExt(demoFile.type) });
-      if (posterFile)
-        fileInfos.push({
+      }
+      if (posterFile) {
+        imageInfos.push({
           fileType: "POSTER" as const,
           contentType: posterFile.type,
           extension: mimeToExt(posterFile.type),
         });
+      }
 
-      // 3. presigned URL 요청
-      const presignedUrls = fileInfos.length ? await getPresignedUrlTeamPost({ teamUuid: team_uuid, fileInfos }) : [];
-      const uploadedMap = new Map(presignedUrls.map((u) => [u.fileType, u.cloudFrontUrl]));
-      console.log("📦 presignedUrls =", JSON.stringify(presignedUrls, null, 4));
-      console.log("📦 uploadedMap =", Object.fromEntries(uploadedMap));
+      const videoInfo = {
+        fileType: "NONE",
+        contentType: "",
+        extension: "",
+        fileSize: 0,
+        partSize: 0,
+      };
 
-      // 4. 실제 S3 업로드
+      if (demoFile) {
+        videoInfo.fileType = "DEMO";
+        videoInfo.contentType = demoFile.type;
+        videoInfo.extension = mimeToExt(demoFile.type);
+        videoInfo.fileSize = demoFile.size;
+        videoInfo.partSize = 10 * 1024 * 1024; // 10MB 단위 (예시)
+      }
+
+      const requestData: IPresignedUrlTeamPostRequest = {
+        teamUuid: team_uuid,
+        imageInfos,
+        videoInfo,
+      };
+      // const requestData: IPresignedUrlTeamPostRequest = {
+      //   teamUuid: team_uuid,
+      //   ...(imageInfos.length > 0 && { imageInfos }),
+      //   ...(videoInfo && { videoInfo }),
+      // };
+
+      // console.log("📦 requestData =", JSON.stringify(requestData, null, 4));
+
+      const presignedUrls = await getPresignedUrlTeamPost(requestData);
+
+      // 결과 분기
+      const videoUploadInfo = presignedUrls.video;
+      const imageUploadInfos = presignedUrls.images ?? [];
+
+      // cloudFrontUrl 매핑용
+      const uploadedMap = new Map<string, string>();
+      imageUploadInfos.forEach((item) => uploadedMap.set(item.fileType, item.cloudFrontUrl));
+      if (videoUploadInfo) uploadedMap.set("DEMO", videoUploadInfo.cloudFrontUrl);
+
+      // 4.1 실제 S3 업로드 - 영상 (멀티파트 방식)
+      if (videoUploadInfo && demoFile) {
+        const uploadParts = videoUploadInfo?.s3Urls as { partNumber: number; url: string }[];
+        // console.log("📦 uploadParts =", JSON.stringify(uploadParts, null, 4));
+
+        const partETags = await Promise.all(
+          uploadParts.map(async ({ partNumber, url }) => {
+            const start = (partNumber - 1) * videoInfo!.partSize;
+            const end = Math.min(start + videoInfo!.partSize, demoFile.size);
+            const blob = demoFile.slice(start, end);
+
+            const res = await uploadWithProgress(url, blob);
+            const rawETag = res?.headers?.etag || res?.headers?.ETag;
+            // const response = await axios.put(url, blob, {
+            //   headers: { "Content-Type": demoFile.type },
+            //   // ✅ 상태 업데이트
+            //   onUploadProgress: (event) => {
+            //     const percent = Math.round((event.loaded / event.total!) * 100);
+            //     setProgress(percent); // ✅ 상태 업데이트
+            //   },
+            // });
+            // // console.log(JSON.stringify(response, null, 4));
+
+            // const rawETag = response.headers["etag"] || response.headers["ETag"];
+
+            return {
+              partNumber,
+              eTag: rawETag.replace(/"/g, ""),
+            };
+          })
+        );
+
+        // console.log("📦 partETags =", JSON.stringify(partETags, null, 4));
+
+        await postMultipartComplete({
+          key: videoUploadInfo.key,
+          uploadId: videoUploadInfo.uploadId,
+          parts: partETags,
+        });
+      }
+
+      // 4.2 실제 S3 업로드 - 이미지 (단일 PUT 방식)
       await Promise.all(
-        presignedUrls.map(async (item) => {
+        imageUploadInfos.map(async (item) => {
           let file: File | null = null;
           if (item.fileType === "TEAM_PROFILE") file = teamProfileFile;
-          if (item.fileType === "DEMO") file = demoFile;
           if (item.fileType === "POSTER") file = posterFile;
 
           if (file) {
-            await axios.put(item.s3Url, file, {
-              headers: { "Content-Type": file.type, "x-amz-meta-content-type": file.type },
-            });
+            await uploadWithProgress(item.s3Url, file);
+            // await axios.put(item.s3Url, file, {
+            //   headers: { "Content-Type": file.type },
+            //   // ✅ 상태 업데이트
+            //   onUploadProgress: (event) => {
+            //     const percent = Math.round((event.loaded / event.total!) * 100);
+            //     setProgress(percent);
+            //   },
+            // });
           }
         })
       );
@@ -247,37 +348,34 @@ const TeamEditPage = () => {
 
       // teamProfileImage
       if (uploadedMap.has("TEAM_PROFILE")) {
-        // 새로 올린 이미지
-        console.log("111111111111111111" + uploadedMap.get("TEAM_PROFILE"));
         formData.append("teamProfileImage", uploadedMap.get("TEAM_PROFILE")!);
       } else if (typeof editData.teamProfileImage === "string") {
-        // 기존 이미지 유지
-        console.log("222222222");
-
         formData.append("teamProfileImage", editData.teamProfileImage);
       } else {
-        // 이미지 없음
-        console.log("2333333333333333333333333333");
-
         formData.append("teamProfileImage", "");
       }
-
-      formData.append("teamProfileImageOperation", "UPLOAD");
+      formData.append("teamProfileImageOperation", editData.teamProfileImage === "" ? "DELETE" : "UPLOAD");
 
       // demoVideo
-      formData.append("demoVideo", uploadedMap.get("DEMO") ?? (typeof editData.demoVideo === "string" ? editData.demoVideo : ""));
-      formData.append("demoVideoOperation", "UPLOAD");
+      formData.append(
+        "demoVideo",
+        uploadedMap.get("DEMO") ?? (typeof editData.demoVideo === "string" ? editData.demoVideo : "")
+      );
+      formData.append("demoVideoOperation", editData.demoVideo === "" ? "DELETE" : "UPLOAD");
 
       // posterImage
-      formData.append("posterImage", uploadedMap.get("POSTER") ?? (typeof editData.posterImage === "string" ? editData.posterImage : ""));
-      formData.append("posterImageOperation", "UPLOAD");
+      formData.append(
+        "posterImage",
+        uploadedMap.get("POSTER") ?? (typeof editData.posterImage === "string" ? editData.posterImage : "")
+      );
+      formData.append("posterImageOperation", editData.posterImage === "" ? "DELETE" : "UPLOAD");
 
       // 테스트용
-      formData.append("teamProfileImagePath", `/teamPost/${team_uuid}/teamProfile`);
-      formData.append("demoVideoPath", `/teamPost/${team_uuid}/demo`);
-      formData.append("posterImagePath", `/teamPost/${team_uuid}/poster`);
+      // formData.append("teamProfileImagePath", `/teamPost/${team_uuid}/teamProfile_`);
+      // formData.append("demoVideoPath", `/teamPost/${team_uuid}/demo_`);
+      // formData.append("posterImagePath", `/teamPost/${team_uuid}/poster_`);
 
-      // formData.forEach((v, k) => console.log(`[formData] ${k}:`, v));
+      // formData.forEach((v, k) => // console.log(`[formData] ${k}:`, v));
 
       // 6. 서버 요청
       const teamPostResponse = await putTeampost(formData);
@@ -298,59 +396,50 @@ const TeamEditPage = () => {
           studentFormData.append("studentBlog", student.studentBlog);
           studentFormData.append("studentEmail", student.studentEmail);
 
-          if (student.profileImage.startsWith("blob:")) {
-            const originalUrl = originalStudents.find((s) => s.encryptedStudentProfileId === student.encryptedStudentProfileId)?.profileImage;
+          if (student.profileImage === "") {
+            studentFormData.append("profileImage", "");
+            studentFormData.append("profileImageOperation", "DELETE");
+          } else if (student.profileImage.startsWith("blob:")) {
+            const originalUrl = originalStudents.find(
+              (s) => s.encryptedStudentProfileId === student.encryptedStudentProfileId
+            )?.profileImage;
             const fallbackFilename = extractFilenameFromUrl(originalUrl || "", "profile.jpg");
             const file = await urlToFile(student.profileImage, fallbackFilename);
             const { s3Url, cloudFrontUrl } = await getPresignedUrlStudent({
               encryptedStudentId: student.encryptedStudentProfileId,
               fileType: "STUDENT_PROFILE",
               contentType: file.type,
-              extension: file.type,
+              extension: mimeToExt(file.type),
             });
 
-            await axios.put(s3Url, file, {
-              headers: { "Content-Type": file.type, "x-amz-meta-content-type": file.type },
-            });
+            await uploadWithProgress(s3Url, file);
+            // await axios.put(s3Url, file, {
+            //   headers: { "Content-Type": file.type },
+            //   onUploadProgress: (event) => {
+            //     // ✅ 상태 업데이트
+            //     const percent = Math.round((event.loaded / event.total!) * 100);
+            //     setProgress(percent);
+            //   },
+            // });
 
             studentFormData.append("profileImage", cloudFrontUrl);
             studentFormData.append("profileImageOperation", "UPLOAD");
           }
 
-          return putTeamStudent(studentFormData);
+          // studentFormData.forEach((v, k) => // console.log(`[studentFormData] ${k}:`, v));
+
+          await putTeamStudent(studentFormData);
         })
       );
 
       // 8. 완료 처리
-      // if (teamPostResponse) {
-      //   setIsDirty(false);
-      //   notifySuccess("저장되었습니다.");
-      //   // navigate(-1);
-      //   console.log(`/${year}/project/${team_uuid}`);
-      //   navigate(`/${year}/project/${team_uuid}`);
-      // }
-      // 저장 성공 후 navigate 최적화
       if (teamPostResponse) {
         setIsDirty(false);
         notifySuccess("저장되었습니다.");
-
-        if (!year || !team_uuid) {
-          console.error("🚨 navigate 실패: year 또는 team_uuid가 undefined", { year, team_uuid });
-          return;
-        }
-
-        const targetUrl = `/${year}/project/${team_uuid}?refresh=${Date.now()}`;
-        console.log("✅ navigating to:", targetUrl);
-
-        // React state 업데이트 이후 약간의 여유를 두고 navigate
-        setTimeout(() => {
-          navigate(targetUrl);
-        }, 0);
-      } else {
-        throw new Error("팀 게시글 저장 실패");
+        navigate(-1);
       }
     } catch (error: unknown) {
-      console.error("[오류 발생]", error);
+      // console.error("[오류 발생]", error);
       notifyError("저장에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       loadingStop();
@@ -366,7 +455,13 @@ const TeamEditPage = () => {
       <TeamIntro>
         {/* 제목 및 카테고리 */}
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <EditableTitle type="text" name="title" value={editData.title} onChange={handleInputChange} placeholder="PROJECT TITLE" />
+          <EditableTitle
+            type="text"
+            name="title"
+            value={editData.title}
+            onChange={handleInputChange}
+            placeholder="PROJECT TITLE"
+          />
           <CategorySelect name="category" value={editData.category} onChange={handleSelectChange}>
             <option value="WEB">WEB</option>
             <option value="MOBILE">MOBILE</option>
@@ -377,17 +472,21 @@ const TeamEditPage = () => {
         {/* 팀 프로필 이미지 */}
         <div style={{ gridRow: "span 2" }}>
           <ImageWrapper onClick={() => document.getElementById("teamProfileInput")?.click()}>
-            <TeamProfile
-              src={
-                editData.teamProfileImage
-                  ? typeof editData.teamProfileImage === "string"
-                    ? editData.teamProfileImage
-                    : URL.createObjectURL(editData.teamProfileImage)
-                  : empty
-              }
-              alt="Team Profile"
-            />
-            <Overlay className="overlay">Team Profile</Overlay>
+            {editData.teamProfileImage ? (
+              <>
+                <TeamProfile
+                  src={
+                    typeof editData.teamProfileImage === "string"
+                      ? editData.teamProfileImage
+                      : URL.createObjectURL(editData.teamProfileImage)
+                  }
+                  alt="Team Profile"
+                />
+                <Overlay className="overlay">Team Profile</Overlay>
+              </>
+            ) : (
+              <SquareMediaButton>+</SquareMediaButton>
+            )}
           </ImageWrapper>
           <FileInput
             id="teamProfileInput"
@@ -398,6 +497,16 @@ const TeamEditPage = () => {
             style={{ display: "none" }}
           />
           <FileFormatNotice>* jpg, png 형식만 업로드 가능합니다.</FileFormatNotice>
+          {editData.teamProfileImage && (
+            <DeleteSqButton
+              onClick={() => {
+                setEditData((prev) => ({ ...prev, teamProfileImage: "" }));
+                setIsDirty(true);
+              }}
+            >
+              프로필 삭제
+            </DeleteSqButton>
+          )}
         </div>
 
         {/* 팀 내용 */}
@@ -427,33 +536,71 @@ const TeamEditPage = () => {
             </StudentItem>
           ))}
       </StudentList>
-      <Modal>{selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}</Modal>
+      <Modal>
+        {selectedStudent && <Profile selectedStudent={selectedStudent} teamUuid={team_uuid} onSave={updateStudent} />}
+      </Modal>
+      {/* 데모 영상 */}
       <div>
         <SectionTitle>Project Video</SectionTitle>
-        <FileFormatNotice>* mkv, mp4, avi 형식만 업로드 가능합니다.</FileFormatNotice>
+        <FileFormatNotice>* mkv, mp4, avi 형식만 업로드 가능합니다.(500MB 이하)</FileFormatNotice>
       </div>
-      <DemoVideoEditor base={editData.demoVideo as string} handleFileChange={handleFileChange} />
+      <DemoVideoEditor
+        base={editData.demoVideo as string}
+        handleFileChange={handleFileChange}
+        onDelete={() => {
+          setEditData((prev) => ({ ...prev, demoVideo: "" }));
+          setIsDirty(true);
+        }}
+      />
+      {/* 포스터 */}
       <div>
         <SectionTitle>Poster</SectionTitle>
         <FileFormatNotice>* jpg, png 형식만 업로드 가능합니다.</FileFormatNotice>
       </div>
       <PosterIntro>
         <ImageWrapper onClick={() => posterInputRef.current?.click()}>
-          <PosterImg
-            src={
-              editData.posterImage
-                ? typeof editData.posterImage === "string"
-                  ? editData.posterImage
-                  : URL.createObjectURL(editData.posterImage)
-                : back_image
-            }
-            alt="Poster"
-          />
-          <Overlay className="overlay">Poster</Overlay>
+          {editData.posterImage ? (
+            <>
+              <PosterImg
+                src={
+                  typeof editData.posterImage === "string"
+                    ? editData.posterImage
+                    : URL.createObjectURL(editData.posterImage)
+                }
+                alt="Poster"
+              />
+              <Overlay className="overlay">Poster</Overlay>
+            </>
+          ) : (
+            <PosterMediaButton>+</PosterMediaButton>
+          )}
         </ImageWrapper>
-        <FileInput ref={posterInputRef} type="file" name="posterImage" accept=".jpg,.png" onChange={handleFileChange} style={{ display: "none" }} />
+        <FileInput
+          ref={posterInputRef}
+          type="file"
+          name="posterImage"
+          accept=".jpg,.png"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
       </PosterIntro>
-      <SaveButton onClick={handleSave}>SAVE</SaveButton> {isLoading && <Spinner />}
+      {editData.posterImage && (
+        <DeleteSqButton
+          onClick={() => {
+            setEditData((prev) => ({ ...prev, posterImage: "" }));
+            setIsDirty(true);
+          }}
+        >
+          포스터 삭제
+        </DeleteSqButton>
+      )}
+      <SaveButton onClick={handleSave}>SAVE</SaveButton>
+      {isLoading && (
+        <>
+          <Spinner progress={progress} />
+        </>
+      )}
+      {/* {isLoading && <Spinner />} */}{" "}
     </Container>
   );
 };

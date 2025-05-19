@@ -59,7 +59,7 @@ const fetchTeamProfile = async (year: string) => {
     const res: string[] = await getTeamProflies(year);
     return res;
   } catch (error) {
-    console.error("Error fetching projects:", error);
+    console.error();
   }
 };
 

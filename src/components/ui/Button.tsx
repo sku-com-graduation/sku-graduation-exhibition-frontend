@@ -34,3 +34,22 @@ export const DeleteButton = styled(motion.button)`
   justify-content: center;
   padding: 0;
 `;
+
+export const DeleteSqButton = styled(motion.button)`
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #ff8585;
+  color: white;
+  font-size: 1rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &:hover {
+    background: #ff6666;
+  }
+`;

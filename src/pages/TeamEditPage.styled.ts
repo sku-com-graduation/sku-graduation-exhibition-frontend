@@ -4,12 +4,38 @@
 
 import styled from "styled-components";
 
+export const AddMediaButton = styled.div`
+  width: 100%;
+  border-radius: 1rem;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+  color: #999;
+  font-size: 2rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #eaeaea;
+  }
+`;
+
+export const SquareMediaButton = styled(AddMediaButton)`
+  aspect-ratio: 1 / 1;
+`;
+
+export const PosterMediaButton = styled(AddMediaButton)`
+  aspect-ratio: 3 / 4; // 세로형 포스터 비율
+`;
+
 export const Container = styled.div`
   width: 100%;
   display: grid;
   grid-template-rows: repeat(5, auto);
   gap: 3rem;
   place-items: center;
+  margin-bottom: 5rem;
 `;
 
 export const SectionTitle = styled.h2`
@@ -80,9 +106,13 @@ export const PosterIntro = styled.div`
 
 export const PosterImg = styled.img`
   width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  border-radius: 1rem;
+  /* width: 100%;
   height: auto;
   object-fit: cover;
-  max-width: 100%;
+  max-width: 100%; */
 `;
 
 export const SaveButton = styled.button`

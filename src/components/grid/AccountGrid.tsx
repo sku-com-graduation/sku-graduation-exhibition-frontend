@@ -35,7 +35,6 @@ const AccountGrid = () => {
         setAccounts(accountData);
       } catch (error) {
         notifyError("데이터 로딩 실패");
-        console.error("데이터 로딩 실패", error);
       } finally {
         setLoading(false);
       }
@@ -59,7 +58,6 @@ const AccountGrid = () => {
       setAccounts((prev) => prev.filter((account) => !selectionModel.includes(account.encryptedAccountId)));
       setSelectionModel([]);
     } catch (error) {
-      console.error("계정 삭제 실패", error);
       notifyError("계정 삭제 실패");
     } finally {
       setLoading(false);
@@ -75,7 +73,6 @@ const AccountGrid = () => {
       const updatedData = await getAccount(selectedYear.toString());
       setAccounts(updatedData);
     } catch (error) {
-      console.error("업로드 실패", error);
       notifyError("업로드 실패, 잠시후 다시 시도해주세요.");
     } finally {
       setLoading(false);

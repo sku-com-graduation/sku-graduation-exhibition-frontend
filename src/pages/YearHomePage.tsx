@@ -172,11 +172,23 @@ const ModernIntroText = styled(motion.p)`
 
 const ModernIntroSection = () => {
   return (
-    <ModernIntroContainer initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 1.2 }}>
-      <ModernIntroTitle initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 1.3 }}>
+    <ModernIntroContainer
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 1.2 }}
+    >
+      <ModernIntroTitle
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 1.3 }}
+      >
         {MODERN_INTRO_TITLE}
       </ModernIntroTitle>
-      <ModernIntroText initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 1.5 }}>
+      <ModernIntroText
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 1.5 }}
+      >
         {MODERN_INTRO_TEXT}
       </ModernIntroText>
     </ModernIntroContainer>
@@ -206,7 +218,7 @@ const YearHomePage = () => {
         console.warn("Unexpected home data:", homeData);
       }
     } catch (error) {
-      console.error("홈 데이터 로딩 실패", error);
+      console.error();
     }
   };
 
@@ -217,11 +229,19 @@ const YearHomePage = () => {
   return (
     <Wrapper>
       <Container>
-        <Title initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3, duration: 0.8 }}>
+        <Title
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+        >
           GRADUATION EXHIBITION
         </Title>
 
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 1 }}>
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
           <VideoCircle
             src={v5}
             autoPlay
@@ -237,7 +257,11 @@ const YearHomePage = () => {
           />
         </motion.div>
 
-        <SubInfo initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5, duration: 0.6 }}>
+        <SubInfo
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+        >
           SUNGKYUL COMPUTER ENGINEERING
           <br />
           {homeInfo?.exhibitionDate}
@@ -257,7 +281,13 @@ const YearHomePage = () => {
 
       <ScrollTextContainer>
         <motion.div style={{ scale, opacity: opacityValue }}>
-          <ScrollText variants={scrollTextVariants} initial="hidden" whileInView="visible" transition={{ duration: 1 }} viewport={{ amount: 0.6 }}>
+          <ScrollText
+            variants={scrollTextVariants}
+            initial="hidden"
+            whileInView="visible"
+            transition={{ duration: 1 }}
+            viewport={{ amount: 0.6 }}
+          >
             PROJECTS
           </ScrollText>
         </motion.div>

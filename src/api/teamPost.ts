@@ -18,7 +18,6 @@ export const putTeampost = async (data: FormData) => {
 
     return result.data;
   } catch (error) {
-    console.error("Error occurred while sending request:", error);
     throw new Error(`${error}`);
   }
 };
