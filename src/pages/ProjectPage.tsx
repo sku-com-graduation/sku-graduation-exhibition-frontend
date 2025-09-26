@@ -8,6 +8,131 @@ import { categories, CategoryType } from "@constant/categorys";
 import i1 from "@assets/image/i2.png";
 import empty from "@assets/image/main_image.png";
 
+const CategoryContainer = styled.div`
+  box-sizing: border-box;
+  padding: 0 5rem 5rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  text-align: center;
+
+  @media (max-width: 1024px) {
+    padding: 0 3rem 3rem;
+    grid-template-columns: repeat(3, 1fr); /* 태블릿에서 3개 */
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 1.5rem 2rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+
+    & > :first-child {
+      grid-column: span 2; /* ALL 버튼 가운데 정렬 */
+    }
+  }
+`;
+
+const Container = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* PC에서 4개 */
+  gap: 5rem;
+  padding: 0 5rem 5rem;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr); /* 태블릿에서 3개 */
+    gap: 3rem;
+    padding: 0 3rem 3rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr); /* 모바일에서 2개 */
+    gap: 1.5rem;
+    padding: 0 1.5rem 2rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; /* 작은 모바일에서는 1개 */
+    gap: 1rem;
+    padding: 0 1rem 1.5rem;
+  }
+`;
+
+const ProjectButton = styled(motion.button)`
+  width: 100%;
+  height: 3rem;
+  padding: 0.5rem 2rem;
+  font-size: 1.2rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7fbfff, #a389f4);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #6faeff, #9279f1);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    height: 2.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+  }
+`;
+
+const Title = styled.div`
+  padding: 5rem 0rem;
+  text-align: center;
+  font-size: 3rem;
+  color: #424242;
+
+  @media (max-width: 1024px) {
+    font-size: 2.5rem;
+    padding: 3rem 0rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    padding: 2rem 0rem;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+    padding: 1.5rem 0rem;
+  }
+`;
+
+const TeamName = styled.div`
+  position: absolute;
+  bottom: -2rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    bottom: -1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    bottom: -1.2rem;
+  }
+`;
+
 const Background = styled.div`
   position: absolute;
   top: 0;
@@ -32,21 +157,55 @@ const Wrapper = styled.div`
   z-index: 1;
 `;
 
-const Container = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-  gap: 5rem;
-  padding: 5rem;
-  box-sizing: border-box;
+// const CategoryContainer = styled.div`
+//   box-sizing: border-box;
+//   padding: 0 5rem 5rem; // <-- Container와 맞춤
+//   display: grid;
+//   grid-template-columns: repeat(5, 1fr);
+//   gap: 1rem;
+//   text-align: center;
 
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: 3rem;
-    padding: 2rem;
-  }
-`;
+//   @media (max-width: 768px) {
+//     padding: 0 2rem;
+//     grid-template-columns: repeat(2, 1fr);
+
+//     & > :first-child {
+//       grid-column: span 2;
+//     }
+//   }
+// `;
+
+// const Container = styled.div`
+//   width: 100%;
+//   min-height: 100vh;
+//   display: grid;
+//   grid-template-columns: repeat(4, 1fr); /* 항상 4개 */
+//   gap: 5rem;
+//   padding: 0 5rem 5rem; // <-- CategoryContainer와 동일
+//   box-sizing: border-box;
+
+//   @media (max-width: 768px) {
+//     grid-template-columns: repeat(2, 1fr);
+//     gap: 3rem;
+//     padding: 0 2rem 2rem;
+//   }
+// `;
+
+// const Container = styled.div`
+//   width: 100%;
+//   min-height: 100vh;
+//   display: grid;
+//   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+//   gap: 5rem;
+//   padding: 5rem;
+//   box-sizing: border-box;
+
+//   @media (max-width: 768px) {
+//     grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+//     gap: 3rem;
+//     padding: 2rem;
+//   }
+// `;
 
 const TeamBox = styled.div`
   box-sizing: border-box;
@@ -98,80 +257,6 @@ const TeamImage = styled.img`
 
   &:hover {
     filter: brightness(50%);
-  }
-`;
-
-const CategoryContainer = styled.div`
-  box-sizing: border-box;
-  padding: 0rem 10rem 5rem;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    padding: 0 2rem;
-    grid-template-columns: repeat(2, 1fr);
-
-    & > :first-child {
-      grid-column: span 2;
-    }
-  }
-`;
-
-const ProjectButton = styled(motion.button)`
-  width: 100%;
-  height: 3rem;
-  padding: 0.5rem 2rem;
-  font-size: 1.2rem;
-  color: #ffffff;
-  background: linear-gradient(135deg, #7fbfff, #a389f4);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #6faeff, #9279f1);
-  }
-
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 0.8rem 1.5rem;
-  }
-`;
-
-const Title = styled.div`
-  padding: 5rem 0rem;
-  text-align: center;
-  font-size: 3rem;
-  color: #424242;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-    padding: 2rem 0rem;
-    margin-top: 5rem;
-  }
-`;
-
-const TeamName = styled.div`
-  position: absolute;
-  bottom: -2rem;
-  width: 100%;
-  text-align: center;
-  font-size: 1.2rem;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    bottom: -2rem;
   }
 `;
 

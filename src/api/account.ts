@@ -1,8 +1,9 @@
+import { IAccountRequest } from "src/interface/IAccount";
 import api from ".";
-import { IAccountResponse, IAccountRequest, IAccountSetInfo } from "@interface";
+import { IAccountResponse, IAccountSetInfo } from "@interface";
 
 /** 계정 및 팀 정보 등록 API*/
-export const postAccounts = async (data: IAccountRequest[]) => {
+export const postAccounts = async (data: IAccountRequest) => {
   try {
     const result = await api.post(`/admin/account/regist`, data);
     return result.data;

@@ -11,11 +11,16 @@ export interface IAccountRequestStudentInfo {
   studentEmail: string;
 }
 
-export interface IAccountRequest {
+export interface IAccountTeamRequest {
   teamName: string;
   category: string;
   professorName: string;
   studentInfos: IAccountRequestStudentInfo[];
+}
+
+export interface IAccountRequest {
+  year: number;
+  registerAccounts: IAccountTeamRequest[];
 }
 
 export interface IAccountSetInfo {

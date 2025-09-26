@@ -3,12 +3,13 @@ import styled from "styled-components";
 import { Box, Button, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Add as AddIcon, Delete as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
-import { IAccountResponse, IAccountRequest } from "@interface";
+import { IAccountResponse } from "@interface";
 import { deleteAccount, getAccount, postAccounts } from "@api/account";
 import { getYearRange } from "@utils/year";
 import { useToast } from "@hooks";
 import style from "@style";
 import AccountCSVUploader from "@components/csv/AccountCSVUploader";
+import { IAccountRequest } from "src/interface/IAccount";
 
 const EditToolbar = () => (
   <GridToolbarContainer>
@@ -64,7 +65,7 @@ const AccountGrid = () => {
     }
   };
 
-  const handleFileParsed = async (parsed: IAccountRequest[]) => {
+  const handleFileParsed = async (parsed: IAccountRequest) => {
     setLoading(true);
     try {
       await postAccounts(parsed);

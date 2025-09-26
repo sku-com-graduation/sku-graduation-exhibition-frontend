@@ -1,6 +1,6 @@
 export type { IAuth } from "./IAuth";
 export type { TAdminMenu } from "./IAdmin";
-export type { IAccountResponse, IAccountRequest, IAccountRequestStudentInfo, IAccountSetInfo } from "./IAccount";
+export type { IAccountResponse, IAccountTeamRequest, IAccountRequestStudentInfo, IAccountSetInfo } from "./IAccount";
 export type { IProfessor } from "./IProfessor";
 export type { IProject } from "./IProject";
 export type { IStudentResponseInfo, IStudentResponseTeamInfo, IStudentResponse, IStudentRequest } from "./IStudent";

@@ -41,7 +41,7 @@ export const TeamIntro = styled.div`
   grid-template-columns: 1.5fr 1fr;
   grid-template-rows: auto 1fr;
   gap: 2rem;
-  padding: 4rem;
+  padding: 4rem 8rem;
   box-sizing: border-box;
   border-radius: 1rem;
   background-color: #f9f9f9;
@@ -105,7 +105,7 @@ export const TeamProfile = styled.img`
 
 export const VideoIntro = styled.div`
   width: 100%;
-  max-width: 80rem;
+  max-width: 60rem;
   overflow: hidden;
   padding: 1rem;
 `;
