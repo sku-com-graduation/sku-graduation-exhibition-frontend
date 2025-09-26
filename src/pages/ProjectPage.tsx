@@ -49,14 +49,14 @@ const Container = styled.div`
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr); /* 모바일에서 2개 */
-    gap: 1.5rem;
-    padding: 0 1.5rem 2rem;
+    gap: 2rem; /* 간격 ↑ */
+    padding: 0 2rem 2.5rem; /* 좌우 여백도 조금 넉넉하게 */
   }
 
   @media (max-width: 480px) {
-    grid-template-columns: 1fr; /* 작은 모바일에서는 1개 */
-    gap: 1rem;
-    padding: 0 1rem 1.5rem;
+    grid-template-columns: repeat(2, 1fr); /* 작은 모바일도 2개 */
+    gap: 1.5rem; /* 1 → 1.5rem로 증가 */
+    padding: 0 1.5rem 2rem;
   }
 `;
 
