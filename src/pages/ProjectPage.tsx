@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { getProjects } from "@api/team";
 import { IProject } from "@interface";
 import { categories, CategoryType } from "@constant/categorys";
-import i1 from "@assets/image/i2.png";
+// import i1 from "@assets/image/i2.png";
 import empty from "@assets/image/main_image.png";
 
 const CategoryContainer = styled.div`
@@ -139,7 +139,6 @@ const Background = styled.div`
   right: 0;
   width: 50vw;
   height: 100vh;
-  background-image: url(${i1});
   background-size: contain;
   background-repeat: no-repeat;
   background-position: right center;
@@ -157,56 +156,6 @@ const Wrapper = styled.div`
   z-index: 1;
 `;
 
-// const CategoryContainer = styled.div`
-//   box-sizing: border-box;
-//   padding: 0 5rem 5rem; // <-- Container와 맞춤
-//   display: grid;
-//   grid-template-columns: repeat(5, 1fr);
-//   gap: 1rem;
-//   text-align: center;
-
-//   @media (max-width: 768px) {
-//     padding: 0 2rem;
-//     grid-template-columns: repeat(2, 1fr);
-
-//     & > :first-child {
-//       grid-column: span 2;
-//     }
-//   }
-// `;
-
-// const Container = styled.div`
-//   width: 100%;
-//   min-height: 100vh;
-//   display: grid;
-//   grid-template-columns: repeat(4, 1fr); /* 항상 4개 */
-//   gap: 5rem;
-//   padding: 0 5rem 5rem; // <-- CategoryContainer와 동일
-//   box-sizing: border-box;
-
-//   @media (max-width: 768px) {
-//     grid-template-columns: repeat(2, 1fr);
-//     gap: 3rem;
-//     padding: 0 2rem 2rem;
-//   }
-// `;
-
-// const Container = styled.div`
-//   width: 100%;
-//   min-height: 100vh;
-//   display: grid;
-//   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-//   gap: 5rem;
-//   padding: 5rem;
-//   box-sizing: border-box;
-
-//   @media (max-width: 768px) {
-//     grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-//     gap: 3rem;
-//     padding: 2rem;
-//   }
-// `;
-
 const TeamBox = styled.div`
   box-sizing: border-box;
   width: 100%;
@@ -214,9 +163,11 @@ const TeamBox = styled.div`
   position: relative;
   flex-direction: column;
   align-items: center;
+  border-radius: 0.5rem;
 
   &:hover .overlay {
     opacity: 1;
+    border-radius: 0.5rem;
   }
 `;
 
@@ -233,6 +184,7 @@ const Overlay = styled.div`
   justify-content: center;
   transition: opacity 0.3s ease-in-out;
   pointer-events: none;
+  border-radius: 0.5rem;
 `;
 
 const OverlayText = styled.h3`
@@ -240,6 +192,9 @@ const OverlayText = styled.h3`
   text-align: center;
   padding: 0.5rem 1rem;
   border-radius: 10px;
+
+  word-break: keep-all; /* 단어 단위로 줄바꿈 (한글/영문 모두 적용) */
+  overflow-wrap: break-word; /* 긴 단어는 줄바꿈 허용 */
 
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -254,6 +209,8 @@ const TeamImage = styled.img`
   height: 100%;
   object-fit: cover;
   transition: filter 0.3s ease-in-out;
+  border-radius: 0.5rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
 
   &:hover {
     filter: brightness(50%);

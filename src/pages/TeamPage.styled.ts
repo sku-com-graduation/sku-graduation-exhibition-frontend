@@ -23,6 +23,11 @@ export const Container = styled.div`
   gap: 3rem;
   place-items: center;
   padding-top: 5rem;
+  box-sizing: border-box;
+
+  /* 좌우 스크롤 방지 */
+  max-width: 100vw;
+  overflow-x: hidden;
 `;
 
 export const SectionTitle = styled.h2`
@@ -41,7 +46,7 @@ export const TeamIntro = styled.div`
   grid-template-columns: 1.5fr 1fr;
   grid-template-rows: auto 1fr;
   gap: 2rem;
-  padding: 4rem 8rem;
+  padding: 4rem 8rem; /* ← 여기 padding이 모바일에서 문제 */
   box-sizing: border-box;
   border-radius: 1rem;
   background-color: #f9f9f9;
@@ -50,7 +55,7 @@ export const TeamIntro = styled.div`
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
-    padding: 2rem;
+    padding: 1.5rem; /* ✅ 모바일에서는 padding 줄여줌 */
   }
 `;
 
@@ -141,6 +146,8 @@ export const PosterIntro = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
+    max-width: 100%; /* ✅ 모바일 꽉차게 */
+    overflow-x: hidden;
   }
 `;
 
@@ -242,6 +249,10 @@ export const TocWrapper = styled.ul`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-size: 0.85rem;
   z-index: 1000;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const TocItem = styled.li<{ active: boolean }>`
