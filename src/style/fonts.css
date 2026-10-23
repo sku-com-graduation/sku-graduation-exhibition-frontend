@@ -1,0 +1,6 @@
+/* 한글 글꼴은 글자 묶음별로 나뉘어 있어 선언만 수백 KB다. main.tsx에서 비동기로 불러와 첫 화면 렌더링을 막지 않는다. */
+@import "@fontsource/ibm-plex-sans-kr/300.css";
+@import "@fontsource/ibm-plex-sans-kr/400.css";
+@import "@fontsource/ibm-plex-sans-kr/500.css";
+@import "@fontsource/ibm-plex-sans-kr/600.css";
+@import "@fontsource/ibm-plex-sans-kr/700.css";

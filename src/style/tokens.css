@@ -1,0 +1,41 @@
+/* 디자인 캔버스 00 디자인 시스템의 토큰. 연도 강조색(--accent, --soft)은 화면에서 연도에 맞춰 덮어쓴다. */
+:root {
+  --ink: #0e0f12;
+  --ink-2: #3a3f48;
+  --muted: #5b6170;
+  --faint: #8a8f99;
+  --line: #e2e4e8;
+  --line-strong: #c9cdd4;
+  --surface: #f3f4f6;
+  --surface-2: #f7f8fa;
+  --paper: #ffffff;
+  --danger: #b42318;
+  --danger-soft: #fef3f2;
+  --ok: #0b7a5c;
+
+  --accent: #1f45fc;
+  --soft: #e8ecff;
+
+  --font-sans: "IBM Plex Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  --radius: 2px;
+  --container: 1360px;
+  --gutter: clamp(16px, 3vw, 40px);
+  --header-h: 60px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-micro: 200ms;
+  --dur-hover: 350ms;
+  --dur-media: 600ms;
+  --dur-reveal: 700ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 0ms;
+    --dur-hover: 0ms;
+    --dur-media: 0ms;
+    --dur-reveal: 0ms;
+  }
+}

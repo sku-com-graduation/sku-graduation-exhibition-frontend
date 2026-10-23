@@ -26,6 +26,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
+      "@src/*": ["src/*"],
       "@api/*": ["src/api/*"],
       "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"],

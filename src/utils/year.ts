@@ -1,6 +1,3 @@
-import { START_YEAR } from "@constant/years";
+import { getExhibitionYears } from "@src/lib/exhibition";
 
-export const getYearRange = (): number[] => {
-  const currentYear = new Date().getFullYear();
-  return Array.from({ length: currentYear - START_YEAR + 1 }, (_, i) => currentYear - i);
-};
+export const getYearRange = (): number[] => getExhibitionYears();
