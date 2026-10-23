@@ -6,9 +6,11 @@ import styles from "./YearSelect.module.css";
 interface YearSelectProps {
   value: number;
   onChange: (year: number) => void;
+  /** 목록을 버튼 왼쪽 끝에 맞출지(사이드바) 오른쪽 끝에 맞출지(헤더) */
+  align?: "left" | "right";
 }
 
-export const YearSelect = ({ value, onChange }: YearSelectProps) => {
+export const YearSelect = ({ value, onChange, align = "right" }: YearSelectProps) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listId = useId();
@@ -47,7 +49,7 @@ export const YearSelect = ({ value, onChange }: YearSelectProps) => {
         <Icon name="chevronDown" size={14} strokeWidth={2} className={styles.chevron} />
       </button>
       {open && (
-        <ul className={styles.list} id={listId} aria-label="전시 연도">
+        <ul className={styles.list} data-align={align} id={listId} aria-label="전시 연도">
           {years.map((y) => (
             <li key={y}>
               <button

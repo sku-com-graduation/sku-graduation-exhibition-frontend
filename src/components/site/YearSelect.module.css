@@ -67,6 +67,12 @@
   }
 }
 
+.list[data-align="left"] {
+  right: auto;
+  left: 0;
+  transform-origin: top left;
+}
+
 .option {
   width: 100%;
   display: flex;
