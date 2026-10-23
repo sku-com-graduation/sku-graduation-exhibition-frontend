@@ -35,20 +35,9 @@ const TEAMS: [string, string, string][] = [
   ["드론가드", "캠퍼스 순찰 드론", "정해진 경로를 자율 비행하며 이상 상황을 감지하는 드론 시스템입니다."],
 ];
 
-const HUES = [222, 12, 268, 160, 190, 330, 40, 248];
-
-/** 예시용 그림. 외부 파일 없이 SVG로 만든다 */
-const art = (i: number, w: number, h: number, label = "") => {
-  const a = HUES[i % HUES.length];
-  const b = (a + 40) % 360;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${a} 70% 55%)"/><stop offset="1" stop-color="hsl(${b} 65% 35%)"/></linearGradient></defs>
-<rect width="${w}" height="${h}" fill="url(#g)"/>
-<circle cx="${w * (0.25 + (i % 3) * 0.2)}" cy="${h * 0.4}" r="${Math.min(w, h) * 0.28}" fill="rgba(255,255,255,.18)"/>
-<rect x="${w * 0.12}" y="${h * 0.62}" width="${w * 0.76}" height="${h * 0.16}" rx="6" fill="rgba(255,255,255,.22)"/>
-<text x="${w * 0.08}" y="${h * 0.16}" font-family="sans-serif" font-size="${Math.round(Math.min(w, h) * 0.07)}" font-weight="700" fill="#fff">${label}</text></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-};
+/** 예시 이미지는 넣지 않는다. 화면은 이미지가 없을 때의 기본 디자인으로 보인다 */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const art = (..._args: unknown[]): string => "";
 
 const name = (n: number) => FAMILY[n % FAMILY.length] + GIVEN[(n * 7) % GIVEN.length];
 
