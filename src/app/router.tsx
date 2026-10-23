@@ -16,7 +16,7 @@ const routes: RouteObject[] = [
     children: [
       { index: true, lazy: page(() => import("@src/pages/HomePage")) },
       { path: "project", lazy: page(() => import("@src/pages/WorksPage")) },
-      { path: "project/:team_uuid", lazy: page(() => import("@src/pages/TeamPage")) },
+      { path: "project/:team_uuid", lazy: page(() => import("@src/pages/WorkDetailPage")) },
       {
         path: "project/:team_uuid/edit",
         lazy: async () => {
