@@ -1,0 +1,385 @@
+.page {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 32px clamp(16px, 6vw, 96px) 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.state {
+  max-width: var(--container);
+  min-height: 60vh;
+  margin: 0 auto;
+  padding: 120px var(--gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.state h1 {
+  margin: 0;
+  font-size: clamp(28px, 3.4vw, 40px);
+  letter-spacing: -0.03em;
+}
+
+.state p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.topbar {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.back {
+  height: 40px;
+  margin-left: -12px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition:
+    background-color var(--dur-micro),
+    color var(--dur-micro);
+}
+
+.back:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.head {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kicker {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.titleField {
+  display: block;
+}
+
+.title {
+  width: 100%;
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px dashed var(--line-strong);
+  background: transparent;
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  transition: border-color var(--dur-micro);
+}
+
+.title:hover {
+  border-bottom-color: var(--muted);
+}
+
+.title:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.title::placeholder {
+  color: var(--line-strong);
+}
+
+.body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 48px;
+}
+
+.main {
+  flex: 999 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.aside {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+@media (min-width: 1000px) {
+  .aside {
+    position: sticky;
+    top: calc(var(--header-h) + 24px);
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section h2,
+.members h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.count[data-full] {
+  color: var(--danger);
+}
+
+.segments {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.segments button {
+  height: 44px;
+  min-width: 88px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--paper);
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro),
+    color var(--dur-micro);
+}
+
+.segments button + button {
+  border-left: 1px solid var(--ink);
+}
+
+.segments button:hover {
+  background: var(--surface);
+}
+
+.segments button[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.posterBox {
+  max-width: 420px;
+}
+
+.videoError {
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--ink);
+  color: var(--line-strong);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 팀원 */
+
+.members {
+  padding-top: 32px;
+  border-top: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.memberGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.member {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-micro),
+    box-shadow var(--dur-micro);
+}
+
+.member:hover {
+  border-color: var(--ink);
+}
+
+.member[data-changed] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--soft);
+}
+
+.memberImage {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.memberImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.memberName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+}
+
+.badge {
+  height: 22px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.memberInfo {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.memberEdit {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.member:hover .memberEdit,
+.member[data-changed] .memberEdit {
+  color: var(--accent);
+}
+
+/* 팀원 수정 창 */
+
+.studentForm {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.studentFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 저장 진행 */
+
+.progress {
+  height: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transition: transform 200ms linear;
+}
+
+.progressText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .page {
+    gap: 28px;
+  }
+
+  .segments {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-self: stretch;
+  }
+
+  .segments button {
+    min-width: 0;
+  }
+
+  .segments button:nth-child(3) {
+    border-left: 0;
+  }
+
+  .segments button:nth-child(n + 3) {
+    border-top: 1px solid var(--ink);
+  }
+
+  .memberGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .studentForm {
+    grid-template-columns: 1fr;
+  }
+
+  .studentPhoto {
+    max-width: 180px;
+  }
+}

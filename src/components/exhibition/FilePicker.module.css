@@ -1,0 +1,108 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zone {
+  position: relative;
+  overflow: hidden;
+  border: 1px dashed var(--line-strong);
+  background: var(--surface-2);
+  transition:
+    border-color var(--dur-micro),
+    background-color var(--dur-micro);
+}
+
+.zone[data-filled] {
+  border-style: solid;
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.zone[data-over] {
+  border-color: var(--accent);
+  background: var(--soft);
+}
+
+.zone > img,
+.zone > video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.zone > video {
+  object-fit: contain;
+  background: var(--ink);
+}
+
+.empty {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.empty:hover {
+  color: var(--accent);
+}
+
+.empty small {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.action {
+  height: 32px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-micro),
+    background-color var(--dur-micro),
+    color var(--dur-micro);
+}
+
+.action:hover {
+  border-color: var(--ink);
+}
+
+.danger:hover {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--paper);
+}
