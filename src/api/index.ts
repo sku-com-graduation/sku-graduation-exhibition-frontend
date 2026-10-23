@@ -16,6 +16,11 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// 디자인 공유용 데모 빌드(npm run build:demo)에서는 서버 대신 예시 데이터로 답한다
+if (import.meta.env.VITE_DEMO === "1") {
+  api.defaults.adapter = async (config) => (await import("@src/demo/demoAdapter")).demoAdapter(config);
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
