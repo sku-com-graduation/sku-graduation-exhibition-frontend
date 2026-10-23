@@ -1,6 +1,7 @@
 import axios from "axios";
 import { clearAuth } from "@store/reducers/auth";
 import store from "@store/store";
+import { getCurrentYear } from "@src/lib/exhibition";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT;
@@ -21,7 +22,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       alert("로그인이 만료되었습니다.");
       store.dispatch(clearAuth());
-      window.location.href = `/${new Date().getFullYear()}`;
+      window.location.href = `/${getCurrentYear()}`;
     }
     return Promise.reject(error);
   }
