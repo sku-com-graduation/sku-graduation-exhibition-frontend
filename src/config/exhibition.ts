@@ -30,7 +30,11 @@ export interface ExhibitionConfig {
 const EXHIBITIONS: Record<number, ExhibitionConfig> = {
   2026: {
     makers: {
-      people: [],
+      people: [
+        { name: "염혜라", role: "프론트엔드 · 디자인", github: "https://github.com/Yeomhyera" },
+        { name: "이준서", role: "백엔드 · 인프라", github: "https://github.com/juns0720" },
+        { name: "Yithian01", role: "백엔드", github: "https://github.com/Yithian01" },
+      ],
     },
   },
 };
