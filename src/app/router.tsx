@@ -15,7 +15,7 @@ const routes: RouteObject[] = [
     hydrateFallbackElement: <div aria-busy="true" style={{ minHeight: "100vh" }} />,
     children: [
       { index: true, lazy: page(() => import("@src/pages/HomePage")) },
-      { path: "project", lazy: page(() => import("@src/pages/ProjectPage")) },
+      { path: "project", lazy: page(() => import("@src/pages/WorksPage")) },
       { path: "project/:team_uuid", lazy: page(() => import("@src/pages/TeamPage")) },
       {
         path: "project/:team_uuid/edit",
