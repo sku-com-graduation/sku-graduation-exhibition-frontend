@@ -3,8 +3,15 @@ import react from "@vitejs/plugin-react-swc";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+
+  // 배포용 dist에 로컬 주소가 박히면 운영에서 모든 API가 실패하므로 빌드를 멈춘다
+  if (command === "build" && /localhost|127\.0\.0\.1/.test(env.VITE_API_BASE_URL ?? "")) {
+    throw new Error(
+      `VITE_API_BASE_URL이 로컬 주소(${env.VITE_API_BASE_URL})입니다. .env.production 에 VITE_API_BASE_URL=/api 를 두고 다시 빌드하세요.`,
+    );
+  }
 
   return {
     plugins: [react(), tsconfigPaths()],

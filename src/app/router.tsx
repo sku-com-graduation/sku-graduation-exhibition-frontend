@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, type RouteObject } from "react-router-dom";
 import { getCurrentYear } from "@src/lib/exhibition";
 import NotFound from "@src/pages/NotFound";
+import RouteError from "./RouteError";
 import { RequireAdmin, RequireTeamOrAdmin } from "./guards";
 import RootLayout from "./RootLayout";
 
@@ -11,7 +12,7 @@ const routes: RouteObject[] = [
   {
     path: "/:year",
     element: <RootLayout />,
-    errorElement: <NotFound />,
+    errorElement: <RouteError />,
     hydrateFallbackElement: <div aria-busy="true" style={{ minHeight: "100vh" }} />,
     children: [
       { index: true, lazy: page(() => import("@src/pages/HomePage")) },
