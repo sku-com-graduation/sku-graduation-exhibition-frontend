@@ -1,0 +1,23 @@
+.box {
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.group {
+  display: flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box {
+    overflow-x: auto;
+  }
+
+  .group[aria-hidden="true"] {
+    display: none;
+  }
+}

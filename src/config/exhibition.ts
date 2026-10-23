@@ -22,8 +22,8 @@ export interface ExhibitionConfig {
   /** public/ 기준 경로. 없으면 작품 데이터로 만든 기본 포스터를 보여준다 */
   poster?: string;
   posterCredit?: string;
-  /** 전시 소개 인용문과 출처 */
-  quote?: { text: string; highlight?: string; by?: string };
+  /** 전시 소개 인용문. highlight는 text 안에서 강조할 부분, body는 옆에 붙는 설명 */
+  quote?: { text: string; highlight?: string; body?: string; by?: string };
   makers?: { note?: string; people: Maker[]; photos?: string[] };
 }
 
@@ -38,6 +38,7 @@ const EXHIBITIONS: Record<number, ExhibitionConfig> = {
 const DEFAULT_QUOTE: NonNullable<ExhibitionConfig["quote"]> = {
   text: "지난 4년간의 연구와 도전이 한 자리에 모인 전시입니다.",
   highlight: "한 자리에 모인",
+  body: "각 작품에는 학생들의 끊임없는 열정과 노력, 그리고 미래에 대한 꿈과 희망이 담겨 있으며, 이를 통해 혁신적인 아이디어와 기술 발전의 현장을 경험하실 수 있습니다.",
 };
 
 export const getExhibitionConfig = (year: number): ExhibitionConfig => {

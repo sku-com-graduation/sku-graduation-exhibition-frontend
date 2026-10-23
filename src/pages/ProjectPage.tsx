@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { getProjects } from "@api/team";
 import { IProject } from "@interface";
 import { categories, CategoryType } from "@constant/categorys";
-// import i1 from "@assets/image/i2.png";
 import empty from "@assets/image/main_image.png";
 
 const CategoryContainer = styled.div`
